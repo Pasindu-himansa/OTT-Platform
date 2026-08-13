@@ -1,0 +1,138 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+      radial-gradient(
+        ellipse at 30% 20%,
+        rgba(88, 86, 214, 0.08),
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse at 70% 80%,
+        rgba(255, 45, 85, 0.06),
+        transparent 50%
+      );
+    pointer-events: none;
+  }
+}
+
+.auth-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+
+  h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: var(--text-dim);
+    margin-bottom: 32px;
+  }
+}
+
+.auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+  font-size: 14px;
+  transition: 0.2s;
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.error-msg {
+  background: rgba(255, 45, 85, 0.1);
+  border: 1px solid rgba(255, 45, 85, 0.3);
+  color: #ff6b8a;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 14px;
+  bottom: 13px;
+  background: none;
+  color: var(--text-dim);
+  font-size: 15px;
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  a {
+    font-size: 14px;
+    transition: 0.2s;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.social-btns {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 500;
+  transition: 0.2s;
+  &:hover {
+    border-color: var(--text-dim);
+    background: var(--surface);
+  }
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--text-dim);
+}

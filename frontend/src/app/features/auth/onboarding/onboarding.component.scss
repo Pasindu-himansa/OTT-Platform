@@ -1,0 +1,78 @@
+.onboarding {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+  gap: 32px;
+}
+
+.onboard-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 500px;
+  animation: fadeUp 0.5s ease;
+
+  h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  p {
+    color: var(--text-dim);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+}
+
+.onboard-illustration {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 100px;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    border: 2px dashed var(--border);
+    animation: spinSlow 20s linear infinite;
+  }
+}
+
+.onboard-dots {
+  display: flex;
+  gap: 8px;
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    cursor: pointer;
+    transition: 0.3s;
+    &.active {
+      background: var(--accent);
+      width: 32px;
+      border-radius: 5px;
+    }
+  }
+}
+
+.onboard-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}

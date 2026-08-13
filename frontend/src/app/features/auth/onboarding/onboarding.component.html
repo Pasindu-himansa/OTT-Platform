@@ -1,0 +1,36 @@
+<div class="onboarding">
+  <div class="onboard-slide fade-up">
+    <div
+      class="onboard-illustration"
+      [style.background]="slides[current].color"
+    >
+      <i
+        class="fa-solid"
+        [class]="slides[current].icon"
+        [style.color]="slides[current].iconColor"
+      ></i>
+    </div>
+    <h2>{{ slides[current].title }}</h2>
+    <p>{{ slides[current].desc }}</p>
+  </div>
+
+  <div class="onboard-dots">
+    <div
+      *ngFor="let s of slides; let i = index"
+      class="dot"
+      [class.active]="i === current"
+      (click)="goTo(i)"
+    ></div>
+  </div>
+
+  <div class="onboard-actions">
+    <button class="btn btn-ghost" (click)="skip()">Skip</button>
+    <button class="btn btn-primary" (click)="next()">
+      {{ current === slides.length - 1 ? "Get Started" : "Next" }}
+      <i
+        class="fa-solid"
+        [class]="current === slides.length - 1 ? 'fa-rocket' : 'fa-arrow-right'"
+      ></i>
+    </button>
+  </div>
+</div>
