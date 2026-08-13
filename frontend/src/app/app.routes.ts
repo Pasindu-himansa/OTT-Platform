@@ -15,6 +15,14 @@ export const routes: Routes = [
       import('./features/home/home.component').then((m) => m.HomeComponent),
   },
   {
+    path: 'player',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/player/player.component').then(
+        (m) => m.PlayerComponent,
+      ),
+  },
+  {
     path: 'admin',
     canActivate: [authGuard],
     loadChildren: () =>

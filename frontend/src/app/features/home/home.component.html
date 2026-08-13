@@ -43,7 +43,7 @@
                 <div class="hero-actions">
                   <button
                     class="btn btn-primary btn-lg"
-                    (click)="openDetail(trendingCards[0])"
+                    (click)="playVideo(heroItems[heroIndex])"
                   >
                     <i class="fa-solid fa-play"></i>
                     {{ item.tag === "Live Now" ? "Watch Live" : "Play Now" }}
@@ -504,7 +504,10 @@
                 navigate treacherous alliances and impossible choices.
               </p>
               <div class="detail-actions">
-                <button class="btn btn-primary btn-lg">
+                <button
+                  class="btn btn-primary btn-lg"
+                  (click)="playVideo(selectedMovie)"
+                >
                   <i class="fa-solid fa-play"></i> Play Now
                 </button>
                 <button class="btn btn-secondary btn-lg">

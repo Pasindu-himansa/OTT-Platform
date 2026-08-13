@@ -401,6 +401,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loadRealData();
   }
 
+  playVideo(item: any): void {
+    this.router.navigate(['/player'], {
+      queryParams: {
+        title: item.title,
+        subtitle: item.meta,
+      },
+    });
+  }
+
   buildMockData(): void {
     const makeCard = (names: string[], offset = 0) =>
       names.map((name, i) => ({

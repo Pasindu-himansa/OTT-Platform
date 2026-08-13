@@ -1,0 +1,268 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  background: #000;
+}
+
+.player-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: #000;
+  overflow: hidden;
+  cursor: pointer;
+
+  &.hide-cursor {
+    cursor: none;
+  }
+}
+
+.video-el {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+// ─── Top bar ─────────────────────────────────────────────────
+.player-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  &.visible {
+    opacity: 1;
+  }
+}
+
+.player-title {
+  flex: 1;
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+  }
+  p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+// ─── Center play ─────────────────────────────────────────────
+.center-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 45, 85, 0.85);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 40px rgba(255, 45, 85, 0.4);
+  transition: transform 0.2s;
+  z-index: 10;
+
+  &:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+// ─── Bottom controls ─────────────────────────────────────────
+.player-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 24px 24px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  &.visible {
+    opacity: 1;
+  }
+}
+
+// ─── Progress bar ─────────────────────────────────────────────
+.progress-wrap {
+  position: relative;
+  margin-bottom: 12px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.progress-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  transition: height 0.2s;
+}
+
+.progress-buffered {
+  position: absolute;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.progress-played {
+  position: absolute;
+  height: 100%;
+  background: #ff2d55;
+  border-radius: 2px;
+}
+
+.progress-thumb {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: -7px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.progress-input {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 18px;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+  z-index: 2;
+
+  &:hover ~ .progress-track {
+    height: 6px;
+  }
+  &:hover ~ .progress-track .progress-thumb {
+    opacity: 1;
+  }
+}
+
+.progress-wrap:hover .progress-track {
+  height: 6px;
+}
+.progress-wrap:hover .progress-thumb {
+  opacity: 1;
+}
+
+// ─── Controls row ─────────────────────────────────────────────
+.controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.controls-left,
+.controls-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ctrl-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+  transition: 0.2s;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+  &.large {
+    font-size: 22px;
+  }
+
+  .seek-label {
+    position: absolute;
+    bottom: -2px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+  }
+}
+
+// ─── Volume ───────────────────────────────────────────────────
+.volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.volume-slider {
+  width: 80px;
+  height: 4px;
+  accent-color: #fff;
+  cursor: pointer;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
+}
+
+// ─── Time display ─────────────────────────────────────────────
+.time-display {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
+// ─── Quality ──────────────────────────────────────────────────
+.quality-select {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+
+  option {
+    background: #1a1a25;
+    color: #fff;
+  }
+}
