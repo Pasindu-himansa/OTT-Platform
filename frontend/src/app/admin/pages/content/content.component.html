@@ -1,0 +1,188 @@
+<div>
+  <div class="page-header">
+    <h2>Content Management</h2>
+    <button class="btn btn-primary btn-sm" (click)="showAddForm = !showAddForm">
+      <i class="fa-solid fa-plus"></i> Add Video
+    </button>
+  </div>
+
+  <!-- Add video form -->
+  @if (showAddForm) {
+    <div class="add-form">
+      <h3 style="margin-bottom: 20px">Add New Video</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Title</label>
+          <input
+            type="text"
+            [(ngModel)]="newVideo.title"
+            placeholder="Video title"
+          />
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select [(ngModel)]="newVideo.type">
+            <option value="movie">Movie</option>
+            <option value="series">Series</option>
+            <option value="episode">Episode</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select [(ngModel)]="newVideo.status">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Release Year</label>
+          <input type="number" [(ngModel)]="newVideo.releaseYear" />
+        </div>
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea
+            rows="3"
+            [(ngModel)]="newVideo.description"
+            placeholder="Description..."
+            style="width: 100%; resize: vertical"
+          ></textarea>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; margin-top: 16px">
+        <button
+          class="btn btn-primary"
+          [disabled]="saving"
+          (click)="saveVideo()"
+        >
+          {{ saving ? "Saving..." : "Save Video" }}
+        </button>
+        <button class="btn btn-secondary" (click)="showAddForm = false">
+          Cancel
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button
+      class="tab"
+      [class.active]="activeTab === 'videos'"
+      (click)="activeTab = 'videos'"
+    >
+      <i class="fa-solid fa-film"></i> Videos ({{ videos.length }})
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeTab === 'channels'"
+      (click)="activeTab = 'channels'"
+    >
+      <i class="fa-solid fa-tower-broadcast"></i> Channels ({{
+        channels.length
+      }})
+    </button>
+  </div>
+
+  <!-- Videos table -->
+  @if (activeTab === "videos") {
+    <div class="data-table-wrap">
+      @if (loading) {
+        <div style="padding: 40px; text-align: center; color: var(--text-dim)">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px"></i>
+        </div>
+      } @else if (videos.length === 0) {
+        <div style="padding: 40px; text-align: center; color: var(--text-dim)">
+          <i
+            class="fa-solid fa-film"
+            style="
+              font-size: 48px;
+              margin-bottom: 16px;
+              display: block;
+              color: var(--text-muted);
+            "
+          ></i>
+          <p>No videos yet. Add your first video above.</p>
+        </div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Views</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (v of videos; track v._id) {
+              <tr>
+                <td>{{ v.title }}</td>
+                <td style="text-transform: capitalize">{{ v.type }}</td>
+                <td>
+                  <span
+                    class="status-badge"
+                    [class.active]="v.status === 'published'"
+                    [class.pending]="v.status === 'draft'"
+                  >
+                    {{ v.status }}
+                  </span>
+                </td>
+                <td>{{ v.views || 0 }}</td>
+                <td>
+                  <button
+                    class="btn btn-sm btn-secondary"
+                    style="color: var(--accent)"
+                    (click)="deleteVideo(v._id)"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  <!-- Channels table -->
+  @if (activeTab === "channels") {
+    <div class="data-table-wrap">
+      @if (channels.length === 0) {
+        <div style="padding: 40px; text-align: center; color: var(--text-dim)">
+          No channels yet.
+        </div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Channel</th>
+              <th>Category</th>
+              <th>Language</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ch of channels; track ch._id) {
+              <tr>
+                <td>{{ ch.name }}</td>
+                <td>{{ ch.category }}</td>
+                <td>{{ ch.language }}</td>
+                <td>
+                  <span
+                    class="status-badge"
+                    [class.active]="ch.isActive"
+                    [class.inactive]="!ch.isActive"
+                  >
+                    {{ ch.isActive ? "Live" : "Offline" }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+</div>

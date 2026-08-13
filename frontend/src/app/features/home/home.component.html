@@ -708,6 +708,419 @@
           </div>
         </div>
       }
+
+      <!-- ══════════════ PROFILE ══════════════ -->
+      @if (activeSection === "profile") {
+        <div class="content-row">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              {{ profile?.name?.charAt(0) || "U" }}
+            </div>
+            <div class="profile-info">
+              <h2>{{ profile?.name || "User" }}</h2>
+              <p>{{ profile?.email }}</p>
+              <div class="profile-stats">
+                <div class="stat">
+                  <div class="stat-val">142</div>
+                  <div class="stat-label">Watched</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-val">23</div>
+                  <div class="stat-label">My List</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-val">5</div>
+                  <div class="stat-label">Downloads</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edit Profile -->
+          <div class="settings-section" style="margin-top: 24px">
+            <h3>Edit Profile</h3>
+            @if (profileSuccess) {
+              <div class="alert-success">
+                <i class="fa-solid fa-circle-check"></i> {{ profileSuccess }}
+              </div>
+            }
+            @if (profileError) {
+              <div class="alert-error">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                {{ profileError }}
+              </div>
+            }
+            <div class="setting-row">
+              <div class="label"><h4>Full Name</h4></div>
+              <input
+                type="text"
+                [(ngModel)]="profileName"
+                style="width: 240px"
+              />
+            </div>
+            <div class="setting-row">
+              <div class="label">
+                <h4>Email</h4>
+                <p>Cannot be changed</p>
+              </div>
+              <span style="color: var(--text-dim); font-size: 14px">{{
+                profile?.email
+              }}</span>
+            </div>
+            <div style="margin-top: 16px">
+              <button
+                class="btn btn-primary"
+                [disabled]="profileLoading"
+                (click)="saveProfile()"
+              >
+                <i class="fa-solid fa-save"></i>
+                {{ profileLoading ? "Saving..." : "Save Changes" }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Change Password -->
+          <div class="settings-section">
+            <h3>Change Password</h3>
+            @if (passwordSuccess) {
+              <div class="alert-success">
+                <i class="fa-solid fa-circle-check"></i> {{ passwordSuccess }}
+              </div>
+            }
+            @if (passwordError) {
+              <div class="alert-error">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                {{ passwordError }}
+              </div>
+            }
+            <div class="setting-row">
+              <div class="label"><h4>Current Password</h4></div>
+              <input
+                type="password"
+                [(ngModel)]="currentPassword"
+                placeholder="Enter current password"
+                style="width: 240px"
+              />
+            </div>
+            <div class="setting-row">
+              <div class="label"><h4>New Password</h4></div>
+              <input
+                type="password"
+                [(ngModel)]="newPassword"
+                placeholder="Enter new password"
+                style="width: 240px"
+              />
+            </div>
+            <div class="setting-row">
+              <div class="label"><h4>Confirm Password</h4></div>
+              <input
+                type="password"
+                [(ngModel)]="confirmNewPassword"
+                placeholder="Confirm new password"
+                style="width: 240px"
+              />
+            </div>
+            <div style="margin-top: 16px">
+              <button
+                class="btn btn-primary"
+                [disabled]="passwordLoading"
+                (click)="changePassword()"
+              >
+                <i class="fa-solid fa-lock"></i>
+                {{ passwordLoading ? "Changing..." : "Change Password" }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="settings-section">
+            <h3>Quick Links</h3>
+            <div
+              class="setting-row"
+              style="cursor: pointer"
+              (click)="onNavigate('subscription')"
+            >
+              <div class="label">
+                <h4>
+                  <i
+                    class="fa-solid fa-crown"
+                    style="color: var(--gold); margin-right: 8px"
+                  ></i>
+                  Subscription
+                </h4>
+                <p>
+                  {{
+                    mySubscription ? "Active plan" : "No active subscription"
+                  }}
+                </p>
+              </div>
+              <i
+                class="fa-solid fa-chevron-right"
+                style="color: var(--text-muted)"
+              ></i>
+            </div>
+            <div
+              class="setting-row"
+              style="cursor: pointer"
+              (click)="onNavigate('downloads')"
+            >
+              <div class="label">
+                <h4>
+                  <i
+                    class="fa-solid fa-download"
+                    style="color: var(--success); margin-right: 8px"
+                  ></i>
+                  Downloads
+                </h4>
+                <p>5 items</p>
+              </div>
+              <i
+                class="fa-solid fa-chevron-right"
+                style="color: var(--text-muted)"
+              ></i>
+            </div>
+            <div
+              class="setting-row"
+              style="cursor: pointer"
+              (click)="onNavigate('settings')"
+            >
+              <div class="label">
+                <h4>
+                  <i
+                    class="fa-solid fa-gear"
+                    style="color: var(--accent2); margin-right: 8px"
+                  ></i>
+                  Settings
+                </h4>
+                <p>App preferences</p>
+              </div>
+              <i
+                class="fa-solid fa-chevron-right"
+                style="color: var(--text-muted)"
+              ></i>
+            </div>
+          </div>
+
+          <button
+            class="btn btn-secondary"
+            style="margin-top: 8px"
+            (click)="authService.logout()"
+          >
+            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+          </button>
+        </div>
+      }
+
+      <!-- ══════════════ SUBSCRIPTION ══════════════ -->
+      @if (activeSection === "subscription") {
+        <div class="plans-container">
+          <h2>Choose Your Plan</h2>
+          <p class="plans-subtitle">Unlock the full OTT TV experience</p>
+
+          @if (subscriptionSuccess) {
+            <div
+              class="alert-success"
+              style="margin-bottom: 24px; max-width: 600px; margin-inline: auto"
+            >
+              <i class="fa-solid fa-circle-check"></i> {{ subscriptionSuccess }}
+            </div>
+          }
+          @if (subscriptionError) {
+            <div
+              class="alert-error"
+              style="margin-bottom: 24px; max-width: 600px; margin-inline: auto"
+            >
+              <i class="fa-solid fa-circle-exclamation"></i>
+              {{ subscriptionError }}
+            </div>
+          }
+
+          @if (mySubscription) {
+            <div class="active-sub-banner">
+              <i class="fa-solid fa-crown"></i>
+              <div>
+                <strong>You have an active subscription</strong>
+                <p>
+                  Expires: {{ mySubscription.endDate | date: "mediumDate" }}
+                </p>
+              </div>
+              <span class="status-badge active">Active</span>
+            </div>
+          }
+
+          <div
+            class="plans-grid"
+            style="
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: 24px;
+              margin-top: 32px;
+            "
+          >
+            @for (plan of plans; track plan.id) {
+              <div
+                class="plan-card"
+                [class.featured]="plan.slug === 'standard'"
+              >
+                @if (plan.slug === "standard") {
+                  <div class="plan-badge">Most Popular</div>
+                }
+                <h3>{{ plan.name }}</h3>
+                <div class="price">${{ plan.price }}<span>/mo</span></div>
+                <div class="plan-period">
+                  Billed monthly • {{ plan.durationDays }} days
+                </div>
+                <ul class="plan-features">
+                  @for (feature of plan.features; track feature) {
+                    <li><i class="fa-solid fa-check"></i> {{ feature }}</li>
+                  }
+                  <li>
+                    <i class="fa-solid fa-check"></i> Up to
+                    {{ plan.maxDevices }} device(s)
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-check"></i>
+                    {{ plan.maxQuality }} quality
+                  </li>
+                </ul>
+                <button
+                  class="btn btn-full"
+                  [class.btn-primary]="plan.slug === 'standard'"
+                  [class.btn-outline]="plan.slug !== 'standard'"
+                  [disabled]="subscriptionLoading"
+                  (click)="subscribePlan(plan.id)"
+                >
+                  {{ subscriptionLoading ? "Processing..." : "Select Plan" }}
+                </button>
+              </div>
+            }
+
+            <!-- Fallback if no plans from API -->
+            @if (plans.length === 0) {
+              <div class="plan-card">
+                <h3>Basic</h3>
+                <div class="price">$4.99<span>/mo</span></div>
+                <div class="plan-period">Billed monthly</div>
+                <ul class="plan-features">
+                  <li><i class="fa-solid fa-check"></i> 1 Device</li>
+                  <li><i class="fa-solid fa-check"></i> SD Quality</li>
+                  <li><i class="fa-solid fa-check"></i> No Ads</li>
+                </ul>
+                <button class="btn btn-outline btn-full">Select Plan</button>
+              </div>
+              <div class="plan-card featured">
+                <div class="plan-badge">Most Popular</div>
+                <h3>Standard</h3>
+                <div class="price">$9.99<span>/mo</span></div>
+                <div class="plan-period">Billed monthly</div>
+                <ul class="plan-features">
+                  <li><i class="fa-solid fa-check"></i> 2 Devices</li>
+                  <li><i class="fa-solid fa-check"></i> Full HD</li>
+                  <li><i class="fa-solid fa-check"></i> No Ads</li>
+                  <li><i class="fa-solid fa-check"></i> Downloads</li>
+                </ul>
+                <button class="btn btn-primary btn-full">Select Plan</button>
+              </div>
+              <div class="plan-card">
+                <h3>Premium</h3>
+                <div class="price">$14.99<span>/mo</span></div>
+                <div class="plan-period">Billed monthly</div>
+                <ul class="plan-features">
+                  <li><i class="fa-solid fa-check"></i> 4 Devices</li>
+                  <li><i class="fa-solid fa-check"></i> 4K Ultra HD</li>
+                  <li><i class="fa-solid fa-check"></i> No Ads</li>
+                  <li><i class="fa-solid fa-check"></i> Downloads</li>
+                  <li><i class="fa-solid fa-check"></i> Early Access</li>
+                </ul>
+                <button class="btn btn-outline btn-full">Select Plan</button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ══════════════ PAYMENT HISTORY ══════════════ -->
+      @if (activeSection === "payments") {
+        <div class="content-row">
+          <div class="content-row-header">
+            <h2 style="font-size: 28px">Payment History</h2>
+          </div>
+          @if (payments.length === 0) {
+            <div class="empty-state">
+              <i class="fa-solid fa-credit-card"></i>
+              <h3>No payments yet</h3>
+              <p>Your payment history will appear here</p>
+              <button
+                class="btn btn-primary"
+                (click)="onNavigate('subscription')"
+              >
+                View Plans
+              </button>
+            </div>
+          } @else {
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Plan</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (payment of payments; track payment.id) {
+                    <tr>
+                      <td>{{ payment.plan?.name || "Plan" }}</td>
+                      <td>${{ payment.amount }}</td>
+                      <td>{{ payment.method || "Card" }}</td>
+                      <td>
+                        <span class="status-badge" [class]="payment.status">
+                          {{ payment.status }}
+                        </span>
+                      </td>
+                      <td style="color: var(--text-dim)">
+                        {{ payment.createdAt | date: "mediumDate" }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ══════════════ NOTIFICATIONS ══════════════ -->
+      @if (activeSection === "notifications") {
+        <div class="content-row">
+          <div class="content-row-header">
+            <h2 style="font-size: 28px">Notifications</h2>
+            <a href="#" style="font-size: 14px; color: var(--accent)"
+              >Mark all as read</a
+            >
+          </div>
+          <div class="notif-list">
+            @for (n of notifications; track $index) {
+              <div class="notif-item" [class.unread]="n.unread">
+                <div
+                  class="notif-icon"
+                  [style.background]="n.color"
+                  [style.color]="n.iconColor"
+                >
+                  <i class="fa-solid" [class]="'fa-solid ' + n.icon"></i>
+                </div>
+                <div class="notif-content">
+                  <h4>{{ n.title }}</h4>
+                  <p>{{ n.desc }}</p>
+                  <div class="time">{{ n.time }}</div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
     </div>
     <!-- end content-body -->
   </div>

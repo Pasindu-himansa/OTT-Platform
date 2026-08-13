@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { VideoService } from '../../core/services/video.service';
+import { SubscriptionService } from '../../core/services/subscription.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -318,8 +320,77 @@ export class HomeComponent implements OnInit, OnDestroy {
     { name: 'Pedro Pascal', role: 'Captain', icon: 'fa-user-shield' },
   ];
 
+  // Profile
+  profile: any = null;
+  profileName = '';
+  profileLoading = false;
+  profileSuccess = '';
+  profileError = '';
+
+  // Password
+  currentPassword = '';
+  newPassword = '';
+  confirmNewPassword = '';
+  passwordLoading = false;
+  passwordSuccess = '';
+  passwordError = '';
+
+  // Subscription
+  plans: any[] = [];
+  mySubscription: any = null;
+  subscriptionLoading = false;
+  subscriptionSuccess = '';
+  subscriptionError = '';
+  selectedPlanId = '';
+
+  // Payment
+  payments: any[] = [];
+  selectedPaymentMethod = 'card';
+
+  // Notifications
+  notifications = [
+    {
+      icon: 'fa-film',
+      color: 'var(--accent-soft)',
+      iconColor: 'var(--accent)',
+      title: 'New Release: The Last Frontier',
+      desc: 'A new blockbuster movie is now available. Watch it now!',
+      time: '2 minutes ago',
+      unread: true,
+    },
+    {
+      icon: 'fa-crown',
+      color: 'var(--success-soft)',
+      iconColor: 'var(--success)',
+      title: 'Subscription Renewed',
+      desc: 'Your Premium plan has been renewed successfully.',
+      time: '1 hour ago',
+      unread: true,
+    },
+    {
+      icon: 'fa-tower-broadcast',
+      color: 'var(--accent2-soft)',
+      iconColor: 'var(--accent2)',
+      title: 'Live: Champions League Final',
+      desc: 'The match is starting now! Tap to watch live.',
+      time: '3 hours ago',
+      unread: true,
+    },
+    {
+      icon: 'fa-star',
+      color: 'var(--gold-soft)',
+      iconColor: 'var(--gold)',
+      title: 'Rate Your Watch',
+      desc: 'How was "Crimson Horizon"? Leave a rating.',
+      time: 'Yesterday',
+      unread: false,
+    },
+  ];
+
   constructor(
     private videoService: VideoService,
+    private subscriptionService: SubscriptionService,
+    public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -457,6 +528,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   onNavigate(section: string): void {
     this.activeSection = section;
     this.sidebarOpen = false;
+    if (section === 'profile') this.loadProfile();
+    if (section === 'subscription') {
+      this.loadPlans();
+      this.loadMySubscription();
+    }
+    if (section === 'payments') this.loadPayments();
     this.cdr.detectChanges();
   }
 
@@ -465,6 +542,107 @@ export class HomeComponent implements OnInit, OnDestroy {
     el.classList.toggle('on');
   }
 
+  loadProfile(): void {
+    this.subscriptionService.getProfile().subscribe({
+      next: (res) => {
+        this.profile = res.data.user;
+        this.profileName = res.data.user.name;
+      },
+      error: () => {},
+    });
+  }
+
+  saveProfile(): void {
+    this.profileLoading = true;
+    this.profileSuccess = '';
+    this.profileError = '';
+    this.subscriptionService
+      .updateProfile({ name: this.profileName })
+      .subscribe({
+        next: () => {
+          this.profileSuccess = 'Profile updated successfully';
+          this.profileLoading = false;
+        },
+        error: (err) => {
+          this.profileError = err.error?.message || 'Update failed';
+          this.profileLoading = false;
+        },
+      });
+  }
+
+  changePassword(): void {
+    if (this.newPassword !== this.confirmNewPassword) {
+      this.passwordError = 'Passwords do not match';
+      return;
+    }
+    this.passwordLoading = true;
+    this.passwordError = '';
+    this.passwordSuccess = '';
+    this.subscriptionService
+      .changePassword(this.currentPassword, this.newPassword)
+      .subscribe({
+        next: () => {
+          this.passwordSuccess = 'Password changed successfully';
+          this.passwordLoading = false;
+          this.currentPassword = '';
+          this.newPassword = '';
+          this.confirmNewPassword = '';
+        },
+        error: (err) => {
+          this.passwordError =
+            err.error?.message || 'Failed to change password';
+          this.passwordLoading = false;
+        },
+      });
+  }
+
+  loadPlans(): void {
+    this.subscriptionService.getPlans().subscribe({
+      next: (res) => {
+        this.plans = res.data.plans;
+      },
+      error: () => {},
+    });
+  }
+
+  loadMySubscription(): void {
+    this.subscriptionService.getMySubscription().subscribe({
+      next: (res) => {
+        this.mySubscription = res.data.subscription;
+      },
+      error: () => {},
+    });
+  }
+
+  subscribePlan(planId: string): void {
+    this.subscriptionLoading = true;
+    this.subscriptionError = '';
+    this.subscriptionSuccess = '';
+    this.subscriptionService.subscribe(planId).subscribe({
+      next: (res) => {
+        this.subscriptionSuccess = `Subscribed to ${res.data.subscription.planId} successfully!`;
+        this.subscriptionLoading = false;
+        this.loadMySubscription();
+      },
+      error: (err) => {
+        this.subscriptionError = err.error?.message || 'Subscription failed';
+        this.subscriptionLoading = false;
+      },
+    });
+  }
+
+  loadPayments(): void {
+    this.subscriptionService.getMyPayments().subscribe({
+      next: (res) => {
+        this.payments = res.data.payments;
+      },
+      error: () => {},
+    });
+  }
+
+  selectPaymentMethod(method: string): void {
+    this.selectedPaymentMethod = method;
+  }
   ngOnDestroy(): void {
     clearInterval(this.heroTimer);
   }

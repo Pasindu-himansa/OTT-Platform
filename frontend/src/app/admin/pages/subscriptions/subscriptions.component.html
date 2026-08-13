@@ -1,0 +1,108 @@
+<div>
+  <h2 style="margin-bottom: 24px">Subscriptions & Payments</h2>
+
+  <div class="tabs" style="margin-bottom: 16px">
+    <button
+      class="tab"
+      [class.active]="activeTab === 'subscriptions'"
+      (click)="activeTab = 'subscriptions'"
+    >
+      <i class="fa-solid fa-crown"></i> Subscriptions ({{ total }})
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeTab === 'payments'"
+      (click)="activeTab = 'payments'"
+    >
+      <i class="fa-solid fa-credit-card"></i> Payments ({{ payments.length }})
+    </button>
+  </div>
+
+  @if (activeTab === "subscriptions") {
+    <div class="data-table-wrap">
+      @if (loading) {
+        <div style="padding: 40px; text-align: center; color: var(--text-dim)">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px"></i>
+        </div>
+      } @else {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Plan</th>
+              <th>Status</th>
+              <th>Start</th>
+              <th>End</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (sub of subscriptions; track sub.id) {
+              <tr>
+                <td style="color: var(--text-dim); font-size: 12px">
+                  {{ sub.userId | slice: 0 : 8 }}...
+                </td>
+                <td>{{ sub.plan?.name || sub.planId }}</td>
+                <td>
+                  <span
+                    class="status-badge"
+                    [class.active]="sub.status === 'active'"
+                    [class.inactive]="sub.status === 'cancelled'"
+                    [class.pending]="sub.status === 'expired'"
+                  >
+                    {{ sub.status }}
+                  </span>
+                </td>
+                <td style="color: var(--text-dim)">
+                  {{ sub.startDate | date: "mediumDate" }}
+                </td>
+                <td style="color: var(--text-dim)">
+                  {{ sub.endDate | date: "mediumDate" }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  @if (activeTab === "payments") {
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of payments; track p.id) {
+            <tr>
+              <td style="color: var(--text-dim); font-size: 12px">
+                {{ p.userId | slice: 0 : 8 }}...
+              </td>
+              <td>${{ p.amount }}</td>
+              <td>{{ p.method || "Card" }}</td>
+              <td>
+                <span
+                  class="status-badge"
+                  [class.active]="p.status === 'success'"
+                  [class.inactive]="p.status === 'failed'"
+                  [class.pending]="p.status === 'pending'"
+                >
+                  {{ p.status }}
+                </span>
+              </td>
+              <td style="color: var(--text-dim)">
+                {{ p.createdAt | date: "mediumDate" }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

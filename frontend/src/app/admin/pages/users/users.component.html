@@ -1,0 +1,110 @@
+<div>
+  <div class="page-header">
+    <h2>Users Management</h2>
+    <div class="header-actions">
+      <input
+        type="text"
+        placeholder="Search users..."
+        [(ngModel)]="searchQuery"
+        style="
+          padding: 8px 16px;
+          font-size: 13px;
+          width: 220px;
+          border-radius: 8px;
+        "
+      />
+    </div>
+  </div>
+
+  <div class="data-table-wrap">
+    <div class="data-table-header">
+      <h3>All Users ({{ total }})</h3>
+    </div>
+
+    @if (loading) {
+      <div style="padding: 40px; text-align: center; color: var(--text-dim)">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px"></i>
+        <p style="margin-top: 12px">Loading users...</p>
+      </div>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of filteredUsers; track user.id) {
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div
+                    class="avatar-sm"
+                    style="
+                      background: linear-gradient(135deg, #ff2d55, #5856d6);
+                    "
+                  >
+                    {{ user.name?.charAt(0) }}
+                  </div>
+                  {{ user.name }}
+                </div>
+              </td>
+              <td style="color: var(--text-dim)">{{ user.email }}</td>
+              <td>
+                <span class="role-badge" [class]="user.role">{{
+                  user.role
+                }}</span>
+              </td>
+              <td>
+                <span
+                  class="status-badge"
+                  [class.active]="user.isActive"
+                  [class.inactive]="!user.isActive"
+                >
+                  {{ user.isActive ? "Active" : "Inactive" }}
+                </span>
+              </td>
+              <td style="color: var(--text-dim)">
+                {{ user.createdAt | date: "mediumDate" }}
+              </td>
+              <td>
+                <button
+                  class="btn btn-sm btn-secondary"
+                  (click)="toggleStatus(user)"
+                >
+                  {{ user.isActive ? "Deactivate" : "Activate" }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button
+          class="btn btn-sm btn-secondary"
+          [disabled]="page === 1"
+          (click)="prevPage()"
+        >
+          <i class="fa-solid fa-chevron-left"></i> Prev
+        </button>
+        <span style="color: var(--text-dim); font-size: 14px"
+          >Page {{ page }} of {{ totalPages }}</span
+        >
+        <button
+          class="btn btn-sm btn-secondary"
+          [disabled]="page === totalPages"
+          (click)="nextPage()"
+        >
+          Next <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,6 +1,8 @@
 .sidebar {
   width: var(--sidebar-w);
   min-height: 100vh;
+  height: 100vh; // add this
+  overflow: hidden; // add this
   background: var(--bg-alt);
   border-right: 1px solid var(--border);
   display: flex;
@@ -35,6 +37,7 @@
   flex: 1;
   padding: 16px 12px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .sidebar-section {

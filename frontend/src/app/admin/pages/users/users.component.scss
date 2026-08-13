@@ -1,0 +1,51 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  h2 {
+    font-size: 28px;
+    font-weight: 700;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.role-badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  &.admin {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  &.subscriber {
+    background: var(--accent2-soft);
+    color: var(--accent2);
+  }
+  &.content_manager {
+    background: var(--gold-soft);
+    color: var(--gold);
+  }
+  &.guest {
+    background: var(--surface);
+    color: var(--text-muted);
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}

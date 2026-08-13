@@ -1,0 +1,100 @@
+<div class="dashboard">
+  <h2 style="margin-bottom: 24px">Dashboard Overview</h2>
+
+  <!-- Stats grid -->
+  <div class="stats-grid">
+    @for (stat of stats; track stat.label) {
+      <div class="stat-card">
+        <div
+          class="stat-icon"
+          [style.background]="stat.color"
+          [style.color]="stat.iconColor"
+        >
+          <i class="fa-solid" [class]="'fa-solid ' + stat.icon"></i>
+        </div>
+        <h4>{{ stat.label }}</h4>
+        <div class="stat-number">{{ stat.value }}</div>
+        <div class="stat-change" [class.up]="stat.up" [class.down]="!stat.up">
+          <i
+            class="fa-solid"
+            [class]="
+              stat.up ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'
+            "
+          ></i>
+          {{ stat.change }} this month
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Recent activity -->
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <h3>Recent Activity</h3>
+        <a routerLink="../users" style="font-size: 14px; color: var(--accent)"
+          >View All</a
+        >
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Action</th>
+            <th>Details</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of recentActivity; track $index) {
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="avatar-sm" [style.background]="a.color">
+                    {{ a.avatar }}
+                  </div>
+                  {{ a.user }}
+                </div>
+              </td>
+              <td>{{ a.action }}</td>
+              <td style="color: var(--text-dim)">{{ a.detail }}</td>
+              <td style="color: var(--text-muted)">{{ a.time }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Top content -->
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <h3>Top Content</h3>
+        <a routerLink="../content" style="font-size: 14px; color: var(--accent)"
+          >View All</a
+        >
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Views</th>
+            <th>Trend</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of topContent; track c.rank) {
+            <tr>
+              <td style="color: var(--text-muted)">{{ c.rank }}</td>
+              <td>{{ c.title }}</td>
+              <td>{{ c.views }}</td>
+              <td [style.color]="c.up ? 'var(--success)' : 'var(--live)'">
+                {{ c.trend }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
