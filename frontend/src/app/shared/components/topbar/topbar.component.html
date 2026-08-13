@@ -1,0 +1,30 @@
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="menu-toggle" (click)="menuToggled.emit()">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+
+  <div class="topbar-search">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input
+      type="text"
+      placeholder="Search movies, shows, channels..."
+      [(ngModel)]="searchQuery"
+      (keyup.enter)="onSearch()"
+    />
+  </div>
+
+  <div class="topbar-right">
+    <button class="topbar-btn" (click)="sectionChanged.emit('search')">
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
+    <button class="topbar-btn">
+      <i class="fa-solid fa-bell"></i>
+      <span class="notif-dot"></span>
+    </button>
+    <button class="topbar-btn" (click)="sectionChanged.emit('profile')">
+      <i class="fa-solid fa-user-circle"></i>
+    </button>
+  </div>
+</div>

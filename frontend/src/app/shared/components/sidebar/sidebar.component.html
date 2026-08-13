@@ -1,0 +1,133 @@
+<nav class="sidebar" [class.open]="isOpen">
+  <div class="sidebar-brand">
+    <i class="fa-solid fa-play"></i>
+    <span>OTT TV</span>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Menu</div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'home'"
+        (click)="go('home')"
+      >
+        <i class="fa-solid fa-house"></i> Home
+      </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'live-tv'"
+        (click)="go('live-tv')"
+      >
+        <i class="fa-solid fa-tower-broadcast"></i> Live TV
+        <span class="badge">Live</span>
+      </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'epg'"
+        (click)="go('epg')"
+      >
+        <i class="fa-solid fa-calendar-days"></i> TV Guide
+      </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'movies'"
+        (click)="go('movies')"
+      >
+        <i class="fa-solid fa-film"></i> Movies
+      </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'tvshows'"
+        (click)="go('tvshows')"
+      >
+        <i class="fa-solid fa-tv"></i> TV Shows
+      </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'sports'"
+        (click)="go('sports')"
+      >
+        <i class="fa-solid fa-football"></i> Sports
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Library</div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'search'"
+        (click)="go('search')"
+      >
+        <i class="fa-solid fa-magnifying-glass"></i> Search
+      </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'categories'"
+        (click)="go('categories')"
+      >
+        <i class="fa-solid fa-layer-group"></i> Categories
+      </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'mylist'"
+        (click)="go('mylist')"
+      >
+        <i class="fa-solid fa-bookmark"></i> My List
+      </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'downloads'"
+        (click)="go('downloads')"
+      >
+        <i class="fa-solid fa-download"></i> Downloads
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Account</div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'subscription'"
+        (click)="go('subscription')"
+      >
+        <i class="fa-solid fa-crown"></i> Subscription
+      </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'profile'"
+        (click)="go('profile')"
+      >
+        <i class="fa-solid fa-user"></i> Profile
+      </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'settings'"
+        (click)="go('settings')"
+      >
+        <i class="fa-solid fa-gear"></i> Settings
+      </div>
+      @if (authService.isAdmin) {
+        <div class="sidebar-link" (click)="go('admin')">
+          <i class="fa-solid fa-shield-halved"></i> Admin
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="avatar">
+      {{ authService.currentUser?.name?.charAt(0) | uppercase }}
+    </div>
+    <div class="info">
+      <div class="name">{{ authService.currentUser?.name }}</div>
+      <div class="plan"><i class="fa-solid fa-crown"></i> Premium</div>
+    </div>
+    <button (click)="logout()" title="Logout">
+      <i
+        class="fa-solid fa-right-from-bracket"
+        style="color: var(--text-muted)"
+      ></i>
+    </button>
+  </div>
+</nav>

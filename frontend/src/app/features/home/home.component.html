@@ -1,0 +1,190 @@
+<!-- Overlay -->
+<div class="overlay" [class.show]="sidebarOpen" (click)="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<app-sidebar
+  [isOpen]="sidebarOpen"
+  [activeSection]="activeSection"
+  (closed)="closeSidebar()"
+  (navigate)="onNavigate($event)"
+/>
+
+<!-- Main -->
+<div class="main-content">
+  <app-topbar
+    [activeSection]="activeSection"
+    (menuToggled)="toggleSidebar()"
+    (sectionChanged)="onNavigate($event)"
+  />
+
+  <div class="content-body">
+    <!-- ── Hero Slider ── -->
+    <div class="hero">
+      @for (item of heroItems; track $index) {
+        <div class="hero-slide" [class.active]="$index === heroIndex">
+          <div class="hero-bg" [style.background]="item.gradient"></div>
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <div class="hero-tag">
+              @if (item.tag === "Live Now") {
+                <span class="live-dot"></span>
+              }
+              {{ item.tag }}
+            </div>
+            <h1>{{ item.title }}</h1>
+            <div class="hero-meta">
+              @if (item.rating) {
+                <span class="rating"
+                  ><i class="fa-solid fa-star"></i> {{ item.rating }}</span
+                >
+              }
+              <span>{{ item.meta }}</span>
+            </div>
+            <p>{{ item.desc }}</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-play"></i>
+                {{ item.tag === "Live Now" ? "Watch Live" : "Play Now" }}
+              </button>
+              <button class="btn btn-secondary btn-lg">
+                <i class="fa-solid fa-info-circle"></i> More Info
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+      <div class="hero-dots">
+        @for (item of heroItems; track $index) {
+          <div
+            class="dot"
+            [class.active]="$index === heroIndex"
+            (click)="setHero($index)"
+          ></div>
+        }
+      </div>
+    </div>
+
+    <!-- ── Continue Watching ── -->
+    <div class="content-row">
+      <div class="content-row-header">
+        <h3>Continue Watching</h3>
+        <a href="#">See All</a>
+      </div>
+      <div class="card-scroll">
+        @for (item of continueCards; track $index) {
+          <div class="card card-wide">
+            <div class="card-img" style="width: 320px; height: 180px">
+              <div class="poster" [style.background]="item.gradient">
+                {{ item.emoji }}
+              </div>
+              <div class="card-overlay">
+                <div class="play-btn">
+                  <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+                </div>
+              </div>
+              <div class="progress-bar-bottom">
+                <div
+                  class="progress-fill"
+                  [style.width.%]="item.progress"
+                ></div>
+              </div>
+            </div>
+            <div class="card-info">
+              <h4>{{ item.title }}</h4>
+              <p>{{ item.meta }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ── Trending Now ── -->
+    <div class="content-row">
+      <div class="content-row-header">
+        <h3>Trending Now</h3>
+        <a href="#">See All</a>
+      </div>
+      <div class="card-scroll">
+        @for (item of trendingCards; track $index) {
+          <div class="card">
+            <div class="card-img">
+              <div class="poster" [style.background]="item.gradient">
+                {{ item.emoji }}
+              </div>
+              <div class="card-overlay">
+                <div class="play-btn">
+                  <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+                </div>
+              </div>
+              @if (item.badge) {
+                <span class="card-badge" [class]="item.badge">{{
+                  item.badge
+                }}</span>
+              }
+            </div>
+            <div class="card-info">
+              <h4>{{ item.title }}</h4>
+              <p>{{ item.meta }}</p>
+              <div class="card-rating">
+                <i class="fa-solid fa-star"></i> {{ item.rating }}
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ── Live Channels ── -->
+    <div class="content-row">
+      <div class="content-row-header">
+        <h3>Live Channels</h3>
+        <a href="#" (click)="onNavigate('live-tv')">See All</a>
+      </div>
+      <div class="card-scroll">
+        @for (ch of liveChannels; track $index) {
+          <div class="live-card">
+            <div class="channel-icon" [style.background]="ch.color">
+              {{ ch.icon }}
+            </div>
+            <h4>{{ ch.name }}</h4>
+            <p>{{ ch.cat }}</p>
+            @if (ch.live) {
+              <div class="live-indicator"><span class="dot"></span> LIVE</div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ── Popular Movies ── -->
+    <div class="content-row">
+      <div class="content-row-header">
+        <h3>Popular Movies</h3>
+        <a href="#" (click)="onNavigate('movies')">See All</a>
+      </div>
+      <div class="card-scroll">
+        @for (item of popularMovies; track $index) {
+          <div class="card">
+            <div class="card-img">
+              <div class="poster" [style.background]="item.gradient">
+                {{ item.emoji }}
+              </div>
+              <div class="card-overlay">
+                <div class="play-btn">
+                  <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+                </div>
+              </div>
+            </div>
+            <div class="card-info">
+              <h4>{{ item.title }}</h4>
+              <p>{{ item.meta }}</p>
+              <div class="card-rating">
+                <i class="fa-solid fa-star"></i> {{ item.rating }}
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
