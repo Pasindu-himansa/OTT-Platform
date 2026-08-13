@@ -62,6 +62,8 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.initPlayer();
+    // Auto hide controls after 3 seconds
+    this.showControlsTemporarily();
   }
 
   initPlayer(): void {
