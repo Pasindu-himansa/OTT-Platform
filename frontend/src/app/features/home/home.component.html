@@ -1,190 +1,716 @@
-<!-- Overlay -->
 <div class="overlay" [class.show]="sidebarOpen" (click)="closeSidebar()"></div>
 
-<!-- Sidebar -->
-<app-sidebar
-  [isOpen]="sidebarOpen"
-  [activeSection]="activeSection"
-  (closed)="closeSidebar()"
-  (navigate)="onNavigate($event)"
-/>
-
-<!-- Main -->
-<div class="main-content">
-  <app-topbar
+<div class="app-wrapper">
+  <app-sidebar
+    [isOpen]="sidebarOpen"
     [activeSection]="activeSection"
-    (menuToggled)="toggleSidebar()"
-    (sectionChanged)="onNavigate($event)"
+    (closed)="closeSidebar()"
+    (navigate)="onNavigate($event)"
   />
 
-  <div class="content-body">
-    <!-- ── Hero Slider ── -->
-    <div class="hero">
-      @for (item of heroItems; track $index) {
-        <div class="hero-slide" [class.active]="$index === heroIndex">
-          <div class="hero-bg" [style.background]="item.gradient"></div>
-          <div class="hero-overlay"></div>
-          <div class="hero-content">
-            <div class="hero-tag">
-              @if (item.tag === "Live Now") {
-                <span class="live-dot"></span>
-              }
-              {{ item.tag }}
+  <div class="main-content">
+    <app-topbar
+      [activeSection]="activeSection"
+      (menuToggled)="toggleSidebar()"
+      (sectionChanged)="onNavigate($event)"
+    />
+
+    <div class="content-body">
+      <!-- ══════════════ HOME ══════════════ -->
+      @if (activeSection === "home") {
+        <div class="hero">
+          @for (item of heroItems; track $index) {
+            <div class="hero-slide" [class.active]="$index === heroIndex">
+              <div class="hero-bg" [style.background]="item.gradient"></div>
+              <div class="hero-overlay"></div>
+              <div class="hero-content">
+                <div class="hero-tag">
+                  @if (item.tag === "Live Now") {
+                    <span class="live-dot"></span>
+                  }
+                  {{ item.tag }}
+                </div>
+                <h1>{{ item.title }}</h1>
+                <div class="hero-meta">
+                  @if (item.rating) {
+                    <span class="rating"
+                      ><i class="fa-solid fa-star"></i> {{ item.rating }}</span
+                    >
+                  }
+                  <span>{{ item.meta }}</span>
+                </div>
+                <p>{{ item.desc }}</p>
+                <div class="hero-actions">
+                  <button
+                    class="btn btn-primary btn-lg"
+                    (click)="openDetail(trendingCards[0])"
+                  >
+                    <i class="fa-solid fa-play"></i>
+                    {{ item.tag === "Live Now" ? "Watch Live" : "Play Now" }}
+                  </button>
+                  <button class="btn btn-secondary btn-lg">
+                    <i class="fa-solid fa-info-circle"></i> More Info
+                  </button>
+                </div>
+              </div>
             </div>
-            <h1>{{ item.title }}</h1>
-            <div class="hero-meta">
-              @if (item.rating) {
-                <span class="rating"
-                  ><i class="fa-solid fa-star"></i> {{ item.rating }}</span
+          }
+          <div class="hero-dots">
+            @for (item of heroItems; track $index) {
+              <div
+                class="dot"
+                [class.active]="$index === heroIndex"
+                (click)="setHero($index)"
+              ></div>
+            }
+          </div>
+        </div>
+
+        <div class="content-row">
+          <div class="content-row-header">
+            <h3>Continue Watching</h3>
+            <a href="#">See All</a>
+          </div>
+          <div class="card-scroll">
+            @for (item of continueCards; track $index) {
+              <div class="card card-wide" (click)="openDetail(item)">
+                <div class="card-img wide">
+                  <div class="poster" [style.background]="item.gradient">
+                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
+                  </div>
+                  <div class="card-overlay">
+                    <div class="play-btn">
+                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+                    </div>
+                  </div>
+                  <div class="progress-bar-bottom">
+                    <div
+                      class="progress-fill"
+                      [style.width.%]="item.progress"
+                    ></div>
+                  </div>
+                </div>
+                <div class="card-info">
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.meta }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="content-row">
+          <div class="content-row-header">
+            <h3>Trending Now</h3>
+            <a href="#" (click)="onNavigate('movies')">See All</a>
+          </div>
+          <div class="card-scroll">
+            @for (item of trendingCards; track $index) {
+              <div class="card" (click)="openDetail(item)">
+                <div class="card-img">
+                  <div class="poster" [style.background]="item.gradient">
+                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
+                  </div>
+                  <div class="card-overlay">
+                    <div class="play-btn">
+                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+                    </div>
+                  </div>
+                  @if (item.badge) {
+                    <span class="card-badge" [class]="item.badge">{{
+                      item.badge
+                    }}</span>
+                  }
+                </div>
+                <div class="card-info">
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.meta }}</p>
+                  <div class="card-rating">
+                    <i class="fa-solid fa-star"></i> {{ item.rating }}
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="content-row">
+          <div class="content-row-header">
+            <h3>Live Channels</h3>
+            <a href="#" (click)="onNavigate('live-tv')">See All</a>
+          </div>
+          <div class="card-scroll">
+            @for (ch of liveChannels; track $index) {
+              <div class="live-card" (click)="onNavigate('live-tv')">
+                <div class="channel-icon" [style.background]="ch.color">
+                  <i class="fa-solid" [class]="'fa-solid ' + ch.icon"></i>
+                </div>
+                <h4>{{ ch.name }}</h4>
+                <p>{{ ch.cat }}</p>
+                @if (ch.live) {
+                  <div class="live-indicator">
+                    <span class="dot"></span> LIVE
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="content-row">
+          <div class="content-row-header">
+            <h3>Popular Movies</h3>
+            <a href="#" (click)="onNavigate('movies')">See All</a>
+          </div>
+          <div class="card-scroll">
+            @for (item of popularMovies; track $index) {
+              <div class="card" (click)="openDetail(item)">
+                <div class="card-img">
+                  <div class="poster" [style.background]="item.gradient">
+                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
+                  </div>
+                  <div class="card-overlay">
+                    <div class="play-btn">
+                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-info">
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.meta }}</p>
+                  <div class="card-rating">
+                    <i class="fa-solid fa-star"></i> {{ item.rating }}
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="content-row" style="padding-bottom: 40px">
+          <div class="content-row-header">
+            <h3>New Releases</h3>
+            <a href="#" (click)="onNavigate('tvshows')">See All</a>
+          </div>
+          <div class="card-scroll">
+            @for (item of newReleases; track $index) {
+              <div class="card" (click)="openDetail(item)">
+                <div class="card-img">
+                  <div class="poster" [style.background]="item.gradient">
+                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
+                  </div>
+                  <div class="card-overlay">
+                    <div class="play-btn">
+                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+                    </div>
+                  </div>
+                  <span class="card-badge new">new</span>
+                </div>
+                <div class="card-info">
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.meta }}</p>
+                  <div class="card-rating">
+                    <i class="fa-solid fa-star"></i> {{ item.rating }}
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ══════════════ LIVE TV ══════════════ -->
+      @if (activeSection === "live-tv") {
+        <div class="content-row">
+          <div class="content-row-header">
+            <h2 style="font-size: 28px">Live TV</h2>
+          </div>
+          <div class="filter-row">
+            @for (f of channelFilters; track f) {
+              <button
+                class="btn btn-sm"
+                [class.btn-primary]="channelFilter === f"
+                [class.btn-secondary]="channelFilter !== f"
+                (click)="filterChannels(f)"
+              >
+                {{ f }}
+              </button>
+            }
+          </div>
+          <div class="channels-grid">
+            @for (ch of filteredChannels; track $index) {
+              <div class="live-card" style="width: auto">
+                <div class="channel-icon" [style.background]="ch.color">
+                  <i class="fa-solid" [class]="'fa-solid ' + ch.icon"></i>
+                </div>
+                <h4>{{ ch.name }}</h4>
+                <p>{{ ch.cat }}</p>
+                @if (ch.live) {
+                  <div class="live-indicator">
+                    <span class="dot"></span> LIVE
+                  </div>
+                } @else {
+                  <div
+                    style="
+                      color: var(--text-muted);
+                      font-size: 11px;
+                      margin-top: 8px;
+                    "
+                  >
+                    Offline
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ══════════════ MOVIES ══════════════ -->
+      @if (activeSection === "movies") {
+        <div class="content-row">
+          <div class="content-row-header">
+            <h2 style="font-size: 28px">Movies</h2>
+          </div>
+          <div class="filter-row">
+            @for (f of movieFilters; track f) {
+              <button
+                class="btn btn-sm"
+                [class.btn-primary]="movieFilter === f"
+                [class.btn-secondary]="movieFilter !== f"
+                (click)="filterMovies(f)"
+              >
+                {{ f }}
+              </button>
+            }
+          </div>
+          <div class="search-grid">
+            @for (item of filteredMovies; track $index) {
+              <div class="card grid-card" (click)="openDetail(item)">
+                <div class="card-img grid-img">
+                  <div class="poster" [style.background]="item.gradient">
+                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
+                  </div>
+                  <div class="card-overlay">
+                    <div class="play-btn">
+                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+                    </div>
+                  </div>
+                  @if (item.badge) {
+                    <span class="card-badge" [class]="item.badge">{{
+                      item.badge
+                    }}</span>
+                  }
+                </div>
+                <div class="card-info">
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.meta }}</p>
+                  <div class="card-rating">
+                    <i class="fa-solid fa-star"></i> {{ item.rating }}
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ══════════════ TV SHOWS ══════════════ -->
+      @if (activeSection === "tvshows") {
+        <div class="content-row">
+          <div class="content-row-header">
+            <h2 style="font-size: 28px">TV Shows</h2>
+          </div>
+          <div class="filter-row">
+            @for (f of showFilters; track f) {
+              <button
+                class="btn btn-sm"
+                [class.btn-primary]="showFilter === f"
+                [class.btn-secondary]="showFilter !== f"
+                (click)="filterShows(f)"
+              >
+                {{ f }}
+              </button>
+            }
+          </div>
+          <div class="search-grid">
+            @for (item of filteredShows; track $index) {
+              <div class="card grid-card" (click)="openDetail(item)">
+                <div class="card-img grid-img">
+                  <div class="poster" [style.background]="item.gradient">
+                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
+                  </div>
+                  <div class="card-overlay">
+                    <div class="play-btn">
+                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-info">
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.meta }}</p>
+                  <div class="card-rating">
+                    <i class="fa-solid fa-star"></i> {{ item.rating }}
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ══════════════ SEARCH ══════════════ -->
+      @if (activeSection === "search") {
+        <div class="search-hero">
+          <h2>What are you looking for?</h2>
+          <div class="search-input-lg">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+              type="text"
+              placeholder="Search movies, shows, channels..."
+              [(ngModel)]="searchQuery"
+              (input)="onSearch()"
+              (keyup.enter)="onSearch()"
+            />
+          </div>
+        </div>
+        <div class="content-row">
+          @if (!hasSearched) {
+            <h3 style="margin-bottom: 16px; color: var(--text-dim)">
+              Popular Searches
+            </h3>
+            <div class="filter-row" style="margin-bottom: 32px">
+              @for (
+                tag of [
+                  "Action Movies",
+                  "Live News",
+                  "Comedy Shows",
+                  "Sports",
+                  "Documentaries",
+                ];
+                track tag
+              ) {
+                <button
+                  class="btn btn-secondary btn-sm"
+                  (click)="searchQuery = tag; onSearch()"
                 >
+                  {{ tag }}
+                </button>
               }
-              <span>{{ item.meta }}</span>
             </div>
-            <p>{{ item.desc }}</p>
-            <div class="hero-actions">
-              <button class="btn btn-primary btn-lg">
-                <i class="fa-solid fa-play"></i>
-                {{ item.tag === "Live Now" ? "Watch Live" : "Play Now" }}
-              </button>
-              <button class="btn btn-secondary btn-lg">
-                <i class="fa-solid fa-info-circle"></i> More Info
-              </button>
+          }
+          <h3 style="margin-bottom: 16px">
+            {{
+              hasSearched ? 'Results for "' + searchQuery + '"' : "Browse All"
+            }}
+          </h3>
+          <div class="search-grid">
+            @for (item of searchResults; track $index) {
+              <div class="card grid-card" (click)="openDetail(item)">
+                <div class="card-img grid-img">
+                  <div class="poster" [style.background]="item.gradient">
+                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
+                  </div>
+                  <div class="card-overlay">
+                    <div class="play-btn">
+                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-info">
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.meta }}</p>
+                  <div class="card-rating">
+                    <i class="fa-solid fa-star"></i> {{ item.rating }}
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ══════════════ CATEGORIES ══════════════ -->
+      @if (activeSection === "categories") {
+        <div class="content-row">
+          <div class="content-row-header">
+            <h2 style="font-size: 28px">Categories</h2>
+          </div>
+        </div>
+        <div class="categories-grid">
+          @for (cat of categories; track $index) {
+            <div class="category-card" (click)="onNavigate('movies')">
+              <div class="cat-bg" [style.background]="cat.gradient"></div>
+              <div class="cat-overlay">
+                <div>
+                  <h3>{{ cat.name }}</h3>
+                  <span>{{ cat.count }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ══════════════ MOVIE DETAIL ══════════════ -->
+      @if (activeSection === "detail" && selectedMovie) {
+        <div class="detail-hero">
+          <div
+            class="hero-bg"
+            [style.background]="selectedMovie.gradient"
+          ></div>
+          <div class="hero-overlay"></div>
+          <div class="detail-info">
+            <div class="detail-poster">
+              <div
+                class="poster"
+                [style.background]="selectedMovie.gradient"
+                style="
+                  width: 100%;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                <i
+                  class="fa-solid"
+                  [class]="'fa-solid ' + selectedMovie.emoji"
+                  style="font-size: 64px; color: rgba(255, 255, 255, 0.9)"
+                ></i>
+              </div>
+            </div>
+            <div class="detail-text">
+              <h1>{{ selectedMovie.title }}</h1>
+              <div class="detail-meta">
+                <span class="rating"
+                  ><i class="fa-solid fa-star"></i>
+                  {{ selectedMovie.rating }}</span
+                >
+                <span class="dot-sep"></span>
+                <span>{{ selectedMovie.meta }}</span>
+                <span class="dot-sep"></span>
+                <span>4K UHD</span>
+              </div>
+              <div class="detail-tags">
+                <span class="tag">Action</span>
+                <span class="tag">Thriller</span>
+                <span class="tag">Sci-Fi</span>
+              </div>
+              <p class="synopsis">
+                In a dystopian future where humanity's last survivors live in
+                floating cities, a rogue pilot discovers a conspiracy that
+                threatens to destroy everything. With time running out, she must
+                navigate treacherous alliances and impossible choices.
+              </p>
+              <div class="detail-actions">
+                <button class="btn btn-primary btn-lg">
+                  <i class="fa-solid fa-play"></i> Play Now
+                </button>
+                <button class="btn btn-secondary btn-lg">
+                  <i class="fa-solid fa-plus"></i> My List
+                </button>
+                <button class="btn btn-secondary btn-lg">
+                  <i class="fa-solid fa-share-nodes"></i> Share
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-body">
+          <div class="detail-section">
+            <h3>Cast & Crew</h3>
+            <div class="cast-grid">
+              @for (c of cast; track $index) {
+                <div class="cast-card">
+                  <div
+                    class="cast-avatar"
+                    [style.background]="gradients[$index]"
+                  >
+                    <i class="fa-solid" [class]="'fa-solid ' + c.icon"></i>
+                  </div>
+                  <div class="name">{{ c.name }}</div>
+                  <div class="role">{{ c.role }}</div>
+                </div>
+              }
+            </div>
+          </div>
+          <div class="detail-section">
+            <h3>More Like This</h3>
+            <div class="card-scroll">
+              @for (item of trendingCards.slice(0, 6); track $index) {
+                <div class="card" (click)="openDetail(item)">
+                  <div class="card-img">
+                    <div class="poster" [style.background]="item.gradient">
+                      <i
+                        class="fa-solid"
+                        [class]="'fa-solid ' + item.emoji"
+                      ></i>
+                    </div>
+                    <div class="card-overlay">
+                      <div class="play-btn">
+                        <i
+                          class="fa-solid fa-play"
+                          style="margin-left: 3px"
+                        ></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-info">
+                    <h4>{{ item.title }}</h4>
+                    <p>{{ item.meta }}</p>
+                    <div class="card-rating">
+                      <i class="fa-solid fa-star"></i> {{ item.rating }}
+                    </div>
+                  </div>
+                </div>
+              }
             </div>
           </div>
         </div>
       }
-      <div class="hero-dots">
-        @for (item of heroItems; track $index) {
-          <div
-            class="dot"
-            [class.active]="$index === heroIndex"
-            (click)="setHero($index)"
-          ></div>
-        }
-      </div>
-    </div>
 
-    <!-- ── Continue Watching ── -->
-    <div class="content-row">
-      <div class="content-row-header">
-        <h3>Continue Watching</h3>
-        <a href="#">See All</a>
-      </div>
-      <div class="card-scroll">
-        @for (item of continueCards; track $index) {
-          <div class="card card-wide">
-            <div class="card-img" style="width: 320px; height: 180px">
-              <div class="poster" [style.background]="item.gradient">
-                {{ item.emoji }}
-              </div>
-              <div class="card-overlay">
-                <div class="play-btn">
-                  <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+      <!-- ══════════════ MY LIST ══════════════ -->
+      @if (activeSection === "mylist") {
+        <div class="content-row">
+          <div class="content-row-header">
+            <h2 style="font-size: 28px">My List</h2>
+          </div>
+          <div class="search-grid">
+            @for (item of trendingCards.slice(0, 8); track $index) {
+              <div class="card grid-card" (click)="openDetail(item)">
+                <div class="card-img grid-img">
+                  <div class="poster" [style.background]="item.gradient">
+                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
+                  </div>
+                  <div class="card-overlay">
+                    <div class="play-btn">
+                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-info">
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.meta }}</p>
                 </div>
               </div>
-              <div class="progress-bar-bottom">
-                <div
-                  class="progress-fill"
-                  [style.width.%]="item.progress"
-                ></div>
-              </div>
-            </div>
-            <div class="card-info">
-              <h4>{{ item.title }}</h4>
-              <p>{{ item.meta }}</p>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- ── Trending Now ── -->
-    <div class="content-row">
-      <div class="content-row-header">
-        <h3>Trending Now</h3>
-        <a href="#">See All</a>
-      </div>
-      <div class="card-scroll">
-        @for (item of trendingCards; track $index) {
-          <div class="card">
-            <div class="card-img">
-              <div class="poster" [style.background]="item.gradient">
-                {{ item.emoji }}
-              </div>
-              <div class="card-overlay">
-                <div class="play-btn">
-                  <i class="fa-solid fa-play" style="margin-left: 3px"></i>
-                </div>
-              </div>
-              @if (item.badge) {
-                <span class="card-badge" [class]="item.badge">{{
-                  item.badge
-                }}</span>
-              }
-            </div>
-            <div class="card-info">
-              <h4>{{ item.title }}</h4>
-              <p>{{ item.meta }}</p>
-              <div class="card-rating">
-                <i class="fa-solid fa-star"></i> {{ item.rating }}
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- ── Live Channels ── -->
-    <div class="content-row">
-      <div class="content-row-header">
-        <h3>Live Channels</h3>
-        <a href="#" (click)="onNavigate('live-tv')">See All</a>
-      </div>
-      <div class="card-scroll">
-        @for (ch of liveChannels; track $index) {
-          <div class="live-card">
-            <div class="channel-icon" [style.background]="ch.color">
-              {{ ch.icon }}
-            </div>
-            <h4>{{ ch.name }}</h4>
-            <p>{{ ch.cat }}</p>
-            @if (ch.live) {
-              <div class="live-indicator"><span class="dot"></span> LIVE</div>
             }
           </div>
-        }
-      </div>
-    </div>
+        </div>
+      }
 
-    <!-- ── Popular Movies ── -->
-    <div class="content-row">
-      <div class="content-row-header">
-        <h3>Popular Movies</h3>
-        <a href="#" (click)="onNavigate('movies')">See All</a>
-      </div>
-      <div class="card-scroll">
-        @for (item of popularMovies; track $index) {
-          <div class="card">
-            <div class="card-img">
-              <div class="poster" [style.background]="item.gradient">
-                {{ item.emoji }}
+      <!-- ══════════════ DOWNLOADS ══════════════ -->
+      @if (activeSection === "downloads") {
+        <div class="content-row">
+          <div class="content-row-header">
+            <h2 style="font-size: 28px">Downloads</h2>
+          </div>
+          @for (item of continueCards.slice(0, 4); track $index) {
+            <div class="download-item">
+              <div class="download-thumb" [style.background]="item.gradient">
+                <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
               </div>
-              <div class="card-overlay">
-                <div class="play-btn">
-                  <i class="fa-solid fa-play" style="margin-left: 3px"></i>
-                </div>
+              <div class="download-info">
+                <h4>{{ item.title }}</h4>
+                <p>
+                  {{ (1 + $index * 0.8).toFixed(1) }} GB —
+                  {{
+                    item.progress > 80
+                      ? "Downloaded"
+                      : item.progress + "% complete"
+                  }}
+                </p>
+                @if (item.progress <= 80) {
+                  <div class="download-progress">
+                    <div class="bar" [style.width.%]="item.progress"></div>
+                  </div>
+                }
               </div>
+              <button class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-play"></i> Play
+              </button>
             </div>
-            <div class="card-info">
-              <h4>{{ item.title }}</h4>
-              <p>{{ item.meta }}</p>
-              <div class="card-rating">
-                <i class="fa-solid fa-star"></i> {{ item.rating }}
+          }
+        </div>
+      }
+
+      <!-- ══════════════ SETTINGS ══════════════ -->
+      @if (activeSection === "settings") {
+        <div class="content-row">
+          <h2 style="margin-bottom: 24px">Settings</h2>
+          <div class="settings-section">
+            <h3>Playback</h3>
+            <div class="setting-row">
+              <div class="label">
+                <h4>Video Quality</h4>
+                <p>Set default streaming quality</p>
               </div>
+              <select>
+                <option>Auto</option>
+                <option>4K UHD</option>
+                <option>1080p</option>
+                <option>720p</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <div class="label">
+                <h4>Autoplay Next</h4>
+                <p>Automatically play next episode</p>
+              </div>
+              <div class="toggle on" (click)="toggleSetting($event)"></div>
+            </div>
+            <div class="setting-row">
+              <div class="label">
+                <h4>Subtitles</h4>
+                <p>Show subtitles by default</p>
+              </div>
+              <div class="toggle" (click)="toggleSetting($event)"></div>
             </div>
           </div>
-        }
-      </div>
+          <div class="settings-section">
+            <h3>Notifications</h3>
+            <div class="setting-row">
+              <div class="label">
+                <h4>Push Notifications</h4>
+                <p>Receive push alerts</p>
+              </div>
+              <div class="toggle on" (click)="toggleSetting($event)"></div>
+            </div>
+            <div class="setting-row">
+              <div class="label">
+                <h4>New Releases</h4>
+                <p>Get notified about new content</p>
+              </div>
+              <div class="toggle on" (click)="toggleSetting($event)"></div>
+            </div>
+          </div>
+          <div class="settings-section">
+            <h3>Account</h3>
+            <div class="setting-row">
+              <div class="label">
+                <h4>Language</h4>
+                <p>Preferred language</p>
+              </div>
+              <select>
+                <option>English</option>
+                <option>Español</option>
+                <option>Français</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <div class="label">
+                <h4>Parental Controls</h4>
+                <p>Restrict mature content</p>
+              </div>
+              <div class="toggle" (click)="toggleSetting($event)"></div>
+            </div>
+          </div>
+        </div>
+      }
     </div>
+    <!-- end content-body -->
   </div>
+  <!-- end main-content -->
 </div>
+<!-- end app-wrapper -->
