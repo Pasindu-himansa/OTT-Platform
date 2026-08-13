@@ -1,11 +1,16 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { TokenService } from '../services/token.service';
 
 export const adminGuard: CanActivateFn = () => {
-  const authService = inject(AuthService);
+  const tokenService = inject(TokenService);
   const router = inject(Router);
-  if (authService.isAdmin) return true;
-  router.navigate(['/']);
+
+  const user = tokenService.getUser();
+  console.log('Admin guard - user:', user);
+
+  if (user && user.role === 'admin') return true;
+
+  router.navigate(['/home']);
   return false;
 };

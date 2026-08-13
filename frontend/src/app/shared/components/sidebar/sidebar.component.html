@@ -108,9 +108,13 @@
         <i class="fa-solid fa-gear"></i> Settings
       </div>
       @if (authService.isAdmin) {
-        <div class="sidebar-link" (click)="go('admin')">
+        <a
+          class="sidebar-link"
+          routerLink="/admin"
+          style="text-decoration: none"
+        >
           <i class="fa-solid fa-shield-halved"></i> Admin
-        </div>
+        </a>
       }
     </div>
   </div>
