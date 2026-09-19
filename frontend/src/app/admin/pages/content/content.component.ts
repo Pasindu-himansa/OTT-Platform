@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 
 @Component({
   selector: 'app-content',
@@ -16,6 +16,16 @@ export class ContentComponent implements OnInit {
   channels: any[] = [];
   activeTab = 'videos';
   loading = true;
+  showAddForm = false;
+  uploadMode = 'url'; // 'url' or 'file'
+  saving = false;
+
+  // Upload progress
+  uploadProgress = 0;
+  uploading = false;
+  uploadSuccess = '';
+  uploadError = '';
+  selectedFile: File | null = null;
 
   newVideo = {
     title: '',
@@ -25,9 +35,10 @@ export class ContentComponent implements OnInit {
     releaseYear: new Date().getFullYear(),
     isFree: false,
     isPremium: true,
+    streamUrl: '',
+    genre: '',
+    categories: '',
   };
-  showAddForm = false;
-  saving = false;
 
   constructor(private http: HttpClient) {}
 
@@ -37,7 +48,8 @@ export class ContentComponent implements OnInit {
   }
 
   loadVideos(): void {
-    this.http.get<any>(`${this.API}/videos?limit=20`).subscribe({
+    this.loading = true;
+    this.http.get<any>(`${this.API}/videos?limit=50`).subscribe({
       next: (res) => {
         this.videos = res.data.videos;
         this.loading = false;
@@ -57,15 +69,98 @@ export class ContentComponent implements OnInit {
     });
   }
 
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      this.selectedFile = input.files[0];
+      if (!this.newVideo.title) {
+        this.newVideo.title = this.selectedFile.name.replace(/\.[^/.]+$/, '');
+      }
+    }
+  }
+
+  uploadFile(): void {
+    if (!this.selectedFile) {
+      this.uploadError = 'Please select a file';
+      return;
+    }
+    if (!this.newVideo.title) {
+      this.uploadError = 'Please enter a title';
+      return;
+    }
+
+    this.uploading = true;
+    this.uploadError = '';
+    this.uploadSuccess = '';
+    this.uploadProgress = 0;
+
+    const formData = new FormData();
+    formData.append('video', this.selectedFile);
+    formData.append('title', this.newVideo.title);
+    formData.append('type', this.newVideo.type);
+    formData.append('description', this.newVideo.description);
+    formData.append('releaseYear', this.newVideo.releaseYear.toString());
+    formData.append('isFree', this.newVideo.isFree.toString());
+    if (this.newVideo.genre) formData.append('genre', this.newVideo.genre);
+
+    this.http
+      .post(`${this.API}/videos/upload`, formData, {
+        reportProgress: true,
+        observe: 'events',
+      })
+      .subscribe({
+        next: (event: any) => {
+          if (event.type === HttpEventType.UploadProgress && event.total) {
+            this.uploadProgress = Math.round(
+              (100 * event.loaded) / event.total,
+            );
+          } else if (event.type === HttpEventType.Response) {
+            this.uploadSuccess = `"${this.newVideo.title}" uploaded successfully!`;
+            this.uploading = false;
+            this.uploadProgress = 100;
+            this.selectedFile = null;
+            this.newVideo.title = '';
+            this.loadVideos();
+            setTimeout(() => {
+              this.uploadSuccess = '';
+              this.showAddForm = false;
+            }, 3000);
+          }
+        },
+        error: (err) => {
+          this.uploadError = err.error?.message || 'Upload failed';
+          this.uploading = false;
+        },
+      });
+  }
+
   saveVideo(): void {
     this.saving = true;
-    this.http.post(`${this.API}/videos`, this.newVideo).subscribe({
+    const payload = {
+      ...this.newVideo,
+      genre: this.newVideo.genre ? [this.newVideo.genre] : [],
+      categories: this.newVideo.categories ? [this.newVideo.categories] : [],
+    };
+    this.http.post(`${this.API}/videos`, payload).subscribe({
       next: () => {
         this.loadVideos();
         this.showAddForm = false;
         this.saving = false;
+        this.newVideo = {
+          title: '',
+          type: 'movie',
+          status: 'draft',
+          description: '',
+          releaseYear: new Date().getFullYear(),
+          isFree: false,
+          isPremium: true,
+          streamUrl: '',
+          genre: '',
+          categories: '',
+        };
       },
-      error: () => {
+      error: (err) => {
+        this.uploadError = err.error?.message || 'Failed to save';
         this.saving = false;
       },
     });
@@ -77,5 +172,11 @@ export class ContentComponent implements OnInit {
       next: () => this.loadVideos(),
       error: () => {},
     });
+  }
+
+  getFileSize(bytes: number): string {
+    if (!bytes) return '—';
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 }

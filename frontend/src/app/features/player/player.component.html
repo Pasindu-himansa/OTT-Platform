@@ -4,7 +4,6 @@
   (click)="showControlsTemporarily()"
   [class.hide-cursor]="!showControls && isPlaying"
 >
-  <!-- Video element -->
   <video #videoEl class="video-el" (click)="togglePlay()" playsinline></video>
 
   <!-- Top bar -->
@@ -13,7 +12,25 @@
       <i class="fa-solid fa-arrow-left"></i>
     </button>
     <div class="player-title">
-      <h3>{{ title }}</h3>
+      <h3>
+        {{ title }}
+        @if (isLive) {
+          <span
+            style="
+              background: #ff453a;
+              color: #fff;
+              font-size: 11px;
+              padding: 2px 8px;
+              border-radius: 4px;
+              margin-left: 8px;
+              font-weight: 700;
+              letter-spacing: 1px;
+            "
+          >
+            ● LIVE
+          </span>
+        }
+      </h3>
       <p>{{ subtitle }}</p>
     </div>
     <div class="topbar-actions">
@@ -33,7 +50,6 @@
 
   <!-- Bottom controls -->
   <div class="player-controls" [class.visible]="showControls">
-    <!-- Progress bar -->
     <div class="progress-wrap">
       <div class="progress-track">
         <div class="progress-buffered" [style.width.%]="buffered"></div>
@@ -51,30 +67,22 @@
       />
     </div>
 
-    <!-- Control buttons -->
     <div class="controls-row">
       <div class="controls-left">
-        <!-- Play/Pause -->
         <button class="ctrl-btn large" (click)="togglePlay()">
           <i
             class="fa-solid"
             [class]="isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play'"
           ></i>
         </button>
-
-        <!-- Rewind -->
         <button class="ctrl-btn" (click)="seekBy(-10)">
           <i class="fa-solid fa-rotate-left"></i>
           <span class="seek-label">10</span>
         </button>
-
-        <!-- Forward -->
         <button class="ctrl-btn" (click)="seekBy(10)">
           <i class="fa-solid fa-rotate-right"></i>
           <span class="seek-label">10</span>
         </button>
-
-        <!-- Volume -->
         <div class="volume-wrap">
           <button class="ctrl-btn" (click)="toggleMute()">
             <i
@@ -99,40 +107,27 @@
             (input)="setVolume($event)"
           />
         </div>
-
-        <!-- Time -->
         <span class="time-display">
           {{ formatTime(currentTime) }} / {{ formatTime(duration) }}
         </span>
       </div>
 
       <div class="controls-right">
-        <!-- Quality -->
         @if (qualityLevels.length > 0) {
-          <div class="quality-wrap">
-            <select
-              class="quality-select"
-              (change)="setQuality(+$any($event.target).value)"
-            >
-              <option value="-1">Auto</option>
-              @for (level of qualityLevels; track $index) {
-                <option [value]="$index">{{ level.height }}p</option>
-              }
-            </select>
-          </div>
+          <select
+            class="quality-select"
+            (change)="setQuality(+$any($event.target).value)"
+          >
+            <option value="-1">Auto</option>
+            @for (level of qualityLevels; track $index) {
+              <option [value]="$index">{{ level.height }}p</option>
+            }
+          </select>
         }
-
-        <!-- Subtitles -->
         <button class="ctrl-btn">
           <i class="fa-solid fa-closed-captioning"></i>
         </button>
-
-        <!-- Settings -->
-        <button class="ctrl-btn">
-          <i class="fa-solid fa-gear"></i>
-        </button>
-
-        <!-- Fullscreen -->
+        <button class="ctrl-btn"><i class="fa-solid fa-gear"></i></button>
         <button class="ctrl-btn large" (click)="toggleFullscreen()">
           <i
             class="fa-solid"

@@ -21,30 +21,23 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('videoEl') videoEl!: ElementRef<HTMLVideoElement>;
 
   hls: Hls | null = null;
-
-  // Player state
   isPlaying = false;
   isMuted = false;
   isFullscreen = false;
   showControls = true;
   controlsTimer: any;
-
-  // Progress
+  isLive = false;
   currentTime = 0;
   duration = 0;
   buffered = 0;
   volume = 0.8;
-
-  // Content info
-  title = 'Crimson Horizon';
-  subtitle = '2024 • Action • 2h 18min';
-
-  // Demo stream — replace with real HLS stream URL
+  title = 'OTT TV';
+  subtitle = '';
   streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
-
-  // Quality levels
   qualityLevels: any[] = [];
-  currentQuality = -1; // auto
+  currentQuality = -1;
+  progressSaveTimer: any;
+  videoId = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -52,18 +45,23 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Get title from query params if passed
     this.route.queryParams.subscribe((params) => {
       if (params['title']) this.title = params['title'];
       if (params['subtitle']) this.subtitle = params['subtitle'];
       if (params['stream']) this.streamUrl = params['stream'];
+      if (params['live']) this.isLive = params['live'] === 'true';
     });
   }
 
   ngAfterViewInit(): void {
     this.initPlayer();
-    // Auto hide controls after 3 seconds
     this.showControlsTemporarily();
+    // Save progress every 10 seconds
+    this.progressSaveTimer = setInterval(() => {
+      if (this.isPlaying && this.duration > 0) {
+        this.saveProgress();
+      }
+    }, 10000);
   }
 
   initPlayer(): void {
@@ -71,34 +69,23 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
     video.volume = this.volume;
 
     if (Hls.isSupported()) {
-      this.hls = new Hls({
-        enableWorker: true,
-        lowLatencyMode: true,
-      });
+      this.hls = new Hls({ enableWorker: true, lowLatencyMode: true });
       this.hls.loadSource(this.streamUrl);
       this.hls.attachMedia(video);
-
       this.hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
         this.qualityLevels = data.levels;
         this.play();
       });
-
       this.hls.on(Hls.Events.ERROR, (_, data) => {
-        if (data.fatal) {
-          console.error('HLS fatal error:', data);
-        }
+        if (data.fatal) console.error('HLS fatal error:', data);
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // Safari native HLS
       video.src = this.streamUrl;
       video.addEventListener('loadedmetadata', () => this.play());
     }
 
-    // Video events
     video.addEventListener('timeupdate', () => this.onTimeUpdate());
     video.addEventListener('ended', () => (this.isPlaying = false));
-    video.addEventListener('waiting', () => {});
-    video.addEventListener('canplay', () => {});
     video.addEventListener('progress', () => this.onProgress());
     video.addEventListener('volumechange', () => {
       this.volume = video.volume;
@@ -164,9 +151,8 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   toggleFullscreen(): void {
-    const el = document.documentElement;
     if (!document.fullscreenElement) {
-      el.requestFullscreen();
+      document.documentElement.requestFullscreen();
       this.isFullscreen = true;
     } else {
       document.exitFullscreen();
@@ -207,10 +193,34 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/home']);
   }
 
+  saveProgress(): void {
+    const token = localStorage.getItem('ott_access_token');
+    if (!token || !this.duration) return;
+
+    const percent = Math.round((this.currentTime / this.duration) * 100);
+
+    fetch('http://localhost/api/v1/watch-history', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        videoId: this.title,
+        title: this.title,
+        type: this.isLive ? 'live' : 'movie',
+        progress: Math.round(this.currentTime),
+        duration: Math.round(this.duration),
+        percent,
+        completed: percent >= 90,
+      }),
+    }).catch(() => {});
+  }
+
   ngOnDestroy(): void {
-    if (this.hls) {
-      this.hls.destroy();
-    }
+    this.saveProgress(); // save when leaving player
+    if (this.hls) this.hls.destroy();
     clearTimeout(this.controlsTimer);
+    clearInterval(this.progressSaveTimer);
   }
 }

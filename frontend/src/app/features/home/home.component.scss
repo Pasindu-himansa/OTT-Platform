@@ -908,3 +908,12 @@
     }
   }
 }
+
+.live-card-wrapper {
+  cursor: pointer;
+  &:hover .live-card {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+  }
+}

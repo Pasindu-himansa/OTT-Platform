@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">OTT TV</string>
+    <string name="title_activity_main">OTT TV</string>
+    <string name="package_name">com.otttv.app</string>
+    <string name="custom_url_scheme">com.otttv.app</string>
+</resources>

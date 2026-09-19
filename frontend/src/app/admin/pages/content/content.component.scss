@@ -17,6 +17,16 @@
   margin-bottom: 24px;
 }
 
+.form-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  width: fit-content;
+  margin-bottom: 24px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -56,4 +66,85 @@
     background: var(--card);
     color: var(--text);
   }
+}
+
+// Upload zone
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-bottom: 16px;
+
+  &:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+}
+
+.upload-placeholder {
+  i {
+    font-size: 48px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    display: block;
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  p {
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+}
+
+.upload-selected {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+
+  i {
+    font-size: 32px;
+    color: var(--accent);
+  }
+  h4 {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  p {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+}
+
+.badge-ready {
+  padding: 4px 12px;
+  background: var(--success-soft);
+  color: var(--success);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.upload-progress-wrap {
+  margin-bottom: 16px;
+}
+
+.upload-progress-bar {
+  height: 8px;
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.upload-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 4px;
+  transition: width 0.3s ease;
 }

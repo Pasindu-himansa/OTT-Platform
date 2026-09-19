@@ -2,64 +2,265 @@
   <div class="page-header">
     <h2>Content Management</h2>
     <button class="btn btn-primary btn-sm" (click)="showAddForm = !showAddForm">
-      <i class="fa-solid fa-plus"></i> Add Video
+      <i class="fa-solid fa-plus"></i> Add Content
     </button>
   </div>
 
-  <!-- Add video form -->
+  <!-- Add / Upload form -->
   @if (showAddForm) {
     <div class="add-form">
-      <h3 style="margin-bottom: 20px">Add New Video</h3>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Title</label>
-          <input
-            type="text"
-            [(ngModel)]="newVideo.title"
-            placeholder="Video title"
-          />
-        </div>
-        <div class="form-group">
-          <label>Type</label>
-          <select [(ngModel)]="newVideo.type">
-            <option value="movie">Movie</option>
-            <option value="series">Series</option>
-            <option value="episode">Episode</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Status</label>
-          <select [(ngModel)]="newVideo.status">
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Release Year</label>
-          <input type="number" [(ngModel)]="newVideo.releaseYear" />
-        </div>
-        <div class="form-group full">
-          <label>Description</label>
-          <textarea
-            rows="3"
-            [(ngModel)]="newVideo.description"
-            placeholder="Description..."
-            style="width: 100%; resize: vertical"
-          ></textarea>
-        </div>
-      </div>
-      <div style="display: flex; gap: 12px; margin-top: 16px">
+      <div class="form-tabs">
         <button
-          class="btn btn-primary"
-          [disabled]="saving"
-          (click)="saveVideo()"
+          class="tab"
+          [class.active]="uploadMode === 'file'"
+          (click)="uploadMode = 'file'"
         >
-          {{ saving ? "Saving..." : "Save Video" }}
+          <i class="fa-solid fa-upload"></i> Upload Video File
         </button>
-        <button class="btn btn-secondary" (click)="showAddForm = false">
-          Cancel
+        <button
+          class="tab"
+          [class.active]="uploadMode === 'url'"
+          (click)="uploadMode = 'url'"
+        >
+          <i class="fa-solid fa-link"></i> Add Stream URL
         </button>
       </div>
+
+      <!-- Upload alerts -->
+      @if (uploadSuccess) {
+        <div class="alert-success" style="margin-bottom: 16px">
+          <i class="fa-solid fa-circle-check"></i> {{ uploadSuccess }}
+        </div>
+      }
+      @if (uploadError) {
+        <div class="alert-error" style="margin-bottom: 16px">
+          <i class="fa-solid fa-circle-exclamation"></i> {{ uploadError }}
+        </div>
+      }
+
+      <!-- File upload mode -->
+      @if (uploadMode === "file") {
+        <div class="upload-zone" (click)="fileInput.click()">
+          <input
+            #fileInput
+            type="file"
+            accept="video/*"
+            style="display: none"
+            (change)="onFileSelected($event)"
+          />
+          @if (!selectedFile) {
+            <div class="upload-placeholder">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <h3>Click to upload video</h3>
+              <p>MP4, MKV, AVI, MOV, WEBM — Max 500MB</p>
+            </div>
+          } @else {
+            <div class="upload-selected">
+              <i class="fa-solid fa-file-video"></i>
+              <div>
+                <h4>{{ selectedFile.name }}</h4>
+                <p>{{ getFileSize(selectedFile.size) }}</p>
+              </div>
+              <span class="badge-ready">Ready</span>
+            </div>
+          }
+        </div>
+
+        <!-- Upload progress -->
+        @if (uploading) {
+          <div class="upload-progress-wrap">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+              "
+            >
+              <span style="font-size: 14px">Uploading...</span>
+              <span style="font-size: 14px; color: var(--accent)"
+                >{{ uploadProgress }}%</span
+              >
+            </div>
+            <div class="upload-progress-bar">
+              <div
+                class="upload-progress-fill"
+                [style.width.%]="uploadProgress"
+              ></div>
+            </div>
+          </div>
+        }
+
+        <div class="form-grid" style="margin-top: 20px">
+          <div class="form-group">
+            <label>Title *</label>
+            <input
+              type="text"
+              [(ngModel)]="newVideo.title"
+              placeholder="Video title"
+            />
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select [(ngModel)]="newVideo.type">
+              <option value="movie">Movie</option>
+              <option value="series">Series</option>
+              <option value="episode">Episode</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Genre</label>
+            <select [(ngModel)]="newVideo.genre">
+              <option value="">Select genre</option>
+              <option value="Action">Action</option>
+              <option value="Comedy">Comedy</option>
+              <option value="Drama">Drama</option>
+              <option value="Sci-Fi">Sci-Fi</option>
+              <option value="Horror">Horror</option>
+              <option value="Documentary">Documentary</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Release Year</label>
+            <input type="number" [(ngModel)]="newVideo.releaseYear" />
+          </div>
+          <div class="form-group full">
+            <label>Description</label>
+            <textarea
+              rows="3"
+              [(ngModel)]="newVideo.description"
+              placeholder="Description..."
+              style="width: 100%; resize: vertical"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+              "
+            >
+              <input
+                type="checkbox"
+                [(ngModel)]="newVideo.isFree"
+                style="accent-color: var(--accent)"
+              />
+              Free content (no subscription required)
+            </label>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 16px">
+          <button
+            class="btn btn-primary"
+            [disabled]="uploading || !selectedFile"
+            (click)="uploadFile()"
+          >
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            {{
+              uploading
+                ? "Uploading " + uploadProgress + "%..."
+                : "Upload Video"
+            }}
+          </button>
+          <button class="btn btn-secondary" (click)="showAddForm = false">
+            Cancel
+          </button>
+        </div>
+      }
+
+      <!-- Stream URL mode -->
+      @if (uploadMode === "url") {
+        <div class="form-grid" style="margin-top: 16px">
+          <div class="form-group">
+            <label>Title *</label>
+            <input
+              type="text"
+              [(ngModel)]="newVideo.title"
+              placeholder="Video title"
+            />
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select [(ngModel)]="newVideo.type">
+              <option value="movie">Movie</option>
+              <option value="series">Series</option>
+              <option value="episode">Episode</option>
+              <option value="live">Live</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Stream URL (HLS .m3u8 or MP4)</label>
+            <input
+              type="text"
+              [(ngModel)]="newVideo.streamUrl"
+              placeholder="https://example.com/stream.m3u8"
+            />
+          </div>
+          <div class="form-group">
+            <label>Genre</label>
+            <select [(ngModel)]="newVideo.genre">
+              <option value="">Select genre</option>
+              <option value="Action">Action</option>
+              <option value="Comedy">Comedy</option>
+              <option value="Drama">Drama</option>
+              <option value="Sci-Fi">Sci-Fi</option>
+              <option value="Horror">Horror</option>
+              <option value="Documentary">Documentary</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Release Year</label>
+            <input type="number" [(ngModel)]="newVideo.releaseYear" />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select [(ngModel)]="newVideo.status">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Description</label>
+            <textarea
+              rows="3"
+              [(ngModel)]="newVideo.description"
+              placeholder="Description..."
+              style="width: 100%; resize: vertical"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+              "
+            >
+              <input
+                type="checkbox"
+                [(ngModel)]="newVideo.isFree"
+                style="accent-color: var(--accent)"
+              />
+              Free content
+            </label>
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px; margin-top: 16px">
+          <button
+            class="btn btn-primary"
+            [disabled]="saving"
+            (click)="saveVideo()"
+          >
+            {{ saving ? "Saving..." : "Save Video" }}
+          </button>
+          <button class="btn btn-secondary" (click)="showAddForm = false">
+            Cancel
+          </button>
+        </div>
+      }
     </div>
   }
 
@@ -91,17 +292,23 @@
           <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px"></i>
         </div>
       } @else if (videos.length === 0) {
-        <div style="padding: 40px; text-align: center; color: var(--text-dim)">
+        <div style="padding: 60px; text-align: center">
           <i
             class="fa-solid fa-film"
             style="
               font-size: 48px;
-              margin-bottom: 16px;
-              display: block;
               color: var(--text-muted);
+              display: block;
+              margin-bottom: 16px;
             "
           ></i>
-          <p>No videos yet. Add your first video above.</p>
+          <h3 style="margin-bottom: 8px">No videos yet</h3>
+          <p style="color: var(--text-dim); margin-bottom: 24px">
+            Upload your first video or add a stream URL
+          </p>
+          <button class="btn btn-primary" (click)="showAddForm = true">
+            <i class="fa-solid fa-plus"></i> Add Content
+          </button>
         </div>
       } @else {
         <table class="data-table">
@@ -109,26 +316,49 @@
             <tr>
               <th>Title</th>
               <th>Type</th>
+              <th>Genre</th>
               <th>Status</th>
               <th>Views</th>
+              <th>Stream</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             @for (v of videos; track v._id) {
               <tr>
-                <td>{{ v.title }}</td>
-                <td style="text-transform: capitalize">{{ v.type }}</td>
+                <td style="font-weight: 500">{{ v.title }}</td>
+                <td style="text-transform: capitalize; color: var(--text-dim)">
+                  {{ v.type }}
+                </td>
+                <td style="color: var(--text-dim)">
+                  {{ v.genre?.[0] || "—" }}
+                </td>
                 <td>
                   <span
                     class="status-badge"
                     [class.active]="v.status === 'published'"
                     [class.pending]="v.status === 'draft'"
+                    [class.inactive]="v.status === 'archived'"
                   >
                     {{ v.status }}
                   </span>
                 </td>
-                <td>{{ v.views || 0 }}</td>
+                <td style="color: var(--text-dim)">{{ v.views || 0 }}</td>
+                <td>
+                  @if (v.streamUrl) {
+                    <a
+                      [href]="v.streamUrl"
+                      target="_blank"
+                      style="color: var(--accent); font-size: 12px"
+                    >
+                      <i class="fa-solid fa-play"></i> Preview
+                    </a>
+                  } @else {
+                    <span style="color: var(--text-muted); font-size: 12px"
+                      >No stream</span
+                    >
+                  }
+                </td>
                 <td>
                   <button
                     class="btn btn-sm btn-secondary"
@@ -167,8 +397,8 @@
             @for (ch of channels; track ch._id) {
               <tr>
                 <td>{{ ch.name }}</td>
-                <td>{{ ch.category }}</td>
-                <td>{{ ch.language }}</td>
+                <td style="color: var(--text-dim)">{{ ch.category }}</td>
+                <td style="color: var(--text-dim)">{{ ch.language }}</td>
                 <td>
                   <span
                     class="status-badge"

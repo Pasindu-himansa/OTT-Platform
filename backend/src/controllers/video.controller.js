@@ -145,6 +145,43 @@ const deleteVideo = async (req, res) => {
   }
 };
 
+const path = require("path");
+
+// POST /api/v1/videos/upload
+const uploadVideo = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
+    }
+
+    const { title, type, description, releaseYear, genre, isFree } = req.body;
+    const streamUrl = `${req.protocol}://${req.get("host")}/uploads/videos/${req.file.filename}`;
+
+    const video = await Video.create({
+      title: title || req.file.originalname,
+      type: type || "movie",
+      description: description || "",
+      releaseYear: parseInt(releaseYear) || new Date().getFullYear(),
+      genre: genre ? [genre] : [],
+      isFree: isFree === "true",
+      isPremium: isFree !== "true",
+      status: "published",
+      streamUrl,
+      createdBy: req.user.id,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Video uploaded successfully",
+      data: { video, streamUrl },
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 module.exports = {
   getVideos,
   getVideoById,
@@ -153,4 +190,5 @@ module.exports = {
   createVideo,
   updateVideo,
   deleteVideo,
+  uploadVideo,
 };

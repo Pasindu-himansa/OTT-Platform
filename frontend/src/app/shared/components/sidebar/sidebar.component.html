@@ -77,6 +77,13 @@
       </div>
       <div
         class="sidebar-link"
+        [class.active]="activeSection === 'watch-history'"
+        (click)="go('watch-history')"
+      >
+        <i class="fa-solid fa-clock-rotate-left"></i> Watch History
+      </div>
+      <div
+        class="sidebar-link"
         [class.active]="activeSection === 'downloads'"
         (click)="go('downloads')"
       >
@@ -92,6 +99,13 @@
         (click)="go('subscription')"
       >
         <i class="fa-solid fa-crown"></i> Subscription
+      </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'notifications'"
+        (click)="go('notifications')"
+      >
+        <i class="fa-solid fa-bell"></i> Notifications
       </div>
       <div
         class="sidebar-link"

@@ -7,6 +7,7 @@ import { TopbarComponent } from '../../shared/components/topbar/topbar.component
 import { VideoService } from '../../core/services/video.service';
 import { SubscriptionService } from '../../core/services/subscription.service';
 import { AuthService } from '../../core/services/auth.service';
+import { TokenService } from '../../core/services/token.service';
 
 @Component({
   selector: 'app-home',
@@ -347,6 +348,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   payments: any[] = [];
   selectedPaymentMethod = 'card';
 
+  // Watch History
+  watchHistory: any[] = [];
+  favorites: any[] = [];
+  favoritesMap: any = {};
+
   // Notifications
   notifications = [
     {
@@ -391,6 +397,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private videoService: VideoService,
     private subscriptionService: SubscriptionService,
     public authService: AuthService,
+    private tokenService: TokenService,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -399,15 +406,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.buildMockData();
     this.startHeroTimer();
     this.loadRealData();
-  }
-
-  playVideo(item: any): void {
-    this.router.navigate(['/player'], {
-      queryParams: {
-        title: item.title,
-        subtitle: item.meta,
-      },
-    });
+    this.loadFavorites();
+    this.loadContinueWatching();
   }
 
   buildMockData(): void {
@@ -468,6 +468,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             color: this.gradients[i % this.gradients.length],
             cat: c.category,
             live: c.isActive,
+            streamUrl: c.streamUrl,
           }));
           this.filteredChannels = [...this.allChannels];
           this.liveChannels = this.allChannels.slice(0, 8);
@@ -514,6 +515,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   openDetail(item: any): void {
     this.selectedMovie = item;
     this.activeSection = 'detail';
+    this.addToWatchHistory(item);
     this.cdr.detectChanges();
   }
 
@@ -543,7 +545,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.loadMySubscription();
     }
     if (section === 'payments') this.loadPayments();
+    if (section === 'watch-history') this.loadWatchHistory();
     this.cdr.detectChanges();
+    if (section === 'mylist') this.loadFavorites();
   }
 
   toggleSetting(event: Event): void {
@@ -551,6 +555,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     el.classList.toggle('on');
   }
 
+  // ─── Profile ─────────────────────────────────────────────
   loadProfile(): void {
     this.subscriptionService.getProfile().subscribe({
       next: (res) => {
@@ -605,6 +610,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
   }
 
+  // ─── Subscription ────────────────────────────────────────
   loadPlans(): void {
     this.subscriptionService.getPlans().subscribe({
       next: (res) => {
@@ -629,7 +635,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subscriptionSuccess = '';
     this.subscriptionService.subscribe(planId).subscribe({
       next: (res) => {
-        this.subscriptionSuccess = `Subscribed to ${res.data.subscription.planId} successfully!`;
+        this.subscriptionSuccess = `Subscribed successfully!`;
         this.subscriptionLoading = false;
         this.loadMySubscription();
       },
@@ -640,6 +646,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ─── Payments ────────────────────────────────────────────
   loadPayments(): void {
     this.subscriptionService.getMyPayments().subscribe({
       next: (res) => {
@@ -652,6 +659,178 @@ export class HomeComponent implements OnInit, OnDestroy {
   selectPaymentMethod(method: string): void {
     this.selectedPaymentMethod = method;
   }
+
+  // ─── Watch History ───────────────────────────────────────
+  loadWatchHistory(): void {
+    const token = this.tokenService.getAccessToken();
+    fetch('http://localhost/api/v1/watch-history', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success) {
+          this.watchHistory = res.data.history;
+          this.cdr.detectChanges();
+        }
+      })
+      .catch(() => {});
+  }
+
+  addToWatchHistory(item: any): void {
+    const token = this.tokenService.getAccessToken();
+    if (!token) return;
+    fetch('http://localhost/api/v1/watch-history', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        videoId: item._id || item.title,
+        title: item.title,
+        type: item.type || 'movie',
+        gradient: item.gradient,
+        emoji: item.emoji,
+        progress: 0,
+        duration: 0,
+      }),
+    }).catch(() => {});
+  }
+
+  clearWatchHistory(): void {
+    const token = this.tokenService.getAccessToken();
+    if (!token) return;
+    fetch('http://localhost/api/v1/watch-history/clear', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(() => {
+        this.watchHistory = [];
+        this.cdr.detectChanges();
+      })
+      .catch(() => {});
+  }
+
+  // ─── Navigation ──────────────────────────────────────────
+  playChannel(ch: any): void {
+    if (!ch.streamUrl) {
+      alert('No stream available for this channel');
+      return;
+    }
+    this.router.navigate(['/player'], {
+      queryParams: {
+        title: ch.name,
+        subtitle: (ch.cat || 'Live') + ' • LIVE',
+        stream: ch.streamUrl,
+        live: 'true',
+      },
+    });
+  }
+
+  playVideo(item: any): void {
+    this.router.navigate(['/player'], {
+      queryParams: {
+        title: item.title,
+        subtitle: item.meta || '',
+      },
+    });
+  }
+
+  // ─── Favorites ───────────────────────────────────────────────
+  loadFavorites(): void {
+    const token = this.tokenService.getAccessToken();
+    if (!token) return;
+    fetch('http://localhost/api/v1/favorites', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success) {
+          this.favorites = res.data.favorites;
+          this.favoritesMap = {};
+          this.favorites.forEach(
+            (f: any) => (this.favoritesMap[f.videoId] = true),
+          );
+          this.cdr.detectChanges();
+        }
+      })
+      .catch(() => {});
+  }
+
+  isFavorite(item: any): boolean {
+    return !!this.favoritesMap[item._id || item.title];
+  }
+
+  toggleFavorite(item: any): void {
+    const token = this.tokenService.getAccessToken();
+    const videoId = item._id || item.title;
+    if (!token) return;
+
+    if (this.isFavorite(item)) {
+      fetch(`http://localhost/api/v1/favorites/${videoId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(() => {
+          delete this.favoritesMap[videoId];
+          this.favorites = this.favorites.filter(
+            (f: any) => f.videoId !== videoId,
+          );
+          this.cdr.detectChanges();
+        })
+        .catch(() => {});
+    } else {
+      fetch('http://localhost/api/v1/favorites', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          videoId,
+          title: item.title,
+          type: item.type || 'movie',
+          gradient: item.gradient,
+          emoji: item.emoji,
+          meta: item.meta,
+          rating: item.rating,
+        }),
+      })
+        .then((r) => r.json())
+        .then(() => {
+          this.favoritesMap[videoId] = true;
+          this.favorites.push({ videoId, ...item });
+          this.cdr.detectChanges();
+        })
+        .catch(() => {});
+    }
+  }
+
+  loadContinueWatching(): void {
+    const token = this.tokenService.getAccessToken();
+    if (!token) return;
+    fetch('http://localhost/api/v1/watch-history?limit=10', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data.history.length) {
+          this.continueCards = res.data.history
+            .filter((h: any) => h.percent > 0 && h.percent < 90)
+            .map((h: any) => ({
+              title: h.title,
+              meta: h.meta || h.type,
+              gradient: h.gradient || this.gradients[0],
+              emoji: h.emoji || 'fa-film',
+              progress: h.percent,
+              videoId: h.videoId,
+            }));
+          this.cdr.detectChanges();
+        }
+      })
+      .catch(() => {});
+  }
+
   ngOnDestroy(): void {
     clearInterval(this.heroTimer);
   }
