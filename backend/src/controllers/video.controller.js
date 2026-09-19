@@ -22,7 +22,7 @@ const getVideos = async (req, res) => {
     if (genre) filter.genre = genre;
     if (language) filter.language = language;
     if (isFree !== undefined) filter.isFree = isFree === "true";
-    if (search) filter.$text = { $search: search };
+    if (search) filter.title = { $regex: search, $options: "i" };
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const sortField = sort.startsWith("-")

@@ -452,8 +452,13 @@ export class HomeComponent implements OnInit, OnDestroy {
             genre: 'Action',
           }));
           this.trendingCards = cards;
-          this.allMovies = cards;
-          this.filteredMovies = cards;
+          // Don't replace allMovies — add real data to it instead
+          const existingTitles = this.allMovies.map((m: any) => m.title);
+          const newCards = cards.filter(
+            (c: any) => !existingTitles.includes(c.title),
+          );
+          this.allMovies = [...this.allMovies, ...newCards];
+          this.filteredMovies = [...this.allMovies];
         }
       },
       error: () => {},
@@ -504,12 +509,51 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   onSearch(): void {
     this.hasSearched = true;
-    const q = this.searchQuery.toLowerCase();
-    this.searchResults = q
-      ? [...this.allMovies, ...this.allShows].filter((i) =>
+    const q = this.searchQuery.toLowerCase().trim();
+
+    if (!q) {
+      this.searchResults = [...this.allMovies, ...this.allShows];
+      return;
+    }
+
+    // Search real API first
+    this.videoService.getVideos({ search: q, status: 'published' }).subscribe({
+      next: (res) => {
+        const apiResults = res.data?.videos?.length
+          ? res.data.videos.map((v: any, i: number) => ({
+              title: v.title,
+              meta: `${v.releaseYear || '2024'} • ${v.type}`,
+              rating: '8.0',
+              gradient: this.gradients[i % this.gradients.length],
+              emoji: this.emojis[i % this.emojis.length],
+              badge: null,
+              genre: v.genre?.[0] || 'Action',
+              type: v.type,
+              _id: v._id,
+            }))
+          : [];
+
+        // Always include local mock results
+        const localResults = [...this.allMovies, ...this.allShows].filter((i) =>
           i.title.toLowerCase().includes(q),
-        )
-      : [...this.allMovies, ...this.allShows];
+        );
+
+        // Merge — API results first, then local (no duplicates)
+        const merged = [...apiResults];
+        localResults.forEach((l) => {
+          if (!merged.find((m) => m.title === l.title)) merged.push(l);
+        });
+
+        this.searchResults = merged.length > 0 ? merged : [];
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.searchResults = [...this.allMovies, ...this.allShows].filter((i) =>
+          i.title.toLowerCase().includes(q),
+        );
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   openDetail(item: any): void {
