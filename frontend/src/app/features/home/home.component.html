@@ -11,6 +11,7 @@
   <div class="main-content">
     <app-topbar
       [activeSection]="activeSection"
+      [unreadCount]="unreadCount"
       (menuToggled)="toggleSidebar()"
       (sectionChanged)="onNavigate($event)"
     />
@@ -1294,28 +1295,60 @@
           <div class="content-row">
             <div class="content-row-header">
               <h2 style="font-size: 28px">Notifications</h2>
-              <a href="#" style="font-size: 14px; color: var(--accent)"
-                >Mark all as read</a
+              <button
+                class="btn btn-secondary btn-sm"
+                (click)="markAllNotificationsRead()"
               >
+                <i class="fa-solid fa-check-double"></i> Mark all read
+              </button>
             </div>
-            <div class="notif-list">
-              @for (n of notifications; track $index) {
-                <div class="notif-item" [class.unread]="n.unread">
-                  <div
-                    class="notif-icon"
-                    [style.background]="n.color"
-                    [style.color]="n.iconColor"
-                  >
-                    <i class="fa-solid" [class]="'fa-solid ' + n.icon"></i>
+
+            @if (realNotifications.length === 0) {
+              <!-- Show mock notifications if no real ones -->
+              <div class="notif-list">
+                @for (n of notifications; track $index) {
+                  <div class="notif-item" [class.unread]="n.unread">
+                    <div
+                      class="notif-icon"
+                      [style.background]="n.color"
+                      [style.color]="n.iconColor"
+                    >
+                      <i class="fa-solid" [class]="'fa-solid ' + n.icon"></i>
+                    </div>
+                    <div class="notif-content">
+                      <h4>{{ n.title }}</h4>
+                      <p>{{ n.desc }}</p>
+                      <div class="time">{{ n.time }}</div>
+                    </div>
                   </div>
-                  <div class="notif-content">
-                    <h4>{{ n.title }}</h4>
-                    <p>{{ n.desc }}</p>
-                    <div class="time">{{ n.time }}</div>
+                }
+              </div>
+            } @else {
+              <!-- Show real notifications -->
+              <div class="notif-list">
+                @for (n of realNotifications; track n._id) {
+                  <div class="notif-item" [class.unread]="!n.isRead">
+                    <div
+                      class="notif-icon"
+                      [style.background]="n.color"
+                      [style.color]="n.iconColor"
+                    >
+                      <i class="fa-solid" [class]="'fa-solid ' + n.icon"></i>
+                    </div>
+                    <div class="notif-content">
+                      <h4>{{ n.title }}</h4>
+                      <p>{{ n.message }}</p>
+                      <div class="time">
+                        {{ n.createdAt | date: "mediumDate" }}
+                      </div>
+                    </div>
+                    @if (!n.isRead) {
+                      <div class="notif-unread-dot"></div>
+                    }
                   </div>
-                </div>
-              }
-            </div>
+                }
+              </div>
+            }
           </div>
         }
         <!-- ══════════════ EPG TV GUIDE ══════════════ -->

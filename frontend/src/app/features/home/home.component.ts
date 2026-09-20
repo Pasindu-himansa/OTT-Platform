@@ -356,6 +356,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   favorites: any[] = [];
   favoritesMap: any = {};
 
+  // Notifications
+  realNotifications: any[] = [];
+  unreadCount = 0;
+
   // EPG
   epgDate = new Date();
   epgCurrentHour = new Date().getHours();
@@ -527,6 +531,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loadFavorites();
     this.loadContinueWatching();
     this.loadWatchHistory();
+    this.loadNotifications();
   }
 
   buildMockData(): void {
@@ -710,6 +715,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (section === 'mylist') this.loadFavorites();
     if (section === 'epg') this.epgCurrentHour = new Date().getHours();
     this.cdr.detectChanges();
+    if (section === 'notifications') this.loadNotifications();
   }
 
   toggleSetting(event: Event): void {
@@ -1009,6 +1015,38 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.router.navigate(['/player'], {
       queryParams: { title: item.title, subtitle: item.meta || '' },
     });
+  }
+
+  loadNotifications(): void {
+    const token = this.tokenService.getAccessToken();
+    if (!token) return;
+    fetch('http://localhost/api/v1/notifications', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success) {
+          this.realNotifications = res.data.notifications;
+          this.unreadCount = res.data.unreadCount;
+          this.cdr.detectChanges();
+        }
+      })
+      .catch(() => {});
+  }
+
+  markAllNotificationsRead(): void {
+    const token = this.tokenService.getAccessToken();
+    if (!token) return;
+    fetch('http://localhost/api/v1/notifications/read-all', {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(() => {
+        this.unreadCount = 0;
+        this.realNotifications.forEach((n: any) => (n.isRead = true));
+        this.cdr.detectChanges();
+      })
+      .catch(() => {});
   }
 
   ngOnDestroy(): void {

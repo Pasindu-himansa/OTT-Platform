@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration=production && copy dist\\frontend\\browser\\browser\\index.csr.html dist\\frontend\\browser\\browser\\index.html",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "build:android": "ng build --configuration=production && npx cap sync android",

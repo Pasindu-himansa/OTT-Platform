@@ -3,6 +3,7 @@ const Plan = require("../models/Plan");
 const Subscription = require("../models/Subscription");
 const Payment = require("../models/Payment");
 const { v4: uuidv4 } = require("uuid");
+const { createNotification } = require("./notification.controller");
 
 // GET /api/v1/subscriptions/plans
 const getPlans = async (req, res) => {
@@ -102,6 +103,17 @@ const subscribe = async (req, res) => {
 
     // Link payment to subscription
     await payment.update({ subscriptionId: subscription.id });
+
+    // Create notification
+    await createNotification(
+      req.user.id,
+      "Subscription Activated",
+      `You have successfully subscribed to ${plan.name} plan. Enjoy unlimited streaming!`,
+      "subscription",
+      "fa-crown",
+      "var(--success-soft)",
+      "var(--success)",
+    );
 
     return res.status(201).json({
       success: true,

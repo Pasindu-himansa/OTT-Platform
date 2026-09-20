@@ -19,9 +19,11 @@
     <button class="topbar-btn" (click)="sectionChanged.emit('search')">
       <i class="fa-solid fa-magnifying-glass"></i>
     </button>
-    <button class="topbar-btn">
+    <button class="topbar-btn" (click)="sectionChanged.emit('notifications')">
       <i class="fa-solid fa-bell"></i>
-      <span class="notif-dot"></span>
+      @if (unreadCount > 0) {
+        <span class="notif-badge">{{ unreadCount }}</span>
+      }
     </button>
     <button class="topbar-btn" (click)="sectionChanged.emit('profile')">
       <i class="fa-solid fa-user-circle"></i>
