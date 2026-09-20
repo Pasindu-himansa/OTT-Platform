@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
@@ -12,13 +12,14 @@ import { TokenService } from '../../core/services/token.service';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, TopbarComponent],
+  imports: [CommonModule, NgIf, FormsModule, SidebarComponent, TopbarComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit, OnDestroy {
   sidebarOpen = false;
   activeSection = 'home';
+  showEpg = false;
 
   heroIndex = 0;
   heroTimer: any;
@@ -350,8 +351,125 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // Watch History
   watchHistory: any[] = [];
+
+  // Favorites
   favorites: any[] = [];
   favoritesMap: any = {};
+
+  // EPG
+  epgDate = new Date();
+  epgCurrentHour = new Date().getHours();
+  epgHours = [
+    '06:00',
+    '07:00',
+    '08:00',
+    '09:00',
+    '10:00',
+    '11:00',
+    '12:00',
+    '13:00',
+    '14:00',
+    '15:00',
+    '16:00',
+    '17:00',
+    '18:00',
+    '19:00',
+    '20:00',
+    '21:00',
+    '22:00',
+    '23:00',
+  ];
+  epgChannels = [
+    {
+      name: 'CNN Live',
+      icon: 'fa-tower-broadcast',
+      color: 'linear-gradient(135deg,#d63031,#ff7675)',
+      programs: [
+        { title: 'Morning News', start: '06:00', end: '08:00', live: false },
+        { title: 'World Report', start: '08:00', end: '10:00', live: false },
+        { title: 'Breaking News', start: '10:00', end: '12:00', live: true },
+        { title: 'Midday Update', start: '12:00', end: '14:00', live: false },
+        {
+          title: 'Afternoon Report',
+          start: '14:00',
+          end: '16:00',
+          live: false,
+        },
+        { title: 'Evening News', start: '16:00', end: '18:00', live: false },
+        { title: 'Prime Time News', start: '18:00', end: '20:00', live: false },
+        { title: 'Night Report', start: '20:00', end: '22:00', live: false },
+        { title: 'Late News', start: '22:00', end: '00:00', live: false },
+      ],
+    },
+    {
+      name: 'ESPN HD',
+      icon: 'fa-basketball',
+      color: 'linear-gradient(135deg,#0984e3,#74b9ff)',
+      programs: [
+        { title: 'SportCenter', start: '06:00', end: '08:00', live: false },
+        { title: 'NFL Highlights', start: '08:00', end: '10:00', live: false },
+        { title: 'NBA Preview', start: '10:00', end: '12:00', live: false },
+        { title: 'Live: NBA Game', start: '12:00', end: '14:00', live: true },
+        { title: 'Tennis Open', start: '14:00', end: '16:00', live: false },
+        { title: 'Football Show', start: '16:00', end: '18:00', live: false },
+        { title: 'Live: NFL Game', start: '18:00', end: '21:00', live: true },
+        { title: 'SportCenter PM', start: '21:00', end: '23:00', live: false },
+      ],
+    },
+    {
+      name: 'Discovery HD',
+      icon: 'fa-microscope',
+      color: 'linear-gradient(135deg,#1abc9c,#16a085)',
+      programs: [
+        { title: 'Wild Planet', start: '06:00', end: '08:00', live: false },
+        { title: 'Ocean Wonders', start: '08:00', end: '10:00', live: false },
+        { title: 'Space Explorers', start: '10:00', end: '12:00', live: false },
+        { title: 'MythBusters', start: '12:00', end: '14:00', live: false },
+        { title: 'Shark Week', start: '14:00', end: '16:00', live: true },
+        {
+          title: 'Universe Secrets',
+          start: '16:00',
+          end: '18:00',
+          live: false,
+        },
+        { title: 'Planet Earth', start: '18:00', end: '20:00', live: false },
+        { title: 'Deep Ocean', start: '20:00', end: '22:00', live: false },
+      ],
+    },
+    {
+      name: 'Cinema Plus',
+      icon: 'fa-clapperboard',
+      color: 'linear-gradient(135deg,#3498db,#2980b9)',
+      programs: [
+        { title: 'Classic Movies', start: '06:00', end: '08:00', live: false },
+        { title: 'Action Heroes', start: '08:00', end: '10:00', live: false },
+        { title: 'The Dark Knight', start: '10:00', end: '12:30', live: false },
+        { title: 'Inception', start: '12:30', end: '14:30', live: false },
+        { title: 'Interstellar', start: '14:30', end: '17:00', live: false },
+        { title: 'Avengers', start: '17:00', end: '19:30', live: false },
+        {
+          title: 'Prime: Blockbuster',
+          start: '19:30',
+          end: '22:00',
+          live: true,
+        },
+        { title: 'Late Night Film', start: '22:00', end: '00:00', live: false },
+      ],
+    },
+    {
+      name: 'Music Box',
+      icon: 'fa-music',
+      color: 'linear-gradient(135deg,#9b59b6,#8e44ad)',
+      programs: [
+        { title: 'Morning Hits', start: '06:00', end: '09:00', live: false },
+        { title: 'Top 40', start: '09:00', end: '12:00', live: false },
+        { title: 'Live Concert', start: '12:00', end: '14:00', live: true },
+        { title: 'Retro Classics', start: '14:00', end: '17:00', live: false },
+        { title: 'Evening Hits', start: '17:00', end: '20:00', live: false },
+        { title: 'Live: Music Fest', start: '20:00', end: '23:00', live: true },
+      ],
+    },
+  ];
 
   // Notifications
   notifications = [
@@ -360,7 +478,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       color: 'var(--accent-soft)',
       iconColor: 'var(--accent)',
       title: 'New Release: The Last Frontier',
-      desc: 'A new blockbuster movie is now available. Watch it now!',
+      desc: 'A new blockbuster movie is now available.',
       time: '2 minutes ago',
       unread: true,
     },
@@ -408,6 +526,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loadRealData();
     this.loadFavorites();
     this.loadContinueWatching();
+    this.loadWatchHistory();
   }
 
   buildMockData(): void {
@@ -452,7 +571,6 @@ export class HomeComponent implements OnInit, OnDestroy {
             genre: 'Action',
           }));
           this.trendingCards = cards;
-          // Don't replace allMovies — add real data to it instead
           const existingTitles = this.allMovies.map((m: any) => m.title);
           const newCards = cards.filter(
             (c: any) => !existingTitles.includes(c.title),
@@ -516,7 +634,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Search real API first
     this.videoService.getVideos({ search: q, status: 'published' }).subscribe({
       next: (res) => {
         const apiResults = res.data?.videos?.length
@@ -533,18 +650,16 @@ export class HomeComponent implements OnInit, OnDestroy {
             }))
           : [];
 
-        // Always include local mock results
         const localResults = [...this.allMovies, ...this.allShows].filter((i) =>
           i.title.toLowerCase().includes(q),
         );
 
-        // Merge — API results first, then local (no duplicates)
         const merged = [...apiResults];
         localResults.forEach((l) => {
           if (!merged.find((m) => m.title === l.title)) merged.push(l);
         });
 
-        this.searchResults = merged.length > 0 ? merged : [];
+        this.searchResults = merged;
         this.cdr.detectChanges();
       },
       error: () => {
@@ -559,6 +674,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   openDetail(item: any): void {
     this.selectedMovie = item;
     this.activeSection = 'detail';
+    this.showEpg = false;
     this.addToWatchHistory(item);
     this.cdr.detectChanges();
   }
@@ -582,6 +698,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   onNavigate(section: string): void {
     this.activeSection = section;
+    this.showEpg = section === 'epg';
     this.sidebarOpen = false;
     if (section === 'profile') this.loadProfile();
     if (section === 'subscription') {
@@ -590,8 +707,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
     if (section === 'payments') this.loadPayments();
     if (section === 'watch-history') this.loadWatchHistory();
-    this.cdr.detectChanges();
     if (section === 'mylist') this.loadFavorites();
+    if (section === 'epg') this.epgCurrentHour = new Date().getHours();
+    this.cdr.detectChanges();
   }
 
   toggleSetting(event: Event): void {
@@ -647,8 +765,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.confirmNewPassword = '';
         },
         error: (err) => {
-          this.passwordError =
-            err.error?.message || 'Failed to change password';
+          this.passwordError = err.error?.message || 'Failed';
           this.passwordLoading = false;
         },
       });
@@ -678,13 +795,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subscriptionError = '';
     this.subscriptionSuccess = '';
     this.subscriptionService.subscribe(planId).subscribe({
-      next: (res) => {
-        this.subscriptionSuccess = `Subscribed successfully!`;
+      next: () => {
+        this.subscriptionSuccess = 'Subscribed successfully!';
         this.subscriptionLoading = false;
         this.loadMySubscription();
       },
       error: (err) => {
-        this.subscriptionError = err.error?.message || 'Subscription failed';
+        this.subscriptionError = err.error?.message || 'Failed';
         this.subscriptionLoading = false;
       },
     });
@@ -723,6 +840,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   addToWatchHistory(item: any): void {
     const token = this.tokenService.getAccessToken();
     if (!token) return;
+    const videoId = item._id || item.title.toLowerCase().replace(/\s+/g, '-');
     fetch('http://localhost/api/v1/watch-history', {
       method: 'POST',
       headers: {
@@ -730,13 +848,15 @@ export class HomeComponent implements OnInit, OnDestroy {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        videoId: item._id || item.title,
+        videoId,
         title: item.title,
         type: item.type || 'movie',
         gradient: item.gradient,
         emoji: item.emoji,
+        meta: item.meta,
         progress: 0,
         duration: 0,
+        percent: 0,
       }),
     }).catch(() => {});
   }
@@ -755,32 +875,32 @@ export class HomeComponent implements OnInit, OnDestroy {
       .catch(() => {});
   }
 
-  // ─── Navigation ──────────────────────────────────────────
-  playChannel(ch: any): void {
-    if (!ch.streamUrl) {
-      alert('No stream available for this channel');
-      return;
-    }
-    this.router.navigate(['/player'], {
-      queryParams: {
-        title: ch.name,
-        subtitle: (ch.cat || 'Live') + ' • LIVE',
-        stream: ch.streamUrl,
-        live: 'true',
-      },
-    });
+  loadContinueWatching(): void {
+    const token = this.tokenService.getAccessToken();
+    if (!token) return;
+    fetch('http://localhost/api/v1/watch-history?limit=10', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data.history.length) {
+          this.continueCards = res.data.history
+            .filter((h: any) => h.percent > 0 && h.percent < 90)
+            .map((h: any) => ({
+              title: h.title,
+              meta: h.meta || h.type,
+              gradient: h.gradient || this.gradients[0],
+              emoji: h.emoji || 'fa-film',
+              progress: h.percent,
+              videoId: h.videoId,
+            }));
+          this.cdr.detectChanges();
+        }
+      })
+      .catch(() => {});
   }
 
-  playVideo(item: any): void {
-    this.router.navigate(['/player'], {
-      queryParams: {
-        title: item.title,
-        subtitle: item.meta || '',
-      },
-    });
-  }
-
-  // ─── Favorites ───────────────────────────────────────────────
+  // ─── Favorites ───────────────────────────────────────────
   loadFavorites(): void {
     const token = this.tokenService.getAccessToken();
     if (!token) return;
@@ -850,29 +970,45 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadContinueWatching(): void {
-    const token = this.tokenService.getAccessToken();
-    if (!token) return;
-    fetch('http://localhost/api/v1/watch-history?limit=10', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((res) => {
-        if (res.success && res.data.history.length) {
-          this.continueCards = res.data.history
-            .filter((h: any) => h.percent > 0 && h.percent < 90)
-            .map((h: any) => ({
-              title: h.title,
-              meta: h.meta || h.type,
-              gradient: h.gradient || this.gradients[0],
-              emoji: h.emoji || 'fa-film',
-              progress: h.percent,
-              videoId: h.videoId,
-            }));
-          this.cdr.detectChanges();
-        }
-      })
-      .catch(() => {});
+  // ─── EPG ─────────────────────────────────────────────────
+  isEpgActive(): boolean {
+    return this.activeSection === 'epg';
+  }
+
+  isCurrentProgram(program: any): boolean {
+    const now = new Date();
+    const current = now.getHours() + now.getMinutes() / 60;
+    const [startH, startM] = program.start.split(':').map(Number);
+    const [endH, endM] = program.end.split(':').map(Number);
+    return current >= startH + startM / 60 && current < endH + endM / 60;
+  }
+
+  getProgramWidth(program: any): number {
+    const [startH, startM] = program.start.split(':').map(Number);
+    const [endH, endM] = program.end.split(':').map(Number);
+    return (endH + endM / 60 - (startH + startM / 60)) * 120;
+  }
+
+  // ─── Navigation ──────────────────────────────────────────
+  playChannel(ch: any): void {
+    if (!ch.streamUrl) {
+      alert('No stream available');
+      return;
+    }
+    this.router.navigate(['/player'], {
+      queryParams: {
+        title: ch.name,
+        subtitle: (ch.cat || 'Live') + ' • LIVE',
+        stream: ch.streamUrl,
+        live: 'true',
+      },
+    });
+  }
+
+  playVideo(item: any): void {
+    this.router.navigate(['/player'], {
+      queryParams: { title: item.title, subtitle: item.meta || '' },
+    });
   }
 
   ngOnDestroy(): void {

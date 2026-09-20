@@ -16,556 +16,179 @@
     />
 
     <div class="content-body">
-      <!-- ══════════════ HOME ══════════════ -->
-      @if (activeSection === "home") {
-        <div class="hero">
-          @for (item of heroItems; track $index) {
-            <div class="hero-slide" [class.active]="$index === heroIndex">
-              <div class="hero-bg" [style.background]="item.gradient"></div>
-              <div class="hero-overlay"></div>
-              <div class="hero-content">
-                <div class="hero-tag">
-                  @if (item.tag === "Live Now") {
-                    <span class="live-dot"></span>
-                  }
-                  {{ item.tag }}
-                </div>
-                <h1>{{ item.title }}</h1>
-                <div class="hero-meta">
-                  @if (item.rating) {
-                    <span class="rating"
-                      ><i class="fa-solid fa-star"></i> {{ item.rating }}</span
-                    >
-                  }
-                  <span>{{ item.meta }}</span>
-                </div>
-                <p>{{ item.desc }}</p>
-                <div class="hero-actions">
-                  <button
-                    class="btn btn-primary btn-lg"
-                    (click)="openDetail(trendingCards[0])"
-                  >
-                    <i class="fa-solid fa-play"></i>
-                    {{ item.tag === "Live Now" ? "Watch Live" : "Play Now" }}
-                  </button>
-                  <button class="btn btn-secondary btn-lg">
-                    <i class="fa-solid fa-info-circle"></i> More Info
-                  </button>
-                </div>
-              </div>
+      <div class="content-body">
+        <div
+          *ngIf="activeSection === 'epg'"
+          style="color: white; padding: 40px; background: red; font-size: 24px"
+        >
+          TV GUIDE TEST
+        </div>
+        <!-- ══════════════ HOME ══════════════ -->
+        @if (activeSection === "home") {
+          @if (showEpg) {
+            <div style="background: red; color: white; padding: 100px">
+              EPG TEST
             </div>
           }
-          <div class="hero-dots">
+          <div class="hero">
             @for (item of heroItems; track $index) {
-              <div
-                class="dot"
-                [class.active]="$index === heroIndex"
-                (click)="setHero($index)"
-              ></div>
-            }
-          </div>
-        </div>
-
-        <div class="content-row">
-          <div class="content-row-header">
-            <h3>Continue Watching</h3>
-            <a href="#">See All</a>
-          </div>
-          <div class="card-scroll">
-            @for (item of continueCards; track $index) {
-              <div class="card card-wide" (click)="openDetail(item)">
-                <div class="card-img wide">
-                  <div class="poster" [style.background]="item.gradient">
-                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
+              <div class="hero-slide" [class.active]="$index === heroIndex">
+                <div class="hero-bg" [style.background]="item.gradient"></div>
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                  <div class="hero-tag">
+                    @if (item.tag === "Live Now") {
+                      <span class="live-dot"></span>
+                    }
+                    {{ item.tag }}
                   </div>
-                  <div class="card-overlay">
-                    <div class="play-btn">
-                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
-                    </div>
+                  <h1>{{ item.title }}</h1>
+                  <div class="hero-meta">
+                    @if (item.rating) {
+                      <span class="rating"
+                        ><i class="fa-solid fa-star"></i>
+                        {{ item.rating }}</span
+                      >
+                    }
+                    <span>{{ item.meta }}</span>
                   </div>
-                  <div class="progress-bar-bottom">
-                    <div
-                      class="progress-fill"
-                      [style.width.%]="item.progress"
-                    ></div>
-                  </div>
-                </div>
-                <div class="card-info">
-                  <h4>{{ item.title }}</h4>
-                  <p>{{ item.meta }}</p>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-
-        <div class="content-row">
-          <div class="content-row-header">
-            <h3>Trending Now</h3>
-            <a href="#" (click)="onNavigate('movies')">See All</a>
-          </div>
-          <div class="card-scroll">
-            @for (item of trendingCards; track $index) {
-              <div class="card" (click)="openDetail(item)">
-                <div class="card-img">
-                  <div class="poster" [style.background]="item.gradient">
-                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
-                  </div>
-                  <div class="card-overlay">
-                    <div class="play-btn">
-                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
-                    </div>
-                  </div>
-                  @if (item.badge) {
-                    <span class="card-badge" [class]="item.badge">{{
-                      item.badge
-                    }}</span>
-                  }
-                </div>
-                <div class="card-info">
-                  <h4>{{ item.title }}</h4>
-                  <p>{{ item.meta }}</p>
-                  <div class="card-rating">
-                    <i class="fa-solid fa-star"></i> {{ item.rating }}
+                  <p>{{ item.desc }}</p>
+                  <div class="hero-actions">
+                    <button
+                      class="btn btn-primary btn-lg"
+                      (click)="openDetail(trendingCards[0])"
+                    >
+                      <i class="fa-solid fa-play"></i>
+                      {{ item.tag === "Live Now" ? "Watch Live" : "Play Now" }}
+                    </button>
+                    <button class="btn btn-secondary btn-lg">
+                      <i class="fa-solid fa-info-circle"></i> More Info
+                    </button>
                   </div>
                 </div>
               </div>
             }
-          </div>
-        </div>
-
-        <div class="content-row">
-          <div class="content-row-header">
-            <h3>Live Channels</h3>
-            <a href="#" (click)="onNavigate('live-tv')">See All</a>
-          </div>
-          <div class="card-scroll">
-            @for (ch of liveChannels; track $index) {
-              <div class="live-card" (click)="playChannel(ch)">
-                <div class="channel-icon" [style.background]="ch.color">
-                  <i class="fa-solid" [class]="'fa-solid ' + ch.icon"></i>
-                </div>
-                <h4>{{ ch.name }}</h4>
-                <p>{{ ch.cat }}</p>
-                @if (ch.live) {
-                  <div class="live-indicator">
-                    <span class="dot"></span> LIVE
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        </div>
-
-        <div class="content-row">
-          <div class="content-row-header">
-            <h3>Popular Movies</h3>
-            <a href="#" (click)="onNavigate('movies')">See All</a>
-          </div>
-          <div class="card-scroll">
-            @for (item of popularMovies; track $index) {
-              <div class="card" (click)="openDetail(item)">
-                <div class="card-img">
-                  <div class="poster" [style.background]="item.gradient">
-                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
-                  </div>
-                  <div class="card-overlay">
-                    <div class="play-btn">
-                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
-                    </div>
-                  </div>
-                </div>
-                <div class="card-info">
-                  <h4>{{ item.title }}</h4>
-                  <p>{{ item.meta }}</p>
-                  <div class="card-rating">
-                    <i class="fa-solid fa-star"></i> {{ item.rating }}
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-
-        <div class="content-row" style="padding-bottom: 40px">
-          <div class="content-row-header">
-            <h3>New Releases</h3>
-            <a href="#" (click)="onNavigate('tvshows')">See All</a>
-          </div>
-          <div class="card-scroll">
-            @for (item of newReleases; track $index) {
-              <div class="card" (click)="openDetail(item)">
-                <div class="card-img">
-                  <div class="poster" [style.background]="item.gradient">
-                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
-                  </div>
-                  <div class="card-overlay">
-                    <div class="play-btn">
-                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
-                    </div>
-                  </div>
-                  <span class="card-badge new">new</span>
-                </div>
-                <div class="card-info">
-                  <h4>{{ item.title }}</h4>
-                  <p>{{ item.meta }}</p>
-                  <div class="card-rating">
-                    <i class="fa-solid fa-star"></i> {{ item.rating }}
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- ══════════════ LIVE TV ══════════════ -->
-      @if (activeSection === "live-tv") {
-        <div class="content-row">
-          <div class="content-row-header">
-            <h2 style="font-size: 28px">Live TV</h2>
-          </div>
-          <div class="filter-row">
-            @for (f of channelFilters; track f) {
-              <button
-                class="btn btn-sm"
-                [class.btn-primary]="channelFilter === f"
-                [class.btn-secondary]="channelFilter !== f"
-                (click)="filterChannels(f)"
-              >
-                {{ f }}
-              </button>
-            }
-          </div>
-          <div class="channels-grid">
-            @for (ch of filteredChannels; track $index) {
-              <div
-                class="live-card"
-                style="width: auto"
-                (click)="playChannel(ch)"
-              >
-                <div class="channel-icon" [style.background]="ch.color">
-                  <i class="fa-solid" [class]="'fa-solid ' + ch.icon"></i>
-                </div>
-                <h4>{{ ch.name }}</h4>
-                <p>{{ ch.cat }}</p>
-                @if (ch.live) {
-                  <div class="live-indicator">
-                    <span class="dot"></span> LIVE
-                  </div>
-                } @else {
-                  <div
-                    style="
-                      color: var(--text-muted);
-                      font-size: 11px;
-                      margin-top: 8px;
-                    "
-                  >
-                    Offline
-                  </div>
-                }
-                @if (ch.streamUrl) {
-                  <button
-                    class="btn btn-primary btn-sm"
-                    style="margin-top: 12px; width: 100%; pointer-events: none"
-                  >
-                    <i class="fa-solid fa-play"></i> Watch Live
-                  </button>
-                }
-              </div>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- ══════════════ MOVIES ══════════════ -->
-      @if (activeSection === "movies") {
-        <div class="content-row">
-          <div class="content-row-header">
-            <h2 style="font-size: 28px">Movies</h2>
-          </div>
-          <div class="filter-row">
-            @for (f of movieFilters; track f) {
-              <button
-                class="btn btn-sm"
-                [class.btn-primary]="movieFilter === f"
-                [class.btn-secondary]="movieFilter !== f"
-                (click)="filterMovies(f)"
-              >
-                {{ f }}
-              </button>
-            }
-          </div>
-          <div class="search-grid">
-            @for (item of filteredMovies; track $index) {
-              <div class="card grid-card" (click)="openDetail(item)">
-                <div class="card-img grid-img">
-                  <div class="poster" [style.background]="item.gradient">
-                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
-                  </div>
-                  <div class="card-overlay">
-                    <div class="play-btn">
-                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
-                    </div>
-                  </div>
-                  @if (item.badge) {
-                    <span class="card-badge" [class]="item.badge">{{
-                      item.badge
-                    }}</span>
-                  }
-                </div>
-                <div class="card-info">
-                  <h4>{{ item.title }}</h4>
-                  <p>{{ item.meta }}</p>
-                  <div class="card-rating">
-                    <i class="fa-solid fa-star"></i> {{ item.rating }}
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- ══════════════ TV SHOWS ══════════════ -->
-      @if (activeSection === "tvshows") {
-        <div class="content-row">
-          <div class="content-row-header">
-            <h2 style="font-size: 28px">TV Shows</h2>
-          </div>
-          <div class="filter-row">
-            @for (f of showFilters; track f) {
-              <button
-                class="btn btn-sm"
-                [class.btn-primary]="showFilter === f"
-                [class.btn-secondary]="showFilter !== f"
-                (click)="filterShows(f)"
-              >
-                {{ f }}
-              </button>
-            }
-          </div>
-          <div class="search-grid">
-            @for (item of filteredShows; track $index) {
-              <div class="card grid-card" (click)="openDetail(item)">
-                <div class="card-img grid-img">
-                  <div class="poster" [style.background]="item.gradient">
-                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
-                  </div>
-                  <div class="card-overlay">
-                    <div class="play-btn">
-                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
-                    </div>
-                  </div>
-                </div>
-                <div class="card-info">
-                  <h4>{{ item.title }}</h4>
-                  <p>{{ item.meta }}</p>
-                  <div class="card-rating">
-                    <i class="fa-solid fa-star"></i> {{ item.rating }}
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- ══════════════ SEARCH ══════════════ -->
-      @if (activeSection === "search") {
-        <div class="search-hero">
-          <h2>What are you looking for?</h2>
-          <div class="search-input-lg">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input
-              type="text"
-              placeholder="Search movies, shows, channels..."
-              [(ngModel)]="searchQuery"
-              (input)="onSearch()"
-              (keyup.enter)="onSearch()"
-            />
-          </div>
-        </div>
-        <div class="content-row">
-          @if (!hasSearched) {
-            <h3 style="margin-bottom: 16px; color: var(--text-dim)">
-              Popular Searches
-            </h3>
-            <div class="filter-row" style="margin-bottom: 32px">
-              @for (
-                tag of [
-                  "Action Movies",
-                  "Live News",
-                  "Comedy Shows",
-                  "Sports",
-                  "Documentaries",
-                ];
-                track tag
-              ) {
-                <button
-                  class="btn btn-secondary btn-sm"
-                  (click)="searchQuery = tag; onSearch()"
-                >
-                  {{ tag }}
-                </button>
-              }
-            </div>
-          }
-          <h3 style="margin-bottom: 16px">
-            {{
-              hasSearched ? 'Results for "' + searchQuery + '"' : "Browse All"
-            }}
-          </h3>
-          <div class="search-grid">
-            @for (item of searchResults; track $index) {
-              <div class="card grid-card" (click)="openDetail(item)">
-                <div class="card-img grid-img">
-                  <div class="poster" [style.background]="item.gradient">
-                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
-                  </div>
-                  <div class="card-overlay">
-                    <div class="play-btn">
-                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
-                    </div>
-                  </div>
-                </div>
-                <div class="card-info">
-                  <h4>{{ item.title }}</h4>
-                  <p>{{ item.meta }}</p>
-                  <div class="card-rating">
-                    <i class="fa-solid fa-star"></i> {{ item.rating }}
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- ══════════════ CATEGORIES ══════════════ -->
-      @if (activeSection === "categories") {
-        <div class="content-row">
-          <div class="content-row-header">
-            <h2 style="font-size: 28px">Categories</h2>
-          </div>
-        </div>
-        <div class="categories-grid">
-          @for (cat of categories; track $index) {
-            <div class="category-card" (click)="onNavigate('movies')">
-              <div class="cat-bg" [style.background]="cat.gradient"></div>
-              <div class="cat-overlay">
-                <div>
-                  <h3>{{ cat.name }}</h3>
-                  <span>{{ cat.count }}</span>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      }
-
-      <!-- ══════════════ MOVIE DETAIL ══════════════ -->
-      @if (activeSection === "detail" && selectedMovie) {
-        <div class="detail-hero">
-          <div
-            class="hero-bg"
-            [style.background]="selectedMovie.gradient"
-          ></div>
-          <div class="hero-overlay"></div>
-          <div class="detail-info">
-            <div class="detail-poster">
-              <div
-                class="poster"
-                [style.background]="selectedMovie.gradient"
-                style="
-                  width: 100%;
-                  height: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                "
-              >
-                <i
-                  class="fa-solid"
-                  [class]="'fa-solid ' + selectedMovie.emoji"
-                  style="font-size: 64px; color: rgba(255, 255, 255, 0.9)"
-                ></i>
-              </div>
-            </div>
-            <div class="detail-text">
-              <h1>{{ selectedMovie.title }}</h1>
-              <div class="detail-meta">
-                <span class="rating"
-                  ><i class="fa-solid fa-star"></i>
-                  {{ selectedMovie.rating }}</span
-                >
-                <span class="dot-sep"></span>
-                <span>{{ selectedMovie.meta }}</span>
-                <span class="dot-sep"></span>
-                <span>4K UHD</span>
-              </div>
-              <div class="detail-tags">
-                <span class="tag">Action</span>
-                <span class="tag">Thriller</span>
-                <span class="tag">Sci-Fi</span>
-              </div>
-              <p class="synopsis">
-                In a dystopian future where humanity's last survivors live in
-                floating cities, a rogue pilot discovers a conspiracy that
-                threatens to destroy everything. With time running out, she must
-                navigate treacherous alliances and impossible choices.
-              </p>
-              <div class="detail-actions">
-                <button
-                  class="btn btn-primary btn-lg"
-                  (click)="playVideo(selectedMovie)"
-                >
-                  <i class="fa-solid fa-play"></i> Play Now
-                </button>
-                <button
-                  class="btn btn-secondary btn-lg"
-                  (click)="toggleFavorite(selectedMovie)"
-                >
-                  <i
-                    class="fa-solid"
-                    [class]="
-                      isFavorite(selectedMovie)
-                        ? 'fa-solid fa-heart'
-                        : 'fa-solid fa-plus'
-                    "
-                  ></i>
-                  {{ isFavorite(selectedMovie) ? "Saved" : "My List" }}
-                </button>
-                <button class="btn btn-secondary btn-lg">
-                  <i class="fa-solid fa-share-nodes"></i> Share
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="detail-body">
-          <div class="detail-section">
-            <h3>Cast & Crew</h3>
-            <div class="cast-grid">
-              @for (c of cast; track $index) {
-                <div class="cast-card">
-                  <div
-                    class="cast-avatar"
-                    [style.background]="gradients[$index]"
-                  >
-                    <i class="fa-solid" [class]="'fa-solid ' + c.icon"></i>
-                  </div>
-                  <div class="name">{{ c.name }}</div>
-                  <div class="role">{{ c.role }}</div>
-                </div>
+            <div class="hero-dots">
+              @for (item of heroItems; track $index) {
+                <div
+                  class="dot"
+                  [class.active]="$index === heroIndex"
+                  (click)="setHero($index)"
+                ></div>
               }
             </div>
           </div>
-          <div class="detail-section">
-            <h3>More Like This</h3>
+
+          <div class="content-row">
+            <div class="content-row-header">
+              <h3>Continue Watching</h3>
+              <a href="#">See All</a>
+            </div>
             <div class="card-scroll">
-              @for (item of trendingCards.slice(0, 6); track $index) {
+              @for (item of continueCards; track $index) {
+                <div class="card card-wide" (click)="openDetail(item)">
+                  <div class="card-img wide">
+                    <div class="poster" [style.background]="item.gradient">
+                      <i
+                        class="fa-solid"
+                        [class]="'fa-solid ' + item.emoji"
+                      ></i>
+                    </div>
+                    <div class="card-overlay">
+                      <div class="play-btn">
+                        <i
+                          class="fa-solid fa-play"
+                          style="margin-left: 3px"
+                        ></i>
+                      </div>
+                    </div>
+                    <div class="progress-bar-bottom">
+                      <div
+                        class="progress-fill"
+                        [style.width.%]="item.progress"
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="card-info">
+                    <h4>{{ item.title }}</h4>
+                    <p>{{ item.meta }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="content-row">
+            <div class="content-row-header">
+              <h3>Trending Now</h3>
+              <a href="#" (click)="onNavigate('movies')">See All</a>
+            </div>
+            <div class="card-scroll">
+              @for (item of trendingCards; track $index) {
+                <div class="card" (click)="openDetail(item)">
+                  <div class="card-img">
+                    <div class="poster" [style.background]="item.gradient">
+                      <i
+                        class="fa-solid"
+                        [class]="'fa-solid ' + item.emoji"
+                      ></i>
+                    </div>
+                    <div class="card-overlay">
+                      <div class="play-btn">
+                        <i
+                          class="fa-solid fa-play"
+                          style="margin-left: 3px"
+                        ></i>
+                      </div>
+                    </div>
+                    @if (item.badge) {
+                      <span class="card-badge" [class]="item.badge">{{
+                        item.badge
+                      }}</span>
+                    }
+                  </div>
+                  <div class="card-info">
+                    <h4>{{ item.title }}</h4>
+                    <p>{{ item.meta }}</p>
+                    <div class="card-rating">
+                      <i class="fa-solid fa-star"></i> {{ item.rating }}
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="content-row">
+            <div class="content-row-header">
+              <h3>Live Channels</h3>
+              <a href="#" (click)="onNavigate('live-tv')">See All</a>
+            </div>
+            <div class="card-scroll">
+              @for (ch of liveChannels; track $index) {
+                <div class="live-card" (click)="playChannel(ch)">
+                  <div class="channel-icon" [style.background]="ch.color">
+                    <i class="fa-solid" [class]="'fa-solid ' + ch.icon"></i>
+                  </div>
+                  <h4>{{ ch.name }}</h4>
+                  <p>{{ ch.cat }}</p>
+                  @if (ch.live) {
+                    <div class="live-indicator">
+                      <span class="dot"></span> LIVE
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="content-row">
+            <div class="content-row-header">
+              <h3>Popular Movies</h3>
+              <a href="#" (click)="onNavigate('movies')">See All</a>
+            </div>
+            <div class="card-scroll">
+              @for (item of popularMovies; track $index) {
                 <div class="card" (click)="openDetail(item)">
                   <div class="card-img">
                     <div class="poster" [style.background]="item.gradient">
@@ -594,36 +217,189 @@
               }
             </div>
           </div>
-        </div>
-      }
 
-      <!-- ══════════════ MY LIST ══════════════ -->
-      @if (activeSection === "mylist") {
-        <div class="content-row">
-          <div class="content-row-header">
-            <h2 style="font-size: 28px">My List</h2>
-          </div>
-          @if (favorites.length === 0) {
-            <div class="empty-state">
-              <i class="fa-solid fa-heart"></i>
-              <h3>Your list is empty</h3>
-              <p>Add movies and shows to your list</p>
-              <button class="btn btn-primary" (click)="onNavigate('home')">
-                Browse Content
-              </button>
+          <div class="content-row" style="padding-bottom: 40px">
+            <div class="content-row-header">
+              <h3>New Releases</h3>
+              <a href="#" (click)="onNavigate('tvshows')">See All</a>
             </div>
-          } @else {
-            <div class="search-grid">
-              @for (item of favorites; track $index) {
-                <div class="card grid-card" (click)="openDetail(item)">
-                  <div class="card-img grid-img">
-                    <div
-                      class="poster"
-                      [style.background]="item.gradient || '#1a1a25'"
-                    >
+            <div class="card-scroll">
+              @for (item of newReleases; track $index) {
+                <div class="card" (click)="openDetail(item)">
+                  <div class="card-img">
+                    <div class="poster" [style.background]="item.gradient">
                       <i
                         class="fa-solid"
-                        [class]="'fa-solid ' + (item.emoji || 'fa-film')"
+                        [class]="'fa-solid ' + item.emoji"
+                      ></i>
+                    </div>
+                    <div class="card-overlay">
+                      <div class="play-btn">
+                        <i
+                          class="fa-solid fa-play"
+                          style="margin-left: 3px"
+                        ></i>
+                      </div>
+                    </div>
+                    <span class="card-badge new">new</span>
+                  </div>
+                  <div class="card-info">
+                    <h4>{{ item.title }}</h4>
+                    <p>{{ item.meta }}</p>
+                    <div class="card-rating">
+                      <i class="fa-solid fa-star"></i> {{ item.rating }}
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ══════════════ LIVE TV ══════════════ -->
+        @if (activeSection === "live-tv") {
+          <div class="content-row">
+            <div class="content-row-header">
+              <h2 style="font-size: 28px">Live TV</h2>
+            </div>
+            <div class="filter-row">
+              @for (f of channelFilters; track f) {
+                <button
+                  class="btn btn-sm"
+                  [class.btn-primary]="channelFilter === f"
+                  [class.btn-secondary]="channelFilter !== f"
+                  (click)="filterChannels(f)"
+                >
+                  {{ f }}
+                </button>
+              }
+            </div>
+            <div class="channels-grid">
+              @for (ch of filteredChannels; track $index) {
+                <div
+                  class="live-card"
+                  style="width: auto"
+                  (click)="playChannel(ch)"
+                >
+                  <div class="channel-icon" [style.background]="ch.color">
+                    <i class="fa-solid" [class]="'fa-solid ' + ch.icon"></i>
+                  </div>
+                  <h4>{{ ch.name }}</h4>
+                  <p>{{ ch.cat }}</p>
+                  @if (ch.live) {
+                    <div class="live-indicator">
+                      <span class="dot"></span> LIVE
+                    </div>
+                  } @else {
+                    <div
+                      style="
+                        color: var(--text-muted);
+                        font-size: 11px;
+                        margin-top: 8px;
+                      "
+                    >
+                      Offline
+                    </div>
+                  }
+                  @if (ch.streamUrl) {
+                    <button
+                      class="btn btn-primary btn-sm"
+                      style="
+                        margin-top: 12px;
+                        width: 100%;
+                        pointer-events: none;
+                      "
+                    >
+                      <i class="fa-solid fa-play"></i> Watch Live
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ══════════════ MOVIES ══════════════ -->
+        @if (activeSection === "movies") {
+          <div class="content-row">
+            <div class="content-row-header">
+              <h2 style="font-size: 28px">Movies</h2>
+            </div>
+            <div class="filter-row">
+              @for (f of movieFilters; track f) {
+                <button
+                  class="btn btn-sm"
+                  [class.btn-primary]="movieFilter === f"
+                  [class.btn-secondary]="movieFilter !== f"
+                  (click)="filterMovies(f)"
+                >
+                  {{ f }}
+                </button>
+              }
+            </div>
+            <div class="search-grid">
+              @for (item of filteredMovies; track $index) {
+                <div class="card grid-card" (click)="openDetail(item)">
+                  <div class="card-img grid-img">
+                    <div class="poster" [style.background]="item.gradient">
+                      <i
+                        class="fa-solid"
+                        [class]="'fa-solid ' + item.emoji"
+                      ></i>
+                    </div>
+                    <div class="card-overlay">
+                      <div class="play-btn">
+                        <i
+                          class="fa-solid fa-play"
+                          style="margin-left: 3px"
+                        ></i>
+                      </div>
+                    </div>
+                    @if (item.badge) {
+                      <span class="card-badge" [class]="item.badge">{{
+                        item.badge
+                      }}</span>
+                    }
+                  </div>
+                  <div class="card-info">
+                    <h4>{{ item.title }}</h4>
+                    <p>{{ item.meta }}</p>
+                    <div class="card-rating">
+                      <i class="fa-solid fa-star"></i> {{ item.rating }}
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ══════════════ TV SHOWS ══════════════ -->
+        @if (activeSection === "tvshows") {
+          <div class="content-row">
+            <div class="content-row-header">
+              <h2 style="font-size: 28px">TV Shows</h2>
+            </div>
+            <div class="filter-row">
+              @for (f of showFilters; track f) {
+                <button
+                  class="btn btn-sm"
+                  [class.btn-primary]="showFilter === f"
+                  [class.btn-secondary]="showFilter !== f"
+                  (click)="filterShows(f)"
+                >
+                  {{ f }}
+                </button>
+              }
+            </div>
+            <div class="search-grid">
+              @for (item of filteredShows; track $index) {
+                <div class="card grid-card" (click)="openDetail(item)">
+                  <div class="card-img grid-img">
+                    <div class="poster" [style.background]="item.gradient">
+                      <i
+                        class="fa-solid"
+                        [class]="'fa-solid ' + item.emoji"
                       ></i>
                     </div>
                     <div class="card-overlay">
@@ -645,42 +421,62 @@
                 </div>
               }
             </div>
-          }
-        </div>
-      }
-      <!-- ══════════════ WATCH HISTORY ══════════════ -->
-      @if (activeSection === "watch-history") {
-        <div class="content-row">
-          <div class="content-row-header">
-            <h2 style="font-size: 28px">Watch History</h2>
-            <button
-              class="btn btn-secondary btn-sm"
-              (click)="clearWatchHistory()"
-            >
-              <i class="fa-solid fa-trash"></i> Clear All
-            </button>
           </div>
-          @if (watchHistory.length === 0) {
-            <div class="empty-state">
-              <i class="fa-solid fa-clock-rotate-left"></i>
-              <h3>No watch history yet</h3>
-              <p>Videos you open will appear here</p>
-              <button class="btn btn-primary" (click)="onNavigate('home')">
-                Browse Content
-              </button>
+        }
+
+        <!-- ══════════════ SEARCH ══════════════ -->
+        @if (activeSection === "search") {
+          <div class="search-hero">
+            <h2>What are you looking for?</h2>
+            <div class="search-input-lg">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input
+                type="text"
+                placeholder="Search movies, shows, channels..."
+                [(ngModel)]="searchQuery"
+                (input)="onSearch()"
+                (keyup.enter)="onSearch()"
+              />
             </div>
-          } @else {
+          </div>
+          <div class="content-row">
+            @if (!hasSearched) {
+              <h3 style="margin-bottom: 16px; color: var(--text-dim)">
+                Popular Searches
+              </h3>
+              <div class="filter-row" style="margin-bottom: 32px">
+                @for (
+                  tag of [
+                    "Action Movies",
+                    "Live News",
+                    "Comedy Shows",
+                    "Sports",
+                    "Documentaries",
+                  ];
+                  track tag
+                ) {
+                  <button
+                    class="btn btn-secondary btn-sm"
+                    (click)="searchQuery = tag; onSearch()"
+                  >
+                    {{ tag }}
+                  </button>
+                }
+              </div>
+            }
+            <h3 style="margin-bottom: 16px">
+              {{
+                hasSearched ? 'Results for "' + searchQuery + '"' : "Browse All"
+              }}
+            </h3>
             <div class="search-grid">
-              @for (item of watchHistory; track $index) {
+              @for (item of searchResults; track $index) {
                 <div class="card grid-card" (click)="openDetail(item)">
                   <div class="card-img grid-img">
-                    <div
-                      class="poster"
-                      [style.background]="item.gradient || '#1a1a25'"
-                    >
+                    <div class="poster" [style.background]="item.gradient">
                       <i
                         class="fa-solid"
-                        [class]="'fa-solid ' + (item.emoji || 'fa-film')"
+                        [class]="'fa-solid ' + item.emoji"
                       ></i>
                     </div>
                     <div class="card-overlay">
@@ -691,568 +487,902 @@
                         ></i>
                       </div>
                     </div>
-                    @if (item.percent > 0) {
-                      <div class="progress-bar-bottom">
-                        <div
-                          class="progress-fill"
-                          [style.width.%]="item.percent"
-                        ></div>
-                      </div>
-                    }
                   </div>
                   <div class="card-info">
                     <h4>{{ item.title }}</h4>
-                    <p style="text-transform: capitalize">{{ item.type }}</p>
-                    <p style="font-size: 11px; color: var(--text-muted)">
-                      {{ item.watchedAt | date: "mediumDate" }}
-                    </p>
+                    <p>{{ item.meta }}</p>
+                    <div class="card-rating">
+                      <i class="fa-solid fa-star"></i> {{ item.rating }}
+                    </div>
                   </div>
                 </div>
               }
             </div>
-          }
-        </div>
-      }
-
-      <!-- ══════════════ DOWNLOADS ══════════════ -->
-      @if (activeSection === "downloads") {
-        <div class="content-row">
-          <div class="content-row-header">
-            <h2 style="font-size: 28px">Downloads</h2>
           </div>
-          @for (item of continueCards.slice(0, 4); track $index) {
-            <div class="download-item">
-              <div class="download-thumb" [style.background]="item.gradient">
-                <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
+        }
+
+        <!-- ══════════════ CATEGORIES ══════════════ -->
+        @if (activeSection === "categories") {
+          <div class="content-row">
+            <div class="content-row-header">
+              <h2 style="font-size: 28px">Categories</h2>
+            </div>
+          </div>
+          <div class="categories-grid">
+            @for (cat of categories; track $index) {
+              <div class="category-card" (click)="onNavigate('movies')">
+                <div class="cat-bg" [style.background]="cat.gradient"></div>
+                <div class="cat-overlay">
+                  <div>
+                    <h3>{{ cat.name }}</h3>
+                    <span>{{ cat.count }}</span>
+                  </div>
+                </div>
               </div>
-              <div class="download-info">
-                <h4>{{ item.title }}</h4>
-                <p>
-                  {{ (1 + $index * 0.8).toFixed(1) }} GB —
-                  {{
-                    item.progress > 80
-                      ? "Downloaded"
-                      : item.progress + "% complete"
-                  }}
+            }
+          </div>
+        }
+
+        <!-- ══════════════ MOVIE DETAIL ══════════════ -->
+        @if (activeSection === "detail" && selectedMovie) {
+          <div class="detail-hero">
+            <div
+              class="hero-bg"
+              [style.background]="selectedMovie.gradient"
+            ></div>
+            <div class="hero-overlay"></div>
+            <div class="detail-info">
+              <div class="detail-poster">
+                <div
+                  class="poster"
+                  [style.background]="selectedMovie.gradient"
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i
+                    class="fa-solid"
+                    [class]="'fa-solid ' + selectedMovie.emoji"
+                    style="font-size: 64px; color: rgba(255, 255, 255, 0.9)"
+                  ></i>
+                </div>
+              </div>
+              <div class="detail-text">
+                <h1>{{ selectedMovie.title }}</h1>
+                <div class="detail-meta">
+                  <span class="rating"
+                    ><i class="fa-solid fa-star"></i>
+                    {{ selectedMovie.rating }}</span
+                  >
+                  <span class="dot-sep"></span>
+                  <span>{{ selectedMovie.meta }}</span>
+                  <span class="dot-sep"></span>
+                  <span>4K UHD</span>
+                </div>
+                <div class="detail-tags">
+                  <span class="tag">Action</span>
+                  <span class="tag">Thriller</span>
+                  <span class="tag">Sci-Fi</span>
+                </div>
+                <p class="synopsis">
+                  In a dystopian future where humanity's last survivors live in
+                  floating cities, a rogue pilot discovers a conspiracy that
+                  threatens to destroy everything. With time running out, she
+                  must navigate treacherous alliances and impossible choices.
                 </p>
-                @if (item.progress <= 80) {
-                  <div class="download-progress">
-                    <div class="bar" [style.width.%]="item.progress"></div>
+                <div class="detail-actions">
+                  <button
+                    class="btn btn-primary btn-lg"
+                    (click)="playVideo(selectedMovie)"
+                  >
+                    <i class="fa-solid fa-play"></i> Play Now
+                  </button>
+                  <button
+                    class="btn btn-secondary btn-lg"
+                    (click)="toggleFavorite(selectedMovie)"
+                  >
+                    <i
+                      class="fa-solid"
+                      [class]="
+                        isFavorite(selectedMovie)
+                          ? 'fa-solid fa-heart'
+                          : 'fa-solid fa-plus'
+                      "
+                    ></i>
+                    {{ isFavorite(selectedMovie) ? "Saved" : "My List" }}
+                  </button>
+                  <button class="btn btn-secondary btn-lg">
+                    <i class="fa-solid fa-share-nodes"></i> Share
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-body">
+            <div class="detail-section">
+              <h3>Cast & Crew</h3>
+              <div class="cast-grid">
+                @for (c of cast; track $index) {
+                  <div class="cast-card">
+                    <div
+                      class="cast-avatar"
+                      [style.background]="gradients[$index]"
+                    >
+                      <i class="fa-solid" [class]="'fa-solid ' + c.icon"></i>
+                    </div>
+                    <div class="name">{{ c.name }}</div>
+                    <div class="role">{{ c.role }}</div>
                   </div>
                 }
               </div>
-              <button class="btn btn-secondary btn-sm">
-                <i class="fa-solid fa-play"></i> Play
-              </button>
             </div>
-          }
-        </div>
-      }
-
-      <!-- ══════════════ SETTINGS ══════════════ -->
-      @if (activeSection === "settings") {
-        <div class="content-row">
-          <h2 style="margin-bottom: 24px">Settings</h2>
-          <div class="settings-section">
-            <h3>Playback</h3>
-            <div class="setting-row">
-              <div class="label">
-                <h4>Video Quality</h4>
-                <p>Set default streaming quality</p>
-              </div>
-              <select>
-                <option>Auto</option>
-                <option>4K UHD</option>
-                <option>1080p</option>
-                <option>720p</option>
-              </select>
-            </div>
-            <div class="setting-row">
-              <div class="label">
-                <h4>Autoplay Next</h4>
-                <p>Automatically play next episode</p>
-              </div>
-              <div class="toggle on" (click)="toggleSetting($event)"></div>
-            </div>
-            <div class="setting-row">
-              <div class="label">
-                <h4>Subtitles</h4>
-                <p>Show subtitles by default</p>
-              </div>
-              <div class="toggle" (click)="toggleSetting($event)"></div>
-            </div>
-          </div>
-          <div class="settings-section">
-            <h3>Notifications</h3>
-            <div class="setting-row">
-              <div class="label">
-                <h4>Push Notifications</h4>
-                <p>Receive push alerts</p>
-              </div>
-              <div class="toggle on" (click)="toggleSetting($event)"></div>
-            </div>
-            <div class="setting-row">
-              <div class="label">
-                <h4>New Releases</h4>
-                <p>Get notified about new content</p>
-              </div>
-              <div class="toggle on" (click)="toggleSetting($event)"></div>
-            </div>
-          </div>
-          <div class="settings-section">
-            <h3>Account</h3>
-            <div class="setting-row">
-              <div class="label">
-                <h4>Language</h4>
-                <p>Preferred language</p>
-              </div>
-              <select>
-                <option>English</option>
-                <option>Español</option>
-                <option>Français</option>
-              </select>
-            </div>
-            <div class="setting-row">
-              <div class="label">
-                <h4>Parental Controls</h4>
-                <p>Restrict mature content</p>
-              </div>
-              <div class="toggle" (click)="toggleSetting($event)"></div>
-            </div>
-          </div>
-        </div>
-      }
-
-      <!-- ══════════════ PROFILE ══════════════ -->
-      @if (activeSection === "profile") {
-        <div class="content-row">
-          <div class="profile-header">
-            <div class="profile-avatar">
-              {{ profile?.name?.charAt(0) || "U" }}
-            </div>
-            <div class="profile-info">
-              <h2>{{ profile?.name || "User" }}</h2>
-              <p>{{ profile?.email }}</p>
-              <div class="profile-stats">
-                <div class="stat">
-                  <div class="stat-val">{{ watchHistory.length }}</div>
-                  <div class="stat-label">Watched</div>
-                </div>
-                <div class="stat">
-                  <div class="stat-val">23</div>
-                  <div class="stat-label">My List</div>
-                </div>
-                <div class="stat">
-                  <div class="stat-val">5</div>
-                  <div class="stat-label">Downloads</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-section" style="margin-top: 24px">
-            <h3>Edit Profile</h3>
-            @if (profileSuccess) {
-              <div class="alert-success">
-                <i class="fa-solid fa-circle-check"></i> {{ profileSuccess }}
-              </div>
-            }
-            @if (profileError) {
-              <div class="alert-error">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                {{ profileError }}
-              </div>
-            }
-            <div class="setting-row">
-              <div class="label"><h4>Full Name</h4></div>
-              <input
-                type="text"
-                [(ngModel)]="profileName"
-                style="width: 240px"
-              />
-            </div>
-            <div class="setting-row">
-              <div class="label">
-                <h4>Email</h4>
-                <p>Cannot be changed</p>
-              </div>
-              <span style="color: var(--text-dim); font-size: 14px">{{
-                profile?.email
-              }}</span>
-            </div>
-            <div style="margin-top: 16px">
-              <button
-                class="btn btn-primary"
-                [disabled]="profileLoading"
-                (click)="saveProfile()"
-              >
-                <i class="fa-solid fa-save"></i>
-                {{ profileLoading ? "Saving..." : "Save Changes" }}
-              </button>
-            </div>
-          </div>
-
-          <div class="settings-section">
-            <h3>Change Password</h3>
-            @if (passwordSuccess) {
-              <div class="alert-success">
-                <i class="fa-solid fa-circle-check"></i> {{ passwordSuccess }}
-              </div>
-            }
-            @if (passwordError) {
-              <div class="alert-error">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                {{ passwordError }}
-              </div>
-            }
-            <div class="setting-row">
-              <div class="label"><h4>Current Password</h4></div>
-              <input
-                type="password"
-                [(ngModel)]="currentPassword"
-                placeholder="Enter current password"
-                style="width: 240px"
-              />
-            </div>
-            <div class="setting-row">
-              <div class="label"><h4>New Password</h4></div>
-              <input
-                type="password"
-                [(ngModel)]="newPassword"
-                placeholder="Enter new password"
-                style="width: 240px"
-              />
-            </div>
-            <div class="setting-row">
-              <div class="label"><h4>Confirm Password</h4></div>
-              <input
-                type="password"
-                [(ngModel)]="confirmNewPassword"
-                placeholder="Confirm new password"
-                style="width: 240px"
-              />
-            </div>
-            <div style="margin-top: 16px">
-              <button
-                class="btn btn-primary"
-                [disabled]="passwordLoading"
-                (click)="changePassword()"
-              >
-                <i class="fa-solid fa-lock"></i>
-                {{ passwordLoading ? "Changing..." : "Change Password" }}
-              </button>
-            </div>
-          </div>
-
-          <div class="settings-section">
-            <h3>Quick Links</h3>
-            <div
-              class="setting-row"
-              style="cursor: pointer"
-              (click)="onNavigate('subscription')"
-            >
-              <div class="label">
-                <h4>
-                  <i
-                    class="fa-solid fa-crown"
-                    style="color: var(--gold); margin-right: 8px"
-                  ></i>
-                  Subscription
-                </h4>
-                <p>
-                  {{
-                    mySubscription ? "Active plan" : "No active subscription"
-                  }}
-                </p>
-              </div>
-              <i
-                class="fa-solid fa-chevron-right"
-                style="color: var(--text-muted)"
-              ></i>
-            </div>
-            <div
-              class="setting-row"
-              style="cursor: pointer"
-              (click)="onNavigate('watch-history')"
-            >
-              <div class="label">
-                <h4>
-                  <i
-                    class="fa-solid fa-clock-rotate-left"
-                    style="color: var(--accent2); margin-right: 8px"
-                  ></i>
-                  Watch History
-                </h4>
-                <p>{{ watchHistory.length }} items</p>
-              </div>
-              <i
-                class="fa-solid fa-chevron-right"
-                style="color: var(--text-muted)"
-              ></i>
-            </div>
-            <div
-              class="setting-row"
-              style="cursor: pointer"
-              (click)="onNavigate('downloads')"
-            >
-              <div class="label">
-                <h4>
-                  <i
-                    class="fa-solid fa-download"
-                    style="color: var(--success); margin-right: 8px"
-                  ></i>
-                  Downloads
-                </h4>
-                <p>5 items</p>
-              </div>
-              <i
-                class="fa-solid fa-chevron-right"
-                style="color: var(--text-muted)"
-              ></i>
-            </div>
-            <div
-              class="setting-row"
-              style="cursor: pointer"
-              (click)="onNavigate('settings')"
-            >
-              <div class="label">
-                <h4>
-                  <i
-                    class="fa-solid fa-gear"
-                    style="color: var(--accent2); margin-right: 8px"
-                  ></i>
-                  Settings
-                </h4>
-                <p>App preferences</p>
-              </div>
-              <i
-                class="fa-solid fa-chevron-right"
-                style="color: var(--text-muted)"
-              ></i>
-            </div>
-          </div>
-
-          <button
-            class="btn btn-secondary"
-            style="margin-top: 8px"
-            (click)="authService.logout()"
-          >
-            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-          </button>
-        </div>
-      }
-
-      <!-- ══════════════ SUBSCRIPTION ══════════════ -->
-      @if (activeSection === "subscription") {
-        <div class="plans-container">
-          <h2>Choose Your Plan</h2>
-          <p class="plans-subtitle">Unlock the full OTT TV experience</p>
-
-          @if (subscriptionSuccess) {
-            <div
-              class="alert-success"
-              style="margin-bottom: 24px; max-width: 600px; margin-inline: auto"
-            >
-              <i class="fa-solid fa-circle-check"></i> {{ subscriptionSuccess }}
-            </div>
-          }
-          @if (subscriptionError) {
-            <div
-              class="alert-error"
-              style="margin-bottom: 24px; max-width: 600px; margin-inline: auto"
-            >
-              <i class="fa-solid fa-circle-exclamation"></i>
-              {{ subscriptionError }}
-            </div>
-          }
-
-          @if (mySubscription) {
-            <div class="active-sub-banner">
-              <i class="fa-solid fa-crown"></i>
-              <div>
-                <strong>You have an active subscription</strong>
-                <p>
-                  Expires: {{ mySubscription.endDate | date: "mediumDate" }}
-                </p>
-              </div>
-              <span class="status-badge active">Active</span>
-            </div>
-          }
-
-          <div
-            class="plans-grid"
-            style="
-              display: grid;
-              grid-template-columns: repeat(3, 1fr);
-              gap: 24px;
-              margin-top: 32px;
-            "
-          >
-            @for (plan of plans; track plan.id) {
-              <div
-                class="plan-card"
-                [class.featured]="plan.slug === 'standard'"
-              >
-                @if (plan.slug === "standard") {
-                  <div class="plan-badge">Most Popular</div>
+            <div class="detail-section">
+              <h3>More Like This</h3>
+              <div class="card-scroll">
+                @for (item of trendingCards.slice(0, 6); track $index) {
+                  <div class="card" (click)="openDetail(item)">
+                    <div class="card-img">
+                      <div class="poster" [style.background]="item.gradient">
+                        <i
+                          class="fa-solid"
+                          [class]="'fa-solid ' + item.emoji"
+                        ></i>
+                      </div>
+                      <div class="card-overlay">
+                        <div class="play-btn">
+                          <i
+                            class="fa-solid fa-play"
+                            style="margin-left: 3px"
+                          ></i>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-info">
+                      <h4>{{ item.title }}</h4>
+                      <p>{{ item.meta }}</p>
+                      <div class="card-rating">
+                        <i class="fa-solid fa-star"></i> {{ item.rating }}
+                      </div>
+                    </div>
+                  </div>
                 }
-                <h3>{{ plan.name }}</h3>
-                <div class="price">${{ plan.price }}<span>/mo</span></div>
-                <div class="plan-period">
-                  Billed monthly • {{ plan.durationDays }} days
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ══════════════ MY LIST ══════════════ -->
+        @if (activeSection === "mylist") {
+          <div class="content-row">
+            <div class="content-row-header">
+              <h2 style="font-size: 28px">My List</h2>
+            </div>
+            @if (favorites.length === 0) {
+              <div class="empty-state">
+                <i class="fa-solid fa-heart"></i>
+                <h3>Your list is empty</h3>
+                <p>Add movies and shows to your list</p>
+                <button class="btn btn-primary" (click)="onNavigate('home')">
+                  Browse Content
+                </button>
+              </div>
+            } @else {
+              <div class="search-grid">
+                @for (item of favorites; track $index) {
+                  <div class="card grid-card" (click)="openDetail(item)">
+                    <div class="card-img grid-img">
+                      <div
+                        class="poster"
+                        [style.background]="item.gradient || '#1a1a25'"
+                      >
+                        <i
+                          class="fa-solid"
+                          [class]="'fa-solid ' + (item.emoji || 'fa-film')"
+                        ></i>
+                      </div>
+                      <div class="card-overlay">
+                        <div class="play-btn">
+                          <i
+                            class="fa-solid fa-play"
+                            style="margin-left: 3px"
+                          ></i>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-info">
+                      <h4>{{ item.title }}</h4>
+                      <p>{{ item.meta }}</p>
+                      <div class="card-rating">
+                        <i class="fa-solid fa-star"></i> {{ item.rating }}
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+        <!-- ══════════════ WATCH HISTORY ══════════════ -->
+        @if (activeSection === "watch-history") {
+          <div class="content-row">
+            <div class="content-row-header">
+              <h2 style="font-size: 28px">Watch History</h2>
+              <button
+                class="btn btn-secondary btn-sm"
+                (click)="clearWatchHistory()"
+              >
+                <i class="fa-solid fa-trash"></i> Clear All
+              </button>
+            </div>
+            @if (watchHistory.length === 0) {
+              <div class="empty-state">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <h3>No watch history yet</h3>
+                <p>Videos you open will appear here</p>
+                <button class="btn btn-primary" (click)="onNavigate('home')">
+                  Browse Content
+                </button>
+              </div>
+            } @else {
+              <div class="search-grid">
+                @for (item of watchHistory; track $index) {
+                  <div class="card grid-card" (click)="openDetail(item)">
+                    <div class="card-img grid-img">
+                      <div
+                        class="poster"
+                        [style.background]="item.gradient || '#1a1a25'"
+                      >
+                        <i
+                          class="fa-solid"
+                          [class]="'fa-solid ' + (item.emoji || 'fa-film')"
+                        ></i>
+                      </div>
+                      <div class="card-overlay">
+                        <div class="play-btn">
+                          <i
+                            class="fa-solid fa-play"
+                            style="margin-left: 3px"
+                          ></i>
+                        </div>
+                      </div>
+                      @if (item.percent > 0) {
+                        <div class="progress-bar-bottom">
+                          <div
+                            class="progress-fill"
+                            [style.width.%]="item.percent"
+                          ></div>
+                        </div>
+                      }
+                    </div>
+                    <div class="card-info">
+                      <h4>{{ item.title }}</h4>
+                      <p style="text-transform: capitalize">{{ item.type }}</p>
+                      <p style="font-size: 11px; color: var(--text-muted)">
+                        {{ item.watchedAt | date: "mediumDate" }}
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ══════════════ DOWNLOADS ══════════════ -->
+        @if (activeSection === "downloads") {
+          <div class="content-row">
+            <div class="content-row-header">
+              <h2 style="font-size: 28px">Downloads</h2>
+            </div>
+            @for (item of continueCards.slice(0, 4); track $index) {
+              <div class="download-item">
+                <div class="download-thumb" [style.background]="item.gradient">
+                  <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
                 </div>
-                <ul class="plan-features">
-                  @for (feature of plan.features; track feature) {
-                    <li><i class="fa-solid fa-check"></i> {{ feature }}</li>
+                <div class="download-info">
+                  <h4>{{ item.title }}</h4>
+                  <p>
+                    {{ (1 + $index * 0.8).toFixed(1) }} GB —
+                    {{
+                      item.progress > 80
+                        ? "Downloaded"
+                        : item.progress + "% complete"
+                    }}
+                  </p>
+                  @if (item.progress <= 80) {
+                    <div class="download-progress">
+                      <div class="bar" [style.width.%]="item.progress"></div>
+                    </div>
                   }
-                  <li>
-                    <i class="fa-solid fa-check"></i> Up to
-                    {{ plan.maxDevices }} device(s)
-                  </li>
-                  <li>
-                    <i class="fa-solid fa-check"></i>
-                    {{ plan.maxQuality }} quality
-                  </li>
-                </ul>
-                <button
-                  class="btn btn-full"
-                  [class.btn-primary]="plan.slug === 'standard'"
-                  [class.btn-outline]="plan.slug !== 'standard'"
-                  [disabled]="subscriptionLoading"
-                  (click)="subscribePlan(plan.id)"
-                >
-                  {{ subscriptionLoading ? "Processing..." : "Select Plan" }}
+                </div>
+                <button class="btn btn-secondary btn-sm">
+                  <i class="fa-solid fa-play"></i> Play
                 </button>
               </div>
             }
-            @if (plans.length === 0) {
-              <div class="plan-card">
-                <h3>Basic</h3>
-                <div class="price">$4.99<span>/mo</span></div>
-                <div class="plan-period">Billed monthly</div>
-                <ul class="plan-features">
-                  <li><i class="fa-solid fa-check"></i> 1 Device</li>
-                  <li><i class="fa-solid fa-check"></i> SD Quality</li>
-                  <li><i class="fa-solid fa-check"></i> No Ads</li>
-                </ul>
-                <button class="btn btn-outline btn-full">Select Plan</button>
-              </div>
-              <div class="plan-card featured">
-                <div class="plan-badge">Most Popular</div>
-                <h3>Standard</h3>
-                <div class="price">$9.99<span>/mo</span></div>
-                <div class="plan-period">Billed monthly</div>
-                <ul class="plan-features">
-                  <li><i class="fa-solid fa-check"></i> 2 Devices</li>
-                  <li><i class="fa-solid fa-check"></i> Full HD</li>
-                  <li><i class="fa-solid fa-check"></i> No Ads</li>
-                  <li><i class="fa-solid fa-check"></i> Downloads</li>
-                </ul>
-                <button class="btn btn-primary btn-full">Select Plan</button>
-              </div>
-              <div class="plan-card">
-                <h3>Premium</h3>
-                <div class="price">$14.99<span>/mo</span></div>
-                <div class="plan-period">Billed monthly</div>
-                <ul class="plan-features">
-                  <li><i class="fa-solid fa-check"></i> 4 Devices</li>
-                  <li><i class="fa-solid fa-check"></i> 4K Ultra HD</li>
-                  <li><i class="fa-solid fa-check"></i> No Ads</li>
-                  <li><i class="fa-solid fa-check"></i> Downloads</li>
-                  <li><i class="fa-solid fa-check"></i> Early Access</li>
-                </ul>
-                <button class="btn btn-outline btn-full">Select Plan</button>
-              </div>
-            }
           </div>
-        </div>
-      }
+        }
 
-      <!-- ══════════════ PAYMENT HISTORY ══════════════ -->
-      @if (activeSection === "payments") {
-        <div class="content-row">
-          <div class="content-row-header">
-            <h2 style="font-size: 28px">Payment History</h2>
+        <!-- ══════════════ SETTINGS ══════════════ -->
+        @if (activeSection === "settings") {
+          <div class="content-row">
+            <h2 style="margin-bottom: 24px">Settings</h2>
+            <div class="settings-section">
+              <h3>Playback</h3>
+              <div class="setting-row">
+                <div class="label">
+                  <h4>Video Quality</h4>
+                  <p>Set default streaming quality</p>
+                </div>
+                <select>
+                  <option>Auto</option>
+                  <option>4K UHD</option>
+                  <option>1080p</option>
+                  <option>720p</option>
+                </select>
+              </div>
+              <div class="setting-row">
+                <div class="label">
+                  <h4>Autoplay Next</h4>
+                  <p>Automatically play next episode</p>
+                </div>
+                <div class="toggle on" (click)="toggleSetting($event)"></div>
+              </div>
+              <div class="setting-row">
+                <div class="label">
+                  <h4>Subtitles</h4>
+                  <p>Show subtitles by default</p>
+                </div>
+                <div class="toggle" (click)="toggleSetting($event)"></div>
+              </div>
+            </div>
+            <div class="settings-section">
+              <h3>Notifications</h3>
+              <div class="setting-row">
+                <div class="label">
+                  <h4>Push Notifications</h4>
+                  <p>Receive push alerts</p>
+                </div>
+                <div class="toggle on" (click)="toggleSetting($event)"></div>
+              </div>
+              <div class="setting-row">
+                <div class="label">
+                  <h4>New Releases</h4>
+                  <p>Get notified about new content</p>
+                </div>
+                <div class="toggle on" (click)="toggleSetting($event)"></div>
+              </div>
+            </div>
+            <div class="settings-section">
+              <h3>Account</h3>
+              <div class="setting-row">
+                <div class="label">
+                  <h4>Language</h4>
+                  <p>Preferred language</p>
+                </div>
+                <select>
+                  <option>English</option>
+                  <option>Español</option>
+                  <option>Français</option>
+                </select>
+              </div>
+              <div class="setting-row">
+                <div class="label">
+                  <h4>Parental Controls</h4>
+                  <p>Restrict mature content</p>
+                </div>
+                <div class="toggle" (click)="toggleSetting($event)"></div>
+              </div>
+            </div>
           </div>
-          @if (payments.length === 0) {
-            <div class="empty-state">
-              <i class="fa-solid fa-credit-card"></i>
-              <h3>No payments yet</h3>
-              <p>Your payment history will appear here</p>
-              <button
-                class="btn btn-primary"
+        }
+
+        <!-- ══════════════ PROFILE ══════════════ -->
+        @if (activeSection === "profile") {
+          <div class="content-row">
+            <div class="profile-header">
+              <div class="profile-avatar">
+                {{ profile?.name?.charAt(0) || "U" }}
+              </div>
+              <div class="profile-info">
+                <h2>{{ profile?.name || "User" }}</h2>
+                <p>{{ profile?.email }}</p>
+                <div class="profile-stats">
+                  <div class="stat">
+                    <div class="stat-val">{{ watchHistory.length }}</div>
+                    <div class="stat-label">Watched</div>
+                  </div>
+                  <div class="stat">
+                    <div class="stat-val">23</div>
+                    <div class="stat-label">My List</div>
+                  </div>
+                  <div class="stat">
+                    <div class="stat-val">5</div>
+                    <div class="stat-label">Downloads</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-section" style="margin-top: 24px">
+              <h3>Edit Profile</h3>
+              @if (profileSuccess) {
+                <div class="alert-success">
+                  <i class="fa-solid fa-circle-check"></i> {{ profileSuccess }}
+                </div>
+              }
+              @if (profileError) {
+                <div class="alert-error">
+                  <i class="fa-solid fa-circle-exclamation"></i>
+                  {{ profileError }}
+                </div>
+              }
+              <div class="setting-row">
+                <div class="label"><h4>Full Name</h4></div>
+                <input
+                  type="text"
+                  [(ngModel)]="profileName"
+                  style="width: 240px"
+                />
+              </div>
+              <div class="setting-row">
+                <div class="label">
+                  <h4>Email</h4>
+                  <p>Cannot be changed</p>
+                </div>
+                <span style="color: var(--text-dim); font-size: 14px">{{
+                  profile?.email
+                }}</span>
+              </div>
+              <div style="margin-top: 16px">
+                <button
+                  class="btn btn-primary"
+                  [disabled]="profileLoading"
+                  (click)="saveProfile()"
+                >
+                  <i class="fa-solid fa-save"></i>
+                  {{ profileLoading ? "Saving..." : "Save Changes" }}
+                </button>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h3>Change Password</h3>
+              @if (passwordSuccess) {
+                <div class="alert-success">
+                  <i class="fa-solid fa-circle-check"></i> {{ passwordSuccess }}
+                </div>
+              }
+              @if (passwordError) {
+                <div class="alert-error">
+                  <i class="fa-solid fa-circle-exclamation"></i>
+                  {{ passwordError }}
+                </div>
+              }
+              <div class="setting-row">
+                <div class="label"><h4>Current Password</h4></div>
+                <input
+                  type="password"
+                  [(ngModel)]="currentPassword"
+                  placeholder="Enter current password"
+                  style="width: 240px"
+                />
+              </div>
+              <div class="setting-row">
+                <div class="label"><h4>New Password</h4></div>
+                <input
+                  type="password"
+                  [(ngModel)]="newPassword"
+                  placeholder="Enter new password"
+                  style="width: 240px"
+                />
+              </div>
+              <div class="setting-row">
+                <div class="label"><h4>Confirm Password</h4></div>
+                <input
+                  type="password"
+                  [(ngModel)]="confirmNewPassword"
+                  placeholder="Confirm new password"
+                  style="width: 240px"
+                />
+              </div>
+              <div style="margin-top: 16px">
+                <button
+                  class="btn btn-primary"
+                  [disabled]="passwordLoading"
+                  (click)="changePassword()"
+                >
+                  <i class="fa-solid fa-lock"></i>
+                  {{ passwordLoading ? "Changing..." : "Change Password" }}
+                </button>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h3>Quick Links</h3>
+              <div
+                class="setting-row"
+                style="cursor: pointer"
                 (click)="onNavigate('subscription')"
               >
-                View Plans
-              </button>
+                <div class="label">
+                  <h4>
+                    <i
+                      class="fa-solid fa-crown"
+                      style="color: var(--gold); margin-right: 8px"
+                    ></i>
+                    Subscription
+                  </h4>
+                  <p>
+                    {{
+                      mySubscription ? "Active plan" : "No active subscription"
+                    }}
+                  </p>
+                </div>
+                <i
+                  class="fa-solid fa-chevron-right"
+                  style="color: var(--text-muted)"
+                ></i>
+              </div>
+              <div
+                class="setting-row"
+                style="cursor: pointer"
+                (click)="onNavigate('watch-history')"
+              >
+                <div class="label">
+                  <h4>
+                    <i
+                      class="fa-solid fa-clock-rotate-left"
+                      style="color: var(--accent2); margin-right: 8px"
+                    ></i>
+                    Watch History
+                  </h4>
+                  <p>{{ watchHistory.length }} items</p>
+                </div>
+                <i
+                  class="fa-solid fa-chevron-right"
+                  style="color: var(--text-muted)"
+                ></i>
+              </div>
+              <div
+                class="setting-row"
+                style="cursor: pointer"
+                (click)="onNavigate('downloads')"
+              >
+                <div class="label">
+                  <h4>
+                    <i
+                      class="fa-solid fa-download"
+                      style="color: var(--success); margin-right: 8px"
+                    ></i>
+                    Downloads
+                  </h4>
+                  <p>5 items</p>
+                </div>
+                <i
+                  class="fa-solid fa-chevron-right"
+                  style="color: var(--text-muted)"
+                ></i>
+              </div>
+              <div
+                class="setting-row"
+                style="cursor: pointer"
+                (click)="onNavigate('settings')"
+              >
+                <div class="label">
+                  <h4>
+                    <i
+                      class="fa-solid fa-gear"
+                      style="color: var(--accent2); margin-right: 8px"
+                    ></i>
+                    Settings
+                  </h4>
+                  <p>App preferences</p>
+                </div>
+                <i
+                  class="fa-solid fa-chevron-right"
+                  style="color: var(--text-muted)"
+                ></i>
+              </div>
             </div>
-          } @else {
-            <div class="data-table-wrap">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Plan</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (payment of payments; track payment.id) {
-                    <tr>
-                      <td>{{ payment.plan?.name || "Plan" }}</td>
-                      <td>${{ payment.amount }}</td>
-                      <td>{{ payment.method || "Card" }}</td>
-                      <td>
-                        <span class="status-badge" [class]="payment.status">{{
-                          payment.status
-                        }}</span>
-                      </td>
-                      <td style="color: var(--text-dim)">
-                        {{ payment.createdAt | date: "mediumDate" }}
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          }
-        </div>
-      }
 
-      <!-- ══════════════ NOTIFICATIONS ══════════════ -->
-      @if (activeSection === "notifications") {
-        <div class="content-row">
-          <div class="content-row-header">
-            <h2 style="font-size: 28px">Notifications</h2>
-            <a href="#" style="font-size: 14px; color: var(--accent)"
-              >Mark all as read</a
+            <button
+              class="btn btn-secondary"
+              style="margin-top: 8px"
+              (click)="authService.logout()"
             >
+              <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+            </button>
           </div>
-          <div class="notif-list">
-            @for (n of notifications; track $index) {
-              <div class="notif-item" [class.unread]="n.unread">
+        }
+
+        <!-- ══════════════ SUBSCRIPTION ══════════════ -->
+        @if (activeSection === "subscription") {
+          <div class="plans-container">
+            <h2>Choose Your Plan</h2>
+            <p class="plans-subtitle">Unlock the full OTT TV experience</p>
+
+            @if (subscriptionSuccess) {
+              <div
+                class="alert-success"
+                style="
+                  margin-bottom: 24px;
+                  max-width: 600px;
+                  margin-inline: auto;
+                "
+              >
+                <i class="fa-solid fa-circle-check"></i>
+                {{ subscriptionSuccess }}
+              </div>
+            }
+            @if (subscriptionError) {
+              <div
+                class="alert-error"
+                style="
+                  margin-bottom: 24px;
+                  max-width: 600px;
+                  margin-inline: auto;
+                "
+              >
+                <i class="fa-solid fa-circle-exclamation"></i>
+                {{ subscriptionError }}
+              </div>
+            }
+
+            @if (mySubscription) {
+              <div class="active-sub-banner">
+                <i class="fa-solid fa-crown"></i>
+                <div>
+                  <strong>You have an active subscription</strong>
+                  <p>
+                    Expires: {{ mySubscription.endDate | date: "mediumDate" }}
+                  </p>
+                </div>
+                <span class="status-badge active">Active</span>
+              </div>
+            }
+
+            <div
+              class="plans-grid"
+              style="
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 24px;
+                margin-top: 32px;
+              "
+            >
+              @for (plan of plans; track plan.id) {
                 <div
-                  class="notif-icon"
-                  [style.background]="n.color"
-                  [style.color]="n.iconColor"
+                  class="plan-card"
+                  [class.featured]="plan.slug === 'standard'"
                 >
-                  <i class="fa-solid" [class]="'fa-solid ' + n.icon"></i>
+                  @if (plan.slug === "standard") {
+                    <div class="plan-badge">Most Popular</div>
+                  }
+                  <h3>{{ plan.name }}</h3>
+                  <div class="price">${{ plan.price }}<span>/mo</span></div>
+                  <div class="plan-period">
+                    Billed monthly • {{ plan.durationDays }} days
+                  </div>
+                  <ul class="plan-features">
+                    @for (feature of plan.features; track feature) {
+                      <li><i class="fa-solid fa-check"></i> {{ feature }}</li>
+                    }
+                    <li>
+                      <i class="fa-solid fa-check"></i> Up to
+                      {{ plan.maxDevices }} device(s)
+                    </li>
+                    <li>
+                      <i class="fa-solid fa-check"></i>
+                      {{ plan.maxQuality }} quality
+                    </li>
+                  </ul>
+                  <button
+                    class="btn btn-full"
+                    [class.btn-primary]="plan.slug === 'standard'"
+                    [class.btn-outline]="plan.slug !== 'standard'"
+                    [disabled]="subscriptionLoading"
+                    (click)="subscribePlan(plan.id)"
+                  >
+                    {{ subscriptionLoading ? "Processing..." : "Select Plan" }}
+                  </button>
                 </div>
-                <div class="notif-content">
-                  <h4>{{ n.title }}</h4>
-                  <p>{{ n.desc }}</p>
-                  <div class="time">{{ n.time }}</div>
+              }
+              @if (plans.length === 0) {
+                <div class="plan-card">
+                  <h3>Basic</h3>
+                  <div class="price">$4.99<span>/mo</span></div>
+                  <div class="plan-period">Billed monthly</div>
+                  <ul class="plan-features">
+                    <li><i class="fa-solid fa-check"></i> 1 Device</li>
+                    <li><i class="fa-solid fa-check"></i> SD Quality</li>
+                    <li><i class="fa-solid fa-check"></i> No Ads</li>
+                  </ul>
+                  <button class="btn btn-outline btn-full">Select Plan</button>
                 </div>
+                <div class="plan-card featured">
+                  <div class="plan-badge">Most Popular</div>
+                  <h3>Standard</h3>
+                  <div class="price">$9.99<span>/mo</span></div>
+                  <div class="plan-period">Billed monthly</div>
+                  <ul class="plan-features">
+                    <li><i class="fa-solid fa-check"></i> 2 Devices</li>
+                    <li><i class="fa-solid fa-check"></i> Full HD</li>
+                    <li><i class="fa-solid fa-check"></i> No Ads</li>
+                    <li><i class="fa-solid fa-check"></i> Downloads</li>
+                  </ul>
+                  <button class="btn btn-primary btn-full">Select Plan</button>
+                </div>
+                <div class="plan-card">
+                  <h3>Premium</h3>
+                  <div class="price">$14.99<span>/mo</span></div>
+                  <div class="plan-period">Billed monthly</div>
+                  <ul class="plan-features">
+                    <li><i class="fa-solid fa-check"></i> 4 Devices</li>
+                    <li><i class="fa-solid fa-check"></i> 4K Ultra HD</li>
+                    <li><i class="fa-solid fa-check"></i> No Ads</li>
+                    <li><i class="fa-solid fa-check"></i> Downloads</li>
+                    <li><i class="fa-solid fa-check"></i> Early Access</li>
+                  </ul>
+                  <button class="btn btn-outline btn-full">Select Plan</button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ══════════════ PAYMENT HISTORY ══════════════ -->
+        @if (activeSection === "payments") {
+          <div class="content-row">
+            <div class="content-row-header">
+              <h2 style="font-size: 28px">Payment History</h2>
+            </div>
+            @if (payments.length === 0) {
+              <div class="empty-state">
+                <i class="fa-solid fa-credit-card"></i>
+                <h3>No payments yet</h3>
+                <p>Your payment history will appear here</p>
+                <button
+                  class="btn btn-primary"
+                  (click)="onNavigate('subscription')"
+                >
+                  View Plans
+                </button>
+              </div>
+            } @else {
+              <div class="data-table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Plan</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (payment of payments; track payment.id) {
+                      <tr>
+                        <td>{{ payment.plan?.name || "Plan" }}</td>
+                        <td>${{ payment.amount }}</td>
+                        <td>{{ payment.method || "Card" }}</td>
+                        <td>
+                          <span class="status-badge" [class]="payment.status">{{
+                            payment.status
+                          }}</span>
+                        </td>
+                        <td style="color: var(--text-dim)">
+                          {{ payment.createdAt | date: "mediumDate" }}
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
               </div>
             }
           </div>
-        </div>
-      }
+        }
+
+        <!-- ══════════════ NOTIFICATIONS ══════════════ -->
+        @if (activeSection === "notifications") {
+          <div class="content-row">
+            <div class="content-row-header">
+              <h2 style="font-size: 28px">Notifications</h2>
+              <a href="#" style="font-size: 14px; color: var(--accent)"
+                >Mark all as read</a
+              >
+            </div>
+            <div class="notif-list">
+              @for (n of notifications; track $index) {
+                <div class="notif-item" [class.unread]="n.unread">
+                  <div
+                    class="notif-icon"
+                    [style.background]="n.color"
+                    [style.color]="n.iconColor"
+                  >
+                    <i class="fa-solid" [class]="'fa-solid ' + n.icon"></i>
+                  </div>
+                  <div class="notif-content">
+                    <h4>{{ n.title }}</h4>
+                    <p>{{ n.desc }}</p>
+                    <div class="time">{{ n.time }}</div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+        <!-- ══════════════ EPG TV GUIDE ══════════════ -->
+        @if (showEpg) {
+          <div style="color: white; padding: 40px; font-size: 24px">
+            EPG IS RENDERING - {{ epgChannels.length }} channels
+          </div>
+          <div class="content-row">
+            <div class="content-row-header">
+              <h2 style="font-size: 28px">TV Guide</h2>
+              <span style="color: var(--text-dim); font-size: 14px">
+                {{ epgDate | date: "EEEE, MMMM d" }}
+              </span>
+            </div>
+
+            <div class="epg-wrap">
+              <!-- Time header -->
+              <div class="epg-header">
+                <div class="epg-channel-col"></div>
+                <div class="epg-times">
+                  @for (hour of epgHours; track hour) {
+                    <div
+                      class="epg-time-slot"
+                      [class.current]="+hour.split(':')[0] === epgCurrentHour"
+                    >
+                      {{ hour }}
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Channel rows -->
+              @for (ch of epgChannels; track $index) {
+                <div class="epg-row">
+                  <div class="epg-channel-col">
+                    <div class="epg-channel-icon" [style.background]="ch.color">
+                      <i class="fa-solid" [class]="'fa-solid ' + ch.icon"></i>
+                    </div>
+                    <span>{{ ch.name }}</span>
+                  </div>
+                  <div class="epg-programs">
+                    @for (prog of ch.programs; track $index) {
+                      <div
+                        class="epg-program"
+                        [class.live]="prog.live"
+                        [class.current]="isCurrentProgram(prog)"
+                        [style.width.px]="getProgramWidth(prog)"
+                      >
+                        <div class="prog-title">{{ prog.title }}</div>
+                        <div class="prog-time">
+                          {{ prog.start }} - {{ prog.end }}
+                        </div>
+                        @if (prog.live) {
+                          <span class="prog-live-badge">LIVE</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+      <!-- end content-body -->
     </div>
-    <!-- end content-body -->
+    <!-- end main-content -->
   </div>
-  <!-- end main-content -->
+  <!-- end app-wrapper -->
 </div>
-<!-- end app-wrapper -->
