@@ -34,15 +34,21 @@
 
 .content-body {
   flex: 1;
-  padding-top: 84px;
+  padding-top: 64px;
+
+  @media (max-width: 1024px) {
+    padding-top: 56px;
+    padding-bottom: 64px;
+  }
 }
 // ─── Hero ────────────────────────────────────────────────────
 .hero {
   position: relative;
-  height: 520px;
+  height: 420px;
   overflow: hidden;
+
   @media (max-width: 768px) {
-    height: 360px;
+    height: 420px;
   }
 }
 
@@ -53,14 +59,16 @@
   align-items: flex-end;
   padding: 60px;
   animation: fadeIn 0.6s ease;
+
   &.active {
     display: flex;
   }
+
   @media (max-width: 768px) {
-    padding: 24px;
+    padding: 20px;
+    align-items: center;
   }
 }
-
 .hero-bg {
   position: absolute;
   inset: 0;

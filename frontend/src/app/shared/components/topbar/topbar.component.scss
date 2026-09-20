@@ -1,21 +1,20 @@
 :host {
   display: block;
   position: fixed;
-  top: 28px;
+  top: 0;
   left: 0;
   right: 0;
   z-index: 999;
+  background: rgba(6, 6, 16, 0.95);
 }
 
 .topbar {
   height: 56px;
-  background: rgba(6, 6, 16, 0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   padding: 0 16px;
   gap: 12px;
+  border-bottom: 1px solid var(--border);
 }
 
 .topbar-left {

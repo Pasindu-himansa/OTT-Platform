@@ -9,11 +9,19 @@ import { SubscriptionService } from '../../core/services/subscription.service';
 import { AuthService } from '../../core/services/auth.service';
 import { TokenService } from '../../core/services/token.service';
 import { environment } from '../../../environments/environment';
+import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, NgIf, FormsModule, SidebarComponent, TopbarComponent],
+  imports: [
+    CommonModule,
+    NgIf,
+    FormsModule,
+    SidebarComponent,
+    TopbarComponent,
+    BottomNavComponent,
+  ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
