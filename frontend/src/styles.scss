@@ -969,3 +969,38 @@ img {
     margin-top: 4px;
   }
 }
+
+app-topbar {
+  display: block;
+  position: fixed !important;
+  top: 0 !important;
+  left: var(--sidebar-w) !important;
+  right: 0 !important;
+  z-index: 999 !important;
+  height: 64px;
+}
+
+app-topbar .topbar {
+  position: relative !important;
+}
+
+app-topbar,
+app-topbar .topbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 240px !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+  width: auto !important;
+}
+
+@media (max-width: 1024px) {
+  app-topbar,
+  app-topbar .topbar {
+    left: 0 !important;
+  }
+}
+
+.content-body {
+  padding-top: 64px !important;
+}

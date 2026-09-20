@@ -13,17 +13,18 @@
 .app-wrapper {
   display: flex;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: var(--bg);
 }
 
 .main-content {
   margin-left: var(--sidebar-w);
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   width: calc(100% - var(--sidebar-w));
-  overflow-x: hidden;
+  overflow: hidden;
 
   @media (max-width: 1024px) {
     margin-left: 0;
@@ -33,6 +34,7 @@
 
 .content-body {
   flex: 1;
+  padding-top: 64px;
 }
 
 // ─── Hero ────────────────────────────────────────────────────
@@ -1042,5 +1044,21 @@
     padding: 1px 5px;
     border-radius: 3px;
     letter-spacing: 0.5px;
+  }
+}
+
+.main-content {
+  margin-left: var(--sidebar-w);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - var(--sidebar-w));
+  overflow-x: hidden;
+  overflow-y: auto; // add this
+  height: 100vh; // add this
+
+  @media (max-width: 1024px) {
+    margin-left: 0;
+    width: 100%;
   }
 }

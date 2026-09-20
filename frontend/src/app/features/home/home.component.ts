@@ -8,6 +8,7 @@ import { VideoService } from '../../core/services/video.service';
 import { SubscriptionService } from '../../core/services/subscription.service';
 import { AuthService } from '../../core/services/auth.service';
 import { TokenService } from '../../core/services/token.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -475,7 +476,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     },
   ];
 
-  // Notifications
+  // Notifications (mock)
   notifications = [
     {
       icon: 'fa-film',
@@ -713,9 +714,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (section === 'payments') this.loadPayments();
     if (section === 'watch-history') this.loadWatchHistory();
     if (section === 'mylist') this.loadFavorites();
+    if (section === 'notifications') this.loadNotifications();
     if (section === 'epg') this.epgCurrentHour = new Date().getHours();
     this.cdr.detectChanges();
-    if (section === 'notifications') this.loadNotifications();
   }
 
   toggleSetting(event: Event): void {
@@ -830,7 +831,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   // ─── Watch History ───────────────────────────────────────
   loadWatchHistory(): void {
     const token = this.tokenService.getAccessToken();
-    fetch('http://localhost/api/v1/watch-history', {
+    fetch(`${environment.apiUrl}/watch-history`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
@@ -847,7 +848,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const token = this.tokenService.getAccessToken();
     if (!token) return;
     const videoId = item._id || item.title.toLowerCase().replace(/\s+/g, '-');
-    fetch('http://localhost/api/v1/watch-history', {
+    fetch(`${environment.apiUrl}/watch-history`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -870,7 +871,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   clearWatchHistory(): void {
     const token = this.tokenService.getAccessToken();
     if (!token) return;
-    fetch('http://localhost/api/v1/watch-history/clear', {
+    fetch(`${environment.apiUrl}/watch-history/clear`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -884,7 +885,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   loadContinueWatching(): void {
     const token = this.tokenService.getAccessToken();
     if (!token) return;
-    fetch('http://localhost/api/v1/watch-history?limit=10', {
+    fetch(`${environment.apiUrl}/watch-history?limit=10`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
@@ -910,7 +911,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   loadFavorites(): void {
     const token = this.tokenService.getAccessToken();
     if (!token) return;
-    fetch('http://localhost/api/v1/favorites', {
+    fetch(`${environment.apiUrl}/favorites`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
@@ -937,7 +938,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!token) return;
 
     if (this.isFavorite(item)) {
-      fetch(`http://localhost/api/v1/favorites/${videoId}`, {
+      fetch(`${environment.apiUrl}/favorites/${videoId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -950,7 +951,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         })
         .catch(() => {});
     } else {
-      fetch('http://localhost/api/v1/favorites', {
+      fetch(`${environment.apiUrl}/favorites`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -974,6 +975,39 @@ export class HomeComponent implements OnInit, OnDestroy {
         })
         .catch(() => {});
     }
+  }
+
+  // ─── Notifications ───────────────────────────────────────
+  loadNotifications(): void {
+    const token = this.tokenService.getAccessToken();
+    if (!token) return;
+    fetch(`${environment.apiUrl}/notifications`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success) {
+          this.realNotifications = res.data.notifications;
+          this.unreadCount = res.data.unreadCount;
+          this.cdr.detectChanges();
+        }
+      })
+      .catch(() => {});
+  }
+
+  markAllNotificationsRead(): void {
+    const token = this.tokenService.getAccessToken();
+    if (!token) return;
+    fetch(`${environment.apiUrl}/notifications/read-all`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(() => {
+        this.unreadCount = 0;
+        this.realNotifications.forEach((n: any) => (n.isRead = true));
+        this.cdr.detectChanges();
+      })
+      .catch(() => {});
   }
 
   // ─── EPG ─────────────────────────────────────────────────
@@ -1015,38 +1049,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.router.navigate(['/player'], {
       queryParams: { title: item.title, subtitle: item.meta || '' },
     });
-  }
-
-  loadNotifications(): void {
-    const token = this.tokenService.getAccessToken();
-    if (!token) return;
-    fetch('http://localhost/api/v1/notifications', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((res) => {
-        if (res.success) {
-          this.realNotifications = res.data.notifications;
-          this.unreadCount = res.data.unreadCount;
-          this.cdr.detectChanges();
-        }
-      })
-      .catch(() => {});
-  }
-
-  markAllNotificationsRead(): void {
-    const token = this.tokenService.getAccessToken();
-    if (!token) return;
-    fetch('http://localhost/api/v1/notifications/read-all', {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(() => {
-        this.unreadCount = 0;
-        this.realNotifications.forEach((n: any) => (n.isRead = true));
-        this.cdr.detectChanges();
-      })
-      .catch(() => {});
   }
 
   ngOnDestroy(): void {

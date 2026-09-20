@@ -4,6 +4,12 @@ const config: CapacitorConfig = {
   appId: 'com.otttv.app',
   appName: 'OTT TV',
   webDir: 'dist/frontend/browser/browser',
+  server: {
+    androidScheme: 'http',
+    url: 'http://192.168.214.34',
+    cleartext: true,
+    hostname: '192.168.214.34',
+  },
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,

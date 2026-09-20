@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import Hls from 'hls.js';
 
 @Component({
@@ -26,6 +27,7 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
   isFullscreen = false;
   showControls = true;
   controlsTimer: any;
+  progressSaveTimer: any;
   isLive = false;
   currentTime = 0;
   duration = 0;
@@ -33,11 +35,10 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
   volume = 0.8;
   title = 'OTT TV';
   subtitle = '';
+  videoId = '';
   streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
   qualityLevels: any[] = [];
   currentQuality = -1;
-  progressSaveTimer: any;
-  videoId = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -50,13 +51,15 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
       if (params['subtitle']) this.subtitle = params['subtitle'];
       if (params['stream']) this.streamUrl = params['stream'];
       if (params['live']) this.isLive = params['live'] === 'true';
+      if (params['videoId']) this.videoId = params['videoId'];
+      if (!this.videoId)
+        this.videoId = this.title.toLowerCase().replace(/\s+/g, '-');
     });
   }
 
   ngAfterViewInit(): void {
     this.initPlayer();
     this.showControlsTemporarily();
-    // Save progress every 10 seconds
     this.progressSaveTimer = setInterval(() => {
       if (this.isPlaying && this.duration > 0) {
         this.saveProgress();
@@ -189,24 +192,20 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 3000);
   }
 
-  goBack(): void {
-    this.router.navigate(['/home']);
-  }
-
   saveProgress(): void {
     const token = localStorage.getItem('ott_access_token');
     if (!token || !this.duration) return;
 
     const percent = Math.round((this.currentTime / this.duration) * 100);
 
-    fetch('http://localhost/api/v1/watch-history', {
+    fetch(`${environment.apiUrl}/watch-history`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        videoId: this.title,
+        videoId: this.videoId,
         title: this.title,
         type: this.isLive ? 'live' : 'movie',
         progress: Math.round(this.currentTime),
@@ -217,8 +216,12 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
     }).catch(() => {});
   }
 
+  goBack(): void {
+    this.router.navigate(['/home']);
+  }
+
   ngOnDestroy(): void {
-    this.saveProgress(); // save when leaving player
+    this.saveProgress();
     if (this.hls) this.hls.destroy();
     clearTimeout(this.controlsTimer);
     clearInterval(this.progressSaveTimer);
