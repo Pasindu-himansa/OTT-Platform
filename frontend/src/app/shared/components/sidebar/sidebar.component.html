@@ -100,6 +100,14 @@
       >
         <i class="fa-solid fa-crown"></i> Subscription
       </div>
+
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'payment-methods'"
+        (click)="go('payment-methods')"
+      >
+        <i class="fa-solid fa-credit-card"></i> Payment Methods
+      </div>
       <div
         class="sidebar-link"
         [class.active]="activeSection === 'notifications'"

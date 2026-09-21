@@ -358,6 +358,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   payments: any[] = [];
   selectedPaymentMethod = 'card';
 
+  // Payment Methods
+  paymentMethods: any[] = [];
+  showAddCard = false;
+  cardLoading = false;
+  cardSuccess = '';
+  cardError = '';
+  newCard = {
+    type: 'visa',
+    last4: '',
+    expiryMonth: '',
+    expiryYear: '',
+    holderName: '',
+    isDefault: false,
+  };
+
   // Watch History
   watchHistory: any[] = [];
 
@@ -725,6 +740,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (section === 'notifications') this.loadNotifications();
     if (section === 'epg') this.epgCurrentHour = new Date().getHours();
     this.cdr.detectChanges();
+    if (section === 'payment-methods') this.loadPaymentMethods();
   }
 
   toggleSetting(event: Event): void {
@@ -1057,6 +1073,105 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.router.navigate(['/player'], {
       queryParams: { title: item.title, subtitle: item.meta || '' },
     });
+  }
+
+  // ─── Payment Methods ─────────────────────────────────────────
+  loadPaymentMethods(): void {
+    const token = this.tokenService.getAccessToken();
+    if (!token) return;
+    fetch(`${environment.apiUrl}/payment-methods`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success) {
+          this.paymentMethods = res.data.methods;
+          this.cdr.detectChanges();
+        }
+      })
+      .catch(() => {});
+  }
+
+  addPaymentMethod(): void {
+    if (
+      !this.newCard.last4 ||
+      !this.newCard.expiryMonth ||
+      !this.newCard.expiryYear ||
+      !this.newCard.holderName
+    ) {
+      this.cardError = 'Please fill all fields';
+      return;
+    }
+    this.cardLoading = true;
+    this.cardError = '';
+    this.cardSuccess = '';
+    const token = this.tokenService.getAccessToken();
+    fetch(`${environment.apiUrl}/payment-methods`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(this.newCard),
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success) {
+          this.cardSuccess = 'Card added successfully';
+          this.cardLoading = false;
+          this.showAddCard = false;
+          this.newCard = {
+            type: 'visa',
+            last4: '',
+            expiryMonth: '',
+            expiryYear: '',
+            holderName: '',
+            isDefault: false,
+          };
+          this.loadPaymentMethods();
+          this.cdr.detectChanges();
+        }
+      })
+      .catch(() => {
+        this.cardLoading = false;
+      });
+  }
+
+  deletePaymentMethod(id: string): void {
+    const token = this.tokenService.getAccessToken();
+    fetch(`${environment.apiUrl}/payment-methods/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(() => {
+        this.paymentMethods = this.paymentMethods.filter(
+          (m: any) => m.id !== id,
+        );
+        this.cdr.detectChanges();
+      })
+      .catch(() => {});
+  }
+
+  setDefaultPaymentMethod(id: string): void {
+    const token = this.tokenService.getAccessToken();
+    fetch(`${environment.apiUrl}/payment-methods/${id}/default`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(() => {
+        this.loadPaymentMethods();
+      })
+      .catch(() => {});
+  }
+
+  getCardIcon(type: string): string {
+    const icons: any = {
+      visa: 'fa-cc-visa',
+      mastercard: 'fa-cc-mastercard',
+      amex: 'fa-cc-amex',
+      paypal: 'fa-cc-paypal',
+    };
+    return icons[type] || 'fa-credit-card';
   }
 
   ngOnDestroy(): void {

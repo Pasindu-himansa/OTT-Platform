@@ -546,18 +546,33 @@ img {
 
 // ─── Form elements ───────────────────────────────────────────
 .form-group {
-  margin-bottom: 20px;
   label {
     display: block;
     font-size: 13px;
     color: var(--text-dim);
     margin-bottom: 6px;
-    font-weight: 500;
   }
   input,
   select,
   textarea {
     width: 100%;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 14px;
+    &:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+  }
+  input[type="checkbox"] {
+    width: auto;
+    padding: 0;
+    margin-right: 8px;
+    accent-color: var(--accent);
+    cursor: pointer;
   }
 }
 
@@ -1003,4 +1018,10 @@ app-topbar .topbar {
 
 .content-body {
   padding-top: 64px !important;
+}
+
+.empty-state {
+  i.fa-credit-card {
+    color: var(--text-muted);
+  }
 }

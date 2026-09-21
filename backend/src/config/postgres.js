@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 const logger = require("../utils/logger");
 
 const sequelize = new Sequelize({
@@ -11,6 +11,50 @@ const sequelize = new Sequelize({
   logging: (msg) => logger.debug(msg),
   pool: { max: 10, min: 0, acquire: 30000, idle: 10000 },
 });
+
+// ─── PaymentMethod Model ──────────────────────────────────────
+const PaymentMethod = sequelize.define(
+  "PaymentMethod",
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    userId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
+    type: {
+      type: DataTypes.ENUM("visa", "mastercard", "amex", "paypal"),
+      allowNull: false,
+    },
+    last4: {
+      type: DataTypes.STRING(4),
+      allowNull: false,
+    },
+    expiryMonth: {
+      type: DataTypes.STRING(2),
+      allowNull: false,
+    },
+    expiryYear: {
+      type: DataTypes.STRING(4),
+      allowNull: false,
+    },
+    holderName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    isDefault: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+  },
+  {
+    tableName: "payment_methods",
+    timestamps: true,
+  },
+);
 
 async function connectPostgres() {
   await sequelize.authenticate();
@@ -44,8 +88,11 @@ async function connectPostgres() {
     as: "subscription",
   });
 
+  User.hasMany(PaymentMethod, { foreignKey: "userId", as: "paymentMethods" });
+  PaymentMethod.belongsTo(User, { foreignKey: "userId", as: "user" });
+
   await sequelize.sync({ alter: process.env.NODE_ENV === "development" });
   logger.info("✅ PostgreSQL connected");
 }
 
-module.exports = { sequelize, connectPostgres };
+module.exports = { sequelize, connectPostgres, PaymentMethod };

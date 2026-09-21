@@ -11,6 +11,7 @@ router.use("/payments", require("./payment.routes"));
 router.use("/favorites", require("./favorites.routes"));
 router.use("/watch-history", require("./watchHistory.routes"));
 router.use("/notifications", require("./notification.routes"));
+router.use("/payment-methods", require("./paymentMethod.routes"));
 
 router.get("/", (req, res) => {
   res.json({ success: true, message: "OTT Platform API v1" });
