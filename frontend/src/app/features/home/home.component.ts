@@ -576,6 +576,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   buildMockData(): void {
+    const ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
     const makeCard = (names: string[], offset = 0) =>
       names.map((name, i) => ({
         title: name,
@@ -585,6 +586,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         emoji: this.emojis[(i + offset) % this.emojis.length],
         badge: i < 2 ? 'hd' : null,
         genre: this.movieFilters[1 + (i % (this.movieFilters.length - 1))],
+        rating_class: ratings[i % ratings.length],
       }));
 
     this.allMovies = makeCard(this.movieNames);
@@ -1237,15 +1239,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!this.parentalEnabled) return false;
     const savedEnabled = localStorage.getItem('parental_enabled');
     if (savedEnabled !== 'true') return false;
-    // Block all content when parental controls enabled with G rating
+
     const ratings: any = { G: 0, PG: 1, 'PG-13': 2, R: 3, 'NC-17': 4 };
     const maxRating =
       ratings[localStorage.getItem('parental_rating') || 'PG-13'] ?? 2;
-    // Default all mock content to PG-13
     const itemRating = ratings[item.rating_class || 'PG-13'] ?? 2;
-    return itemRating > maxRating;
-  }
 
+    // Block content AT and ABOVE the set rating
+    return itemRating >= maxRating;
+  }
   openWithPinCheck(item: any): void {
     console.log('openWithPinCheck called', item.title);
     console.log('parentalEnabled:', this.parentalEnabled);

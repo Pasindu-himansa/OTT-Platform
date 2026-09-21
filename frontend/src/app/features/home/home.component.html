@@ -142,6 +142,13 @@
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
                   </div>
+                  @if (item.rating_class) {
+                    <span
+                      class="rating-class-badge"
+                      [attr.data-rating]="item.rating_class"
+                      >{{ item.rating_class }}</span
+                    >
+                  }
                   <div class="card-overlay">
                     <div class="play-btn">
                       <i class="fa-solid fa-play" style="margin-left: 3px"></i>
@@ -175,6 +182,27 @@
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
                   </div>
+                  @if (item.rating_class) {
+                    <span
+                      class="rating-class-badge"
+                      [attr.data-rating]="item.rating_class"
+                      >{{ item.rating_class }}</span
+                    >
+                  }
+                  @if (item.rating_class) {
+                    <span
+                      class="rating-class-badge"
+                      [attr.data-rating]="item.rating_class"
+                      >{{ item.rating_class }}</span
+                    >
+                  }
+                  @if (item.rating_class) {
+                    <span
+                      class="rating-class-badge"
+                      [attr.data-rating]="item.rating_class"
+                      >{{ item.rating_class }}</span
+                    >
+                  }
                   <div class="card-overlay">
                     <div class="play-btn">
                       <i class="fa-solid fa-play" style="margin-left: 3px"></i>
@@ -184,6 +212,13 @@
                     <span class="card-badge" [class]="item.badge">{{
                       item.badge
                     }}</span>
+                  }
+                  @if (item.rating_class) {
+                    <span
+                      class="rating-class-badge"
+                      [attr.data-rating]="item.rating_class"
+                      >{{ item.rating_class }}</span
+                    >
                   }
                 </div>
                 <div class="card-info">
@@ -233,6 +268,13 @@
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
                   </div>
+                  @if (item.rating_class) {
+                    <span
+                      class="rating-class-badge"
+                      [attr.data-rating]="item.rating_class"
+                      >{{ item.rating_class }}</span
+                    >
+                  }
                   <div class="card-overlay">
                     <div class="play-btn">
                       <i class="fa-solid fa-play" style="margin-left: 3px"></i>
@@ -263,6 +305,13 @@
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
                   </div>
+                  @if (item.rating_class) {
+                    <span
+                      class="rating-class-badge"
+                      [attr.data-rating]="item.rating_class"
+                      >{{ item.rating_class }}</span
+                    >
+                  }
                   <div class="card-overlay">
                     <div class="play-btn">
                       <i class="fa-solid fa-play" style="margin-left: 3px"></i>
@@ -367,6 +416,13 @@
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
                   </div>
+                  @if (item.rating_class) {
+                    <span
+                      class="rating-class-badge"
+                      [attr.data-rating]="item.rating_class"
+                      >{{ item.rating_class }}</span
+                    >
+                  }
                   <div class="card-overlay">
                     <div class="play-btn">
                       <i class="fa-solid fa-play" style="margin-left: 3px"></i>
@@ -376,6 +432,13 @@
                     <span class="card-badge" [class]="item.badge">{{
                       item.badge
                     }}</span>
+                  }
+                  @if (item.rating_class) {
+                    <span
+                      class="rating-class-badge"
+                      [attr.data-rating]="item.rating_class"
+                      >{{ item.rating_class }}</span
+                    >
                   }
                 </div>
                 <div class="card-info">
@@ -416,6 +479,13 @@
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
                   </div>
+                  @if (item.rating_class) {
+                    <span
+                      class="rating-class-badge"
+                      [attr.data-rating]="item.rating_class"
+                      >{{ item.rating_class }}</span
+                    >
+                  }
                   <div class="card-overlay">
                     <div class="play-btn">
                       <i class="fa-solid fa-play" style="margin-left: 3px"></i>
@@ -487,6 +557,13 @@
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
                   </div>
+                  @if (item.rating_class) {
+                    <span
+                      class="rating-class-badge"
+                      [attr.data-rating]="item.rating_class"
+                      >{{ item.rating_class }}</span
+                    >
+                  }
                   <div class="card-overlay">
                     <div class="play-btn">
                       <i class="fa-solid fa-play" style="margin-left: 3px"></i>
@@ -638,6 +715,13 @@
                         [class]="'fa-solid ' + item.emoji"
                       ></i>
                     </div>
+                    @if (item.rating_class) {
+                      <span
+                        class="rating-class-badge"
+                        [attr.data-rating]="item.rating_class"
+                        >{{ item.rating_class }}</span
+                      >
+                    }
                     <div class="card-overlay">
                       <div class="play-btn">
                         <i
@@ -690,6 +774,13 @@
                         [class]="'fa-solid ' + (item.emoji || 'fa-film')"
                       ></i>
                     </div>
+                    @if (item.rating_class) {
+                      <span
+                        class="rating-class-badge"
+                        [attr.data-rating]="item.rating_class"
+                        >{{ item.rating_class }}</span
+                      >
+                    }
                     <div class="card-overlay">
                       <div class="play-btn">
                         <i
@@ -745,6 +836,13 @@
                         [class]="'fa-solid ' + (item.emoji || 'fa-film')"
                       ></i>
                     </div>
+                    @if (item.rating_class) {
+                      <span
+                        class="rating-class-badge"
+                        [attr.data-rating]="item.rating_class"
+                        >{{ item.rating_class }}</span
+                      >
+                    }
                     <div class="card-overlay">
                       <div class="play-btn">
                         <i

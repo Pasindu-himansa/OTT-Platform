@@ -1123,3 +1123,33 @@ app-topbar .topbar {
     outline: none;
   }
 }
+
+.rating-class-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  z-index: 5;
+  letter-spacing: 0.5px;
+  color: #fff;
+
+  &[data-rating="G"] {
+    background: #30d158;
+  }
+  &[data-rating="PG"] {
+    background: #ffd60a;
+    color: #000;
+  }
+  &[data-rating="PG-13"] {
+    background: #ff9f0a;
+  }
+  &[data-rating="R"] {
+    background: #ff453a;
+  }
+  &[data-rating="NC-17"] {
+    background: #8e23e0;
+  }
+}
