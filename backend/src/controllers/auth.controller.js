@@ -172,4 +172,71 @@ const me = async (req, res) => {
   });
 };
 
-module.exports = { register, login, refresh, logout, me };
+// POST /api/v1/auth/forgot-password
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const { sendOtpEmail } = require("../utils/email");
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.json({ success: true, message: "OTP sent if email exists" });
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Store OTP in Redis (expires in 10 minutes)
+    const { set } = require("../config/redis");
+    await set(`otp:${email}`, otp, 600);
+
+    // Send OTP via email
+    await sendOtpEmail(email, otp);
+
+    return res.json({
+      success: true,
+      message: "OTP sent to your email",
+    });
+  } catch (err) {
+    console.error("Forgot password error:", err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// POST /api/v1/auth/verify-otp
+const verifyOtp = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    const { get, del } = require("../config/redis");
+
+    const storedOtp = await get(`otp:${email}`);
+
+    if (!storedOtp || storedOtp !== otp) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired OTP" });
+    }
+
+    // OTP verified — update password
+    const bcrypt = require("bcryptjs");
+    const hashed = await bcrypt.hash(newPassword, 12);
+    await User.update({ password: hashed }, { where: { email } });
+
+    // Delete OTP from Redis
+    await del(`otp:${email}`);
+
+    return res.json({ success: true, message: "Password reset successfully" });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  refresh,
+  logout,
+  me,
+  forgotPassword,
+  verifyOtp,
+};

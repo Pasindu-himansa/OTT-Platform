@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 
 export const AUTH_ROUTES: Routes = [
-  { path: '', redirectTo: 'splash', pathMatch: 'full' },
   {
     path: 'splash',
     loadComponent: () =>
@@ -24,4 +23,12 @@ export const AUTH_ROUTES: Routes = [
     loadComponent: () =>
       import('./register/register.component').then((m) => m.RegisterComponent),
   },
+  {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./forgot-password/forgot-password.component').then(
+        (m) => m.ForgotPasswordComponent,
+      ),
+  },
+  { path: '', redirectTo: 'splash', pathMatch: 'full' },
 ];
