@@ -397,6 +397,50 @@ export class HomeComponent implements OnInit, OnDestroy {
   forgotPinError = '';
   forgotPinSuccess = '';
 
+  // Help & Support
+  faqOpen: any = {};
+  supportName = '';
+  supportEmail = '';
+  supportMessage = '';
+  supportLoading = false;
+  supportSuccess = '';
+  supportError = '';
+
+  faqs = [
+    {
+      q: 'How do I cancel my subscription?',
+      a: 'Go to Profile → Subscription → Manage Subscription → Cancel Plan. Your access continues until the end of the billing period.',
+    },
+    {
+      q: 'Can I watch on multiple devices?',
+      a: 'Yes! Depending on your plan: Basic (1 device), Standard (2 devices), Premium (4 devices).',
+    },
+    {
+      q: 'How do I download content for offline viewing?',
+      a: 'Tap the download icon on any movie or show. Downloads are available on Standard and Premium plans.',
+    },
+    {
+      q: 'Why is my video buffering?',
+      a: 'Check your internet connection. We recommend at least 5 Mbps for HD and 25 Mbps for 4K streaming.',
+    },
+    {
+      q: 'How do I reset my password?',
+      a: 'Go to Login page → Forgot Password → Enter your email → Enter the OTP received → Set new password.',
+    },
+    {
+      q: 'How do I set up Parental Controls?',
+      a: 'Go to Parental Controls in the sidebar → Enable → Set age rating → Set a 4-digit PIN → Save.',
+    },
+    {
+      q: 'What payment methods are accepted?',
+      a: 'We accept Visa, Mastercard, Amex and PayPal. All transactions are secure and encrypted.',
+    },
+    {
+      q: 'How do I report a problem?',
+      a: 'Use the contact form below or email us at support@otttv.com. We respond within 24 hours.',
+    },
+  ];
+
   // Watch History
   watchHistory: any[] = [];
 
@@ -1386,6 +1430,32 @@ export class HomeComponent implements OnInit, OnDestroy {
       .catch(() => {
         this.forgotPinLoading = false;
       });
+  }
+
+  // ─── Help & Support ──────────────────────────────────────────
+  toggleFaq(index: number): void {
+    this.faqOpen[index] = !this.faqOpen[index];
+  }
+
+  submitSupport(): void {
+    if (!this.supportName || !this.supportEmail || !this.supportMessage) {
+      this.supportError = 'Please fill all fields';
+      return;
+    }
+    this.supportLoading = true;
+    this.supportError = '';
+    this.supportSuccess = '';
+
+    // Simulate sending
+    setTimeout(() => {
+      this.supportSuccess =
+        'Your message has been sent! We will respond within 24 hours.';
+      this.supportLoading = false;
+      this.supportName = '';
+      this.supportEmail = '';
+      this.supportMessage = '';
+      this.cdr.detectChanges();
+    }, 1000);
   }
 
   ngOnDestroy(): void {

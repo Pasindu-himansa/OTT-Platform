@@ -137,6 +137,14 @@
       >
         <i class="fa-solid fa-gear"></i> Settings
       </div>
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'help'"
+        (click)="go('help')"
+      >
+        <i class="fa-solid fa-circle-question"></i> Help & Support
+      </div>
+
       @if (authService.isAdmin) {
         <a
           class="sidebar-link"
