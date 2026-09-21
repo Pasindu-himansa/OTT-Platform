@@ -388,6 +388,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   pinInput = ['', '', '', ''];
   pinError = '';
   pendingContent: any = null;
+  showForgotPin = false;
+  forgotPinEmail = '';
+  forgotPinOtp = '';
+  forgotPinNewPin = '';
+  forgotPinStep = 1; // 1=email, 2=otp+pin
+  forgotPinLoading = false;
+  forgotPinError = '';
+  forgotPinSuccess = '';
 
   // Watch History
   watchHistory: any[] = [];
@@ -1310,6 +1318,74 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (event.key === 'Backspace' && !this.pinInput[index] && index > 0) {
       document.getElementById('pin' + (index - 1))?.focus();
     }
+  }
+
+  // ─── Forgot PIN ──────────────────────────────────────────────
+  sendPinResetOtp(): void {
+    if (!this.forgotPinEmail) {
+      this.forgotPinError = 'Enter your email';
+      return;
+    }
+    this.forgotPinLoading = true;
+    this.forgotPinError = '';
+
+    fetch(`${environment.apiUrl}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: this.forgotPinEmail }),
+    })
+      .then((r) => r.json())
+      .then(() => {
+        this.forgotPinStep = 2;
+        this.forgotPinLoading = false;
+        this.cdr.detectChanges();
+      })
+      .catch(() => {
+        this.forgotPinLoading = false;
+      });
+  }
+
+  resetPin(): void {
+    if (!this.forgotPinOtp) {
+      this.forgotPinError = 'Enter OTP';
+      return;
+    }
+    if (!this.forgotPinNewPin || this.forgotPinNewPin.length !== 4) {
+      this.forgotPinError = 'PIN must be 4 digits';
+      return;
+    }
+    this.forgotPinLoading = true;
+    this.forgotPinError = '';
+
+    fetch(`${environment.apiUrl}/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: this.forgotPinEmail,
+        otp: this.forgotPinOtp,
+        newPassword: 'dummy_not_used_for_pin_reset',
+      }),
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success) {
+          localStorage.setItem('parental_pin', this.forgotPinNewPin);
+          this.forgotPinSuccess = 'PIN reset successfully!';
+          this.forgotPinLoading = false;
+          this.showForgotPin = false;
+          this.forgotPinStep = 1;
+          this.forgotPinEmail = '';
+          this.forgotPinOtp = '';
+          this.forgotPinNewPin = '';
+          this.cdr.detectChanges();
+        } else {
+          this.forgotPinError = 'Invalid OTP';
+          this.forgotPinLoading = false;
+        }
+      })
+      .catch(() => {
+        this.forgotPinLoading = false;
+      });
   }
 
   ngOnDestroy(): void {
