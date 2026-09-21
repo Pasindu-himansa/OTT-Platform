@@ -1,5 +1,68 @@
 <div class="overlay" [class.show]="sidebarOpen" (click)="closeSidebar()"></div>
 
+<!-- PIN Prompt Modal -->
+@if (showPinPrompt) {
+  <div class="pin-overlay">
+    <div class="pin-modal">
+      <i
+        class="fa-solid fa-shield-halved"
+        style="
+          font-size: 40px;
+          color: var(--accent);
+          margin-bottom: 16px;
+          display: block;
+          text-align: center;
+        "
+      ></i>
+      <h3 style="text-align: center; margin-bottom: 8px">Restricted Content</h3>
+      <p
+        style="
+          text-align: center;
+          color: var(--text-dim);
+          font-size: 14px;
+          margin-bottom: 24px;
+        "
+      >
+        This content is restricted. Enter your PIN to continue.
+      </p>
+      @if (pinError) {
+        <div class="alert-error" style="margin-bottom: 16px">
+          <i class="fa-solid fa-circle-exclamation"></i> {{ pinError }}
+        </div>
+      }
+      <div
+        style="
+          display: flex;
+          gap: 12px;
+          justify-content: center;
+          margin-bottom: 24px;
+        "
+      >
+        @for (i of [0, 1, 2, 3]; track i) {
+          <input
+            type="password"
+            maxlength="1"
+            class="otp-input"
+            [(ngModel)]="pinInput[i]"
+            [name]="'pin' + i"
+            [id]="'pin' + i"
+            (input)="onPinInput($event, i)"
+            (keydown)="onPinKeydown($event, i)"
+          />
+        }
+      </div>
+      <div style="display: flex; gap: 12px">
+        <button class="btn btn-primary btn-full" (click)="verifyPin()">
+          <i class="fa-solid fa-unlock"></i> Unlock
+        </button>
+        <button class="btn btn-secondary btn-full" (click)="closePinPrompt()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
 <div class="app-wrapper">
   <app-sidebar
     [isOpen]="sidebarOpen"
@@ -74,7 +137,7 @@
           </div>
           <div class="card-scroll">
             @for (item of continueCards; track $index) {
-              <div class="card card-wide" (click)="openDetail(item)">
+              <div class="card card-wide" (click)="openWithPinCheck(item)">
                 <div class="card-img wide">
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
@@ -107,7 +170,7 @@
           </div>
           <div class="card-scroll">
             @for (item of trendingCards; track $index) {
-              <div class="card" (click)="openDetail(item)">
+              <div class="card" (click)="openWithPinCheck(item)">
                 <div class="card-img">
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
@@ -165,7 +228,7 @@
           </div>
           <div class="card-scroll">
             @for (item of popularMovies; track $index) {
-              <div class="card" (click)="openDetail(item)">
+              <div class="card" (click)="openWithPinCheck(item)">
                 <div class="card-img">
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
@@ -195,7 +258,7 @@
           </div>
           <div class="card-scroll">
             @for (item of newReleases; track $index) {
-              <div class="card" (click)="openDetail(item)">
+              <div class="card" (click)="openWithPinCheck(item)">
                 <div class="card-img">
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
@@ -299,7 +362,7 @@
           </div>
           <div class="search-grid">
             @for (item of filteredMovies; track $index) {
-              <div class="card grid-card" (click)="openDetail(item)">
+              <div class="card grid-card" (click)="openWithPinCheck(item)">
                 <div class="card-img grid-img">
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
@@ -348,7 +411,7 @@
           </div>
           <div class="search-grid">
             @for (item of filteredShows; track $index) {
-              <div class="card grid-card" (click)="openDetail(item)">
+              <div class="card grid-card" (click)="openWithPinCheck(item)">
                 <div class="card-img grid-img">
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
@@ -419,7 +482,7 @@
           </h3>
           <div class="search-grid">
             @for (item of searchResults; track $index) {
-              <div class="card grid-card" (click)="openDetail(item)">
+              <div class="card grid-card" (click)="openWithPinCheck(item)">
                 <div class="card-img grid-img">
                   <div class="poster" [style.background]="item.gradient">
                     <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
@@ -567,7 +630,7 @@
             <h3>More Like This</h3>
             <div class="card-scroll">
               @for (item of trendingCards.slice(0, 6); track $index) {
-                <div class="card" (click)="openDetail(item)">
+                <div class="card" (click)="openWithPinCheck(item)">
                   <div class="card-img">
                     <div class="poster" [style.background]="item.gradient">
                       <i
@@ -616,7 +679,7 @@
           } @else {
             <div class="search-grid">
               @for (item of favorites; track $index) {
-                <div class="card grid-card" (click)="openDetail(item)">
+                <div class="card grid-card" (click)="openWithPinCheck(item)">
                   <div class="card-img grid-img">
                     <div
                       class="poster"
@@ -671,7 +734,7 @@
           } @else {
             <div class="search-grid">
               @for (item of watchHistory; track $index) {
-                <div class="card grid-card" (click)="openDetail(item)">
+                <div class="card grid-card" (click)="openWithPinCheck(item)">
                   <div class="card-img grid-img">
                     <div
                       class="poster"
@@ -1416,6 +1479,153 @@
               </table>
             </div>
           }
+        </div>
+      }
+
+      <!-- ══════════════ PARENTAL CONTROLS ══════════════ -->
+      @if (activeSection === "parental-controls") {
+        <div class="content-row">
+          <div class="content-row-header">
+            <h2 style="font-size: 28px">Parental Controls</h2>
+          </div>
+
+          @if (parentalSuccess) {
+            <div class="alert-success">
+              <i class="fa-solid fa-circle-check"></i> {{ parentalSuccess }}
+            </div>
+          }
+          @if (parentalError) {
+            <div class="alert-error">
+              <i class="fa-solid fa-circle-exclamation"></i> {{ parentalError }}
+            </div>
+          }
+
+          <div class="settings-section">
+            <h3>Content Restrictions</h3>
+            <div class="setting-row">
+              <div class="label">
+                <h4>Enable Parental Controls</h4>
+                <p>Restrict content based on age rating</p>
+              </div>
+              <div
+                class="toggle"
+                [class.on]="parentalEnabled"
+                (click)="parentalEnabled = !parentalEnabled"
+              ></div>
+            </div>
+
+            @if (parentalEnabled) {
+              <div class="setting-row">
+                <div class="label">
+                  <h4>Maximum Age Rating</h4>
+                  <p>Content above this rating will be blocked</p>
+                </div>
+                <select [(ngModel)]="parentalRating" style="width: 120px">
+                  @for (r of parentalRatings; track r) {
+                    <option [value]="r">{{ r }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
+
+          @if (parentalEnabled) {
+            <div class="settings-section">
+              <h3>Set PIN</h3>
+              <p
+                style="
+                  color: var(--text-dim);
+                  font-size: 14px;
+                  margin-bottom: 16px;
+                "
+              >
+                Set a 4-digit PIN to access restricted content
+              </p>
+              <div class="setting-row">
+                <div class="label"><h4>PIN</h4></div>
+                <input
+                  type="password"
+                  [(ngModel)]="parentalPin"
+                  maxlength="4"
+                  placeholder="Enter 4-digit PIN"
+                  style="
+                    width: 160px;
+                    letter-spacing: 8px;
+                    font-size: 20px;
+                    text-align: center;
+                  "
+                />
+              </div>
+              <div class="setting-row">
+                <div class="label"><h4>Confirm PIN</h4></div>
+                <input
+                  type="password"
+                  [(ngModel)]="parentalConfirmPin"
+                  maxlength="4"
+                  placeholder="Confirm PIN"
+                  style="
+                    width: 160px;
+                    letter-spacing: 8px;
+                    font-size: 20px;
+                    text-align: center;
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h3>Rating Guide</h3>
+              <div class="rating-guide">
+                <div
+                  class="rating-item"
+                  [class.blocked]="parentalRatings.indexOf(parentalRating) < 0"
+                >
+                  <span class="rating-badge g">G</span>
+                  <div>
+                    <h4>General Audiences</h4>
+                    <p>Suitable for all ages</p>
+                  </div>
+                </div>
+                <div class="rating-item">
+                  <span class="rating-badge pg">PG</span>
+                  <div>
+                    <h4>Parental Guidance</h4>
+                    <p>Some material may not suit children</p>
+                  </div>
+                </div>
+                <div class="rating-item">
+                  <span class="rating-badge pg13">PG-13</span>
+                  <div>
+                    <h4>Parents Strongly Cautioned</h4>
+                    <p>Some material may be inappropriate under 13</p>
+                  </div>
+                </div>
+                <div class="rating-item">
+                  <span class="rating-badge r">R</span>
+                  <div>
+                    <h4>Restricted</h4>
+                    <p>Under 17 requires parent or guardian</p>
+                  </div>
+                </div>
+                <div class="rating-item">
+                  <span class="rating-badge nc17">NC-17</span>
+                  <div>
+                    <h4>Adults Only</h4>
+                    <p>No one 17 and under admitted</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <button
+            class="btn btn-primary"
+            [disabled]="parentalLoading"
+            (click)="saveParentalControls()"
+          >
+            <i class="fa-solid fa-shield-halved"></i>
+            {{ parentalLoading ? "Saving..." : "Save Settings" }}
+          </button>
         </div>
       }
 

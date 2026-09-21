@@ -373,6 +373,22 @@ export class HomeComponent implements OnInit, OnDestroy {
     isDefault: false,
   };
 
+  // Parental Controls
+  parentalEnabled = false;
+  parentalPin = '';
+  parentalConfirmPin = '';
+  parentalRating = 'PG-13';
+  parentalLoading = false;
+  parentalSuccess = '';
+  parentalError = '';
+  parentalRatings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
+
+  // PIN prompt
+  showPinPrompt = false;
+  pinInput = ['', '', '', ''];
+  pinError = '';
+  pendingContent: any = null;
+
   // Watch History
   watchHistory: any[] = [];
 
@@ -556,6 +572,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loadContinueWatching();
     this.loadWatchHistory();
     this.loadNotifications();
+    this.loadParentalControls();
   }
 
   buildMockData(): void {
@@ -741,6 +758,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (section === 'epg') this.epgCurrentHour = new Date().getHours();
     this.cdr.detectChanges();
     if (section === 'payment-methods') this.loadPaymentMethods();
+    if (section === 'parental-controls') this.loadParentalControls();
   }
 
   toggleSetting(event: Event): void {
@@ -1172,6 +1190,124 @@ export class HomeComponent implements OnInit, OnDestroy {
       paypal: 'fa-cc-paypal',
     };
     return icons[type] || 'fa-credit-card';
+  }
+
+  // ─── Parental Controls ───────────────────────────────────────
+  saveParentalControls(): void {
+    if (this.parentalEnabled) {
+      if (!this.parentalPin) {
+        this.parentalError = 'Please set a PIN';
+        return;
+      }
+      if (this.parentalPin !== this.parentalConfirmPin) {
+        this.parentalError = 'PINs do not match';
+        return;
+      }
+      if (this.parentalPin.length !== 4) {
+        this.parentalError = 'PIN must be 4 digits';
+        return;
+      }
+    }
+
+    this.parentalLoading = true;
+    this.parentalError = '';
+    this.parentalSuccess = '';
+
+    // Store in localStorage for now
+    localStorage.setItem('parental_enabled', this.parentalEnabled.toString());
+    localStorage.setItem('parental_rating', this.parentalRating);
+    if (this.parentalPin) {
+      localStorage.setItem('parental_pin', this.parentalPin);
+    }
+
+    setTimeout(() => {
+      this.parentalSuccess = 'Parental controls saved successfully';
+      this.parentalLoading = false;
+      this.cdr.detectChanges();
+    }, 500);
+  }
+
+  loadParentalControls(): void {
+    this.parentalEnabled = localStorage.getItem('parental_enabled') === 'true';
+    this.parentalRating = localStorage.getItem('parental_rating') || 'PG-13';
+  }
+
+  // ─── PIN Prompt ──────────────────────────────────────────────
+  isContentBlocked(item: any): boolean {
+    if (!this.parentalEnabled) return false;
+    const savedEnabled = localStorage.getItem('parental_enabled');
+    if (savedEnabled !== 'true') return false;
+    // Block all content when parental controls enabled with G rating
+    const ratings: any = { G: 0, PG: 1, 'PG-13': 2, R: 3, 'NC-17': 4 };
+    const maxRating =
+      ratings[localStorage.getItem('parental_rating') || 'PG-13'] ?? 2;
+    // Default all mock content to PG-13
+    const itemRating = ratings[item.rating_class || 'PG-13'] ?? 2;
+    return itemRating > maxRating;
+  }
+
+  openWithPinCheck(item: any): void {
+    console.log('openWithPinCheck called', item.title);
+    console.log('parentalEnabled:', this.parentalEnabled);
+    console.log(
+      'localStorage enabled:',
+      localStorage.getItem('parental_enabled'),
+    );
+    console.log('isContentBlocked:', this.isContentBlocked(item));
+
+    if (this.isContentBlocked(item)) {
+      console.log('BLOCKING content - showing PIN prompt');
+      this.pendingContent = item;
+      this.showPinPrompt = true;
+      this.pinInput = ['', '', '', ''];
+      this.pinError = '';
+      this.cdr.detectChanges();
+    } else {
+      console.log('NOT blocking - opening detail');
+      this.openDetail(item);
+    }
+  }
+
+  verifyPin(): void {
+    const enteredPin = this.pinInput.join('');
+    const savedPin = localStorage.getItem('parental_pin');
+
+    if (enteredPin === savedPin) {
+      this.showPinPrompt = false;
+      this.pinError = '';
+      if (this.pendingContent) {
+        this.openDetail(this.pendingContent);
+        this.pendingContent = null;
+      }
+    } else {
+      this.pinError = 'Incorrect PIN. Try again.';
+      this.pinInput = ['', '', '', ''];
+      document.getElementById('pin0')?.focus();
+    }
+    this.cdr.detectChanges();
+  }
+
+  closePinPrompt(): void {
+    this.showPinPrompt = false;
+    this.pendingContent = null;
+    this.pinInput = ['', '', '', ''];
+    this.pinError = '';
+  }
+
+  onPinInput(event: Event, index: number): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value && index < 3) {
+      document.getElementById('pin' + (index + 1))?.focus();
+    }
+    if (this.pinInput.every((d) => d !== '')) {
+      this.verifyPin();
+    }
+  }
+
+  onPinKeydown(event: KeyboardEvent, index: number): void {
+    if (event.key === 'Backspace' && !this.pinInput[index] && index > 0) {
+      document.getElementById('pin' + (index - 1))?.focus();
+    }
   }
 
   ngOnDestroy(): void {

@@ -122,6 +122,14 @@
       >
         <i class="fa-solid fa-user"></i> Profile
       </div>
+
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'parental-controls'"
+        (click)="go('parental-controls')"
+      >
+        <i class="fa-solid fa-shield-halved"></i> Parental Controls
+      </div>
       <div
         class="sidebar-link"
         [class.active]="activeSection === 'settings'"

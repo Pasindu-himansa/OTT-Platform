@@ -1025,3 +1025,101 @@ app-topbar .topbar {
     color: var(--text-muted);
   }
 }
+
+// ─── Parental Controls ────────────────────────────────────────
+.rating-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rating-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  p {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+}
+
+.rating-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+  color: #fff;
+
+  &.g {
+    background: #30d158;
+  }
+  &.pg {
+    background: #ffd60a;
+    color: #000;
+  }
+  &.pg13 {
+    background: #ff9f0a;
+  }
+  &.r {
+    background: #ff453a;
+  }
+  &.nc17 {
+    background: #8e23e0;
+  }
+}
+
+// ─── PIN Prompt ───────────────────────────────────────────────
+.pin-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+
+.pin-modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  max-width: 360px;
+  margin: 24px auto;
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+}
+
+.otp-input {
+  width: 52px;
+  height: 56px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  color: var(--text);
+  &:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+}
