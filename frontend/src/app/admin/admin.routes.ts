@@ -42,6 +42,13 @@ export const ADMIN_ROUTES: Routes = [
             (m) => m.AnalyticsComponent,
           ),
       },
+      {
+        path: 'live-tv',
+        loadComponent: () =>
+          import('./pages/live-tv/live-tv.component').then(
+            (m) => m.LiveTvComponent,
+          ),
+      },
     ],
   },
 ];

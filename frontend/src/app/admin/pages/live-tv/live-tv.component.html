@@ -1,0 +1,226 @@
+<div>
+  <div class="page-header">
+    <h2>Live TV Management</h2>
+    <button class="btn btn-primary btn-sm" (click)="showAddForm = !showAddForm">
+      <i class="fa-solid fa-plus"></i> Add Channel
+    </button>
+  </div>
+
+  @if (success) {
+    <div class="alert-success" style="margin-bottom: 16px">
+      <i class="fa-solid fa-circle-check"></i> {{ success }}
+    </div>
+  }
+
+  <!-- Add channel form -->
+  @if (showAddForm) {
+    <div class="add-form" style="margin-bottom: 24px">
+      <h3 style="margin-bottom: 20px">Add New Channel</h3>
+      @if (error) {
+        <div class="alert-error" style="margin-bottom: 16px">
+          <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+        </div>
+      }
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Channel Name *</label>
+          <input
+            type="text"
+            [(ngModel)]="newChannel.name"
+            placeholder="CNN International"
+          />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select [(ngModel)]="newChannel.category">
+            @for (cat of categories; track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Stream URL * (HLS .m3u8)</label>
+          <input
+            type="text"
+            [(ngModel)]="newChannel.streamUrl"
+            placeholder="https://example.com/stream.m3u8"
+          />
+        </div>
+        <div class="form-group full">
+          <label>Description</label>
+          <input
+            type="text"
+            [(ngModel)]="newChannel.description"
+            placeholder="Channel description"
+          />
+        </div>
+        <div class="form-group">
+          <label>Language</label>
+          <select [(ngModel)]="newChannel.language">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="ar">Arabic</option>
+            <option value="zh">Chinese</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Country</label>
+          <input
+            type="text"
+            [(ngModel)]="newChannel.country"
+            placeholder="US"
+          />
+        </div>
+        <div class="form-group">
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              cursor: pointer;
+            "
+          >
+            <input
+              type="checkbox"
+              [(ngModel)]="newChannel.isActive"
+              style="width: auto"
+            />
+            Active (Live)
+          </label>
+        </div>
+        <div class="form-group">
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              cursor: pointer;
+            "
+          >
+            <input
+              type="checkbox"
+              [(ngModel)]="newChannel.isFree"
+              style="width: auto"
+            />
+            Free Channel
+          </label>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; margin-top: 16px">
+        <button
+          class="btn btn-primary"
+          [disabled]="saving"
+          (click)="saveChannel()"
+        >
+          {{ saving ? "Saving..." : "Add Channel" }}
+        </button>
+        <button
+          class="btn btn-secondary"
+          (click)="showAddForm = false; error = ''"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Channels table -->
+  <div class="data-table-wrap">
+    @if (loading) {
+      <div style="padding: 40px; text-align: center; color: var(--text-dim)">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px"></i>
+      </div>
+    } @else if (channels.length === 0) {
+      <div style="padding: 60px; text-align: center">
+        <i
+          class="fa-solid fa-tower-broadcast"
+          style="
+            font-size: 48px;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 16px;
+          "
+        ></i>
+        <h3 style="margin-bottom: 8px">No channels yet</h3>
+        <p style="color: var(--text-dim); margin-bottom: 24px">
+          Add your first live channel
+        </p>
+        <button class="btn btn-primary" (click)="showAddForm = true">
+          <i class="fa-solid fa-plus"></i> Add Channel
+        </button>
+      </div>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Channel</th>
+            <th>Category</th>
+            <th>Stream URL</th>
+            <th>Status</th>
+            <th>Free</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ch of channels; track ch._id) {
+            <tr>
+              <td style="font-weight: 500">{{ ch.name }}</td>
+              <td style="color: var(--text-dim)">{{ ch.category }}</td>
+              <td>
+                @if (ch.streamUrl) {
+                  <a
+                    [href]="ch.streamUrl"
+                    target="_blank"
+                    style="color: var(--accent); font-size: 12px"
+                  >
+                    <i class="fa-solid fa-link"></i> Stream
+                  </a>
+                } @else {
+                  <span style="color: var(--text-muted); font-size: 12px"
+                    >No URL</span
+                  >
+                }
+              </td>
+              <td>
+                <span
+                  class="status-badge"
+                  [class.active]="ch.isActive"
+                  [class.inactive]="!ch.isActive"
+                >
+                  {{ ch.isActive ? "Live" : "Offline" }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="status-badge"
+                  [class.active]="ch.isFree"
+                  [class.inactive]="!ch.isFree"
+                >
+                  {{ ch.isFree ? "Free" : "Premium" }}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: 8px">
+                  <button
+                    class="btn btn-sm btn-secondary"
+                    (click)="toggleChannel(ch)"
+                  >
+                    {{ ch.isActive ? "Go Offline" : "Go Live" }}
+                  </button>
+                  <button
+                    class="btn btn-sm btn-secondary"
+                    style="color: var(--accent)"
+                    (click)="deleteChannel(ch._id)"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

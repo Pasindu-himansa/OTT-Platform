@@ -22,10 +22,10 @@ export class AdminLayoutComponent {
     { label: 'Dashboard', icon: 'fa-chart-line', path: 'dashboard' },
     { label: 'Users', icon: 'fa-users', path: 'users' },
     { label: 'Content', icon: 'fa-film', path: 'content' },
+    { label: 'Live TV', icon: 'fa-tower-broadcast', path: 'live-tv' },
     { label: 'Subscriptions', icon: 'fa-crown', path: 'subscriptions' },
     { label: 'Analytics', icon: 'fa-chart-pie', path: 'analytics' },
   ];
-
   constructor(
     public authService: AuthService,
     private router: Router,
