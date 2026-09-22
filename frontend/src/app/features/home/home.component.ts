@@ -236,6 +236,152 @@ export class HomeComponent implements OnInit, OnDestroy {
     'Lost City',
   ];
 
+  seasons: any[] = [
+    {
+      season: 1,
+      episodes: [
+        {
+          ep: 1,
+          title: 'Pilot',
+          duration: '52 min',
+          desc: 'The story begins as our heroes discover a hidden world.',
+          progress: 100,
+        },
+        {
+          ep: 2,
+          title: 'The Awakening',
+          duration: '48 min',
+          desc: 'Strange events unfold as the team investigates further.',
+          progress: 60,
+        },
+        {
+          ep: 3,
+          title: 'Dark Waters',
+          duration: '51 min',
+          desc: 'A dangerous journey takes them to uncharted territory.',
+          progress: 0,
+        },
+        {
+          ep: 4,
+          title: 'The Reckoning',
+          duration: '49 min',
+          desc: 'Old enemies return with a new plan.',
+          progress: 0,
+        },
+        {
+          ep: 5,
+          title: 'Into the Storm',
+          duration: '53 min',
+          desc: 'The team faces their biggest challenge yet.',
+          progress: 0,
+        },
+        {
+          ep: 6,
+          title: 'Broken Alliances',
+          duration: '47 min',
+          desc: 'Trust is tested when secrets are revealed.',
+          progress: 0,
+        },
+        {
+          ep: 7,
+          title: 'The Final Stand',
+          duration: '55 min',
+          desc: 'Everything comes to a head in this explosive episode.',
+          progress: 0,
+        },
+        {
+          ep: 8,
+          title: 'Season Finale',
+          duration: '62 min',
+          desc: 'The shocking conclusion to season one.',
+          progress: 0,
+        },
+      ],
+    },
+    {
+      season: 2,
+      episodes: [
+        {
+          ep: 1,
+          title: 'New Beginnings',
+          duration: '50 min',
+          desc: 'Six months later, the team reunites for a new mission.',
+          progress: 0,
+        },
+        {
+          ep: 2,
+          title: 'The Resistance',
+          duration: '48 min',
+          desc: 'A new threat emerges from the shadows.',
+          progress: 0,
+        },
+        {
+          ep: 3,
+          title: 'Uprising',
+          duration: '52 min',
+          desc: 'The resistance grows stronger.',
+          progress: 0,
+        },
+        {
+          ep: 4,
+          title: 'Betrayal',
+          duration: '49 min',
+          desc: 'One of their own turns against them.',
+          progress: 0,
+        },
+        {
+          ep: 5,
+          title: 'The Long Night',
+          duration: '58 min',
+          desc: 'A night that changes everything.',
+          progress: 0,
+        },
+        {
+          ep: 6,
+          title: 'Season 2 Finale',
+          duration: '65 min',
+          desc: 'The epic conclusion to season two.',
+          progress: 0,
+        },
+      ],
+    },
+    {
+      season: 3,
+      episodes: [
+        {
+          ep: 1,
+          title: 'The Return',
+          duration: '51 min',
+          desc: 'After a year, the team is back together.',
+          progress: 0,
+        },
+        {
+          ep: 2,
+          title: 'New Threat',
+          duration: '47 min',
+          desc: 'A new enemy more powerful than ever.',
+          progress: 0,
+        },
+        {
+          ep: 3,
+          title: 'The Alliance',
+          duration: '53 min',
+          desc: 'Unlikely allies join the fight.',
+          progress: 0,
+        },
+        {
+          ep: 4,
+          title: 'Season 3 Finale',
+          duration: '70 min',
+          desc: 'The ultimate showdown begins.',
+          progress: 0,
+        },
+      ],
+    },
+  ];
+
+  selectedSeason = 0;
+
   channelData = [
     {
       name: 'StreamNews',
@@ -352,6 +498,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   subscriptionLoading = false;
   subscriptionSuccess = '';
   subscriptionError = '';
+  cancelLoading = false;
+  cancelSuccess = '';
+  cancelError = '';
+  showCancelConfirm = false;
+  cancelReason = '';
   selectedPlanId = '';
 
   // Payment
@@ -404,7 +555,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   supportMessage = '';
   supportLoading = false;
   supportSuccess = '';
+  cacheSize = '120 MB';
+
   supportError = '';
+
+  // Downloads
+  downloadedItems: any[] = [];
 
   faqs = [
     {
@@ -625,11 +781,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loadWatchHistory();
     this.loadNotifications();
     this.loadParentalControls();
+    this.loadMySubscription();
   }
 
   buildMockData(): void {
     const ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
-    const makeCard = (names: string[], offset = 0) =>
+
+    const makeCard = (names: string[], offset = 0, type = 'movie') =>
       names.map((name, i) => ({
         title: name,
         meta: `${2020 + (i % 5)} • ${1 + (i % 3)}h ${30 * (i % 2)}min`,
@@ -639,11 +797,25 @@ export class HomeComponent implements OnInit, OnDestroy {
         badge: i < 2 ? 'hd' : null,
         genre: this.movieFilters[1 + (i % (this.movieFilters.length - 1))],
         rating_class: ratings[i % ratings.length],
+        type: type,
       }));
 
-    this.allMovies = makeCard(this.movieNames);
+    const makeShowCard = (names: string[], offset = 0) =>
+      names.map((name, i) => ({
+        title: name,
+        meta: `${2020 + (i % 5)} • ${(i % 3) + 1} Season${(i % 3) + 1 > 1 ? 's' : ''} • Drama`,
+        rating: (7 + (i % 3) * 0.5).toFixed(1),
+        gradient: this.gradients[(i + offset) % this.gradients.length],
+        emoji: this.emojis[(i + offset) % this.emojis.length],
+        badge: i < 2 ? 'hd' : null,
+        genre: this.showFilters[1 + (i % (this.showFilters.length - 1))],
+        rating_class: ratings[i % ratings.length],
+        type: 'series',
+      }));
+
+    this.allMovies = makeCard(this.movieNames, 0, 'movie');
     this.filteredMovies = [...this.allMovies];
-    this.allShows = makeCard(this.showNames, 4);
+    this.allShows = makeShowCard(this.showNames, 4);
     this.filteredShows = [...this.allShows];
     this.allChannels = this.channelData;
     this.filteredChannels = [...this.allChannels];
@@ -656,7 +828,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.newReleases = this.allShows.slice(0, 8);
     this.searchResults = [...this.allMovies, ...this.allShows];
   }
-
   loadRealData(): void {
     this.videoService.getTrending(10).subscribe({
       next: (res) => {
@@ -1456,6 +1627,97 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.supportMessage = '';
       this.cdr.detectChanges();
     }, 1000);
+  }
+
+  cancelSubscription(): void {
+    this.cancelLoading = true;
+    this.cancelError = '';
+    this.cancelSuccess = '';
+    this.subscriptionService.cancel(this.cancelReason).subscribe({
+      next: () => {
+        this.cancelSuccess = 'Subscription cancelled successfully';
+        this.cancelLoading = false;
+        this.showCancelConfirm = false;
+        this.mySubscription = null;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.cancelError = err.error?.message || 'Failed to cancel';
+        this.cancelLoading = false;
+      },
+    });
+  }
+
+  // ─── Settings ────────────────────────────────────────────────
+  clearCache(): void {
+    // Clear localStorage except auth tokens
+    const token = localStorage.getItem('ott_access_token');
+    const refreshToken = localStorage.getItem('ott_refresh_token');
+    const user = localStorage.getItem('ott_user');
+    const parentalPin = localStorage.getItem('parental_pin');
+    const parentalEnabled = localStorage.getItem('parental_enabled');
+    const parentalRating = localStorage.getItem('parental_rating');
+
+    localStorage.clear();
+
+    // Restore important items
+    if (token) localStorage.setItem('ott_access_token', token);
+    if (refreshToken) localStorage.setItem('ott_refresh_token', refreshToken);
+    if (user) localStorage.setItem('ott_user', user);
+    if (parentalPin) localStorage.setItem('parental_pin', parentalPin);
+    if (parentalEnabled)
+      localStorage.setItem('parental_enabled', parentalEnabled);
+    if (parentalRating) localStorage.setItem('parental_rating', parentalRating);
+
+    this.cacheSize = '0 MB';
+    this.cdr.detectChanges();
+
+    // Show success briefly
+    alert('Cache cleared successfully!');
+  }
+
+  // ─── Downloads ───────────────────────────────────────────────
+  loadDownloads(): void {
+    const saved = localStorage.getItem('ott_downloads');
+    this.downloadedItems = saved ? JSON.parse(saved) : [];
+  }
+
+  isDownloaded(item: any): boolean {
+    return this.downloadedItems.some((d: any) => d.title === item.title);
+  }
+
+  downloadContent(item: any): void {
+    if (this.isDownloaded(item)) return;
+
+    const download = {
+      title: item.title,
+      meta: item.meta,
+      gradient: item.gradient,
+      emoji: item.emoji,
+      progress: 100,
+      size: `${(Math.random() * 2 + 0.5).toFixed(1)} GB`,
+      downloadedAt: new Date().toISOString(),
+    };
+
+    this.downloadedItems.push(download);
+    localStorage.setItem('ott_downloads', JSON.stringify(this.downloadedItems));
+    this.cdr.detectChanges();
+
+    // Show feedback
+    const btn = document.activeElement as HTMLElement;
+    if (btn) btn.blur();
+  }
+
+  removeDownload(index: number): void {
+    this.downloadedItems.splice(index, 1);
+    localStorage.setItem('ott_downloads', JSON.stringify(this.downloadedItems));
+    this.cdr.detectChanges();
+  }
+
+  clearDownloads(): void {
+    this.downloadedItems = [];
+    localStorage.setItem('ott_downloads', '[]');
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {

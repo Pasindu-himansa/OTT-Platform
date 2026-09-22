@@ -800,6 +800,20 @@
                   ></i>
                   {{ isFavorite(selectedMovie) ? "Saved" : "My List" }}
                 </button>
+                <button
+                  class="btn btn-secondary btn-lg"
+                  (click)="downloadContent(selectedMovie)"
+                >
+                  <i
+                    class="fa-solid"
+                    [class]="
+                      isDownloaded(selectedMovie)
+                        ? 'fa-solid fa-check'
+                        : 'fa-solid fa-download'
+                    "
+                  ></i>
+                  {{ isDownloaded(selectedMovie) ? "Downloaded" : "Download" }}
+                </button>
                 <button class="btn btn-secondary btn-lg">
                   <i class="fa-solid fa-share-nodes"></i> Share
                 </button>
@@ -826,6 +840,54 @@
               }
             </div>
           </div>
+
+          <!-- Episodes & Seasons (for TV Shows) -->
+          @if (selectedMovie?.type === "series") {
+            <div class="detail-section">
+              <h3>Episodes</h3>
+
+              <!-- Season selector -->
+              <div class="season-selector">
+                @for (s of seasons; track $index) {
+                  <button
+                    class="season-btn"
+                    [class.active]="selectedSeason === $index"
+                    (click)="selectedSeason = $index"
+                  >
+                    Season {{ s.season }}
+                  </button>
+                }
+              </div>
+
+              <!-- Episode list -->
+              <div class="episode-list">
+                @for (ep of seasons[selectedSeason].episodes; track ep.ep) {
+                  <div class="episode-item" (click)="playVideo(selectedMovie)">
+                    <div class="ep-number">{{ ep.ep }}</div>
+                    <div class="ep-info">
+                      <div class="ep-header">
+                        <h4>{{ ep.title }}</h4>
+                        <span class="ep-duration">{{ ep.duration }}</span>
+                      </div>
+                      <p>{{ ep.desc }}</p>
+                      @if (ep.progress > 0) {
+                        <div class="ep-progress">
+                          <div
+                            class="ep-progress-fill"
+                            [style.width.%]="ep.progress"
+                          ></div>
+                        </div>
+                      }
+                    </div>
+                    <button class="ep-play-btn">
+                      <i class="fa-solid fa-play"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
           <div class="detail-section">
             <h3>More Like This</h3>
             <div class="card-scroll">
@@ -929,10 +991,7 @@
         <div class="content-row">
           <div class="content-row-header">
             <h2 style="font-size: 28px">Watch History</h2>
-            <button
-              class="btn btn-secondary btn-sm"
-              (click)="clearWatchHistory()"
-            >
+            <button class="btn btn-secondary btn-sm" (click)="clearDownloads()">
               <i class="fa-solid fa-trash"></i> Clear All
             </button>
           </div>
@@ -1002,40 +1061,66 @@
         <div class="content-row">
           <div class="content-row-header">
             <h2 style="font-size: 28px">Downloads</h2>
+            @if (downloadedItems.length > 0) {
+              <button
+                class="btn btn-secondary btn-sm"
+                (click)="downloadedItems = []; removeDownload(-1)"
+              >
+                <i class="fa-solid fa-trash"></i> Clear All
+              </button>
+            }
           </div>
-          @for (item of continueCards.slice(0, 4); track $index) {
-            <div class="download-item">
-              <div class="download-thumb" [style.background]="item.gradient">
-                <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
-              </div>
-              <div class="download-info">
-                <h4>{{ item.title }}</h4>
-                <p>
-                  {{ (1 + $index * 0.8).toFixed(1) }} GB —
-                  {{
-                    item.progress > 80
-                      ? "Downloaded"
-                      : item.progress + "% complete"
-                  }}
-                </p>
-                @if (item.progress <= 80) {
-                  <div class="download-progress">
-                    <div class="bar" [style.width.%]="item.progress"></div>
-                  </div>
-                }
-              </div>
-              <button class="btn btn-secondary btn-sm">
-                <i class="fa-solid fa-play"></i> Play
+
+          @if (downloadedItems.length === 0) {
+            <div class="empty-state">
+              <i class="fa-solid fa-download"></i>
+              <h3>No downloads yet</h3>
+              <p>Download movies and shows to watch offline</p>
+              <button class="btn btn-primary" (click)="onNavigate('movies')">
+                Browse Content
               </button>
             </div>
+          } @else {
+            @for (item of downloadedItems; track $index) {
+              <div class="download-item">
+                <div class="download-thumb" [style.background]="item.gradient">
+                  <i
+                    class="fa-solid"
+                    [class]="'fa-solid ' + (item.emoji || 'fa-film')"
+                  ></i>
+                </div>
+                <div class="download-info">
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.size }} • Downloaded</p>
+                  <p style="font-size: 11px; color: var(--text-muted)">
+                    {{ item.downloadedAt | date: "mediumDate" }}
+                  </p>
+                </div>
+                <div style="display: flex; gap: 8px">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    (click)="playVideo(item)"
+                  >
+                    <i class="fa-solid fa-play"></i>
+                  </button>
+                  <button
+                    class="btn btn-secondary btn-sm"
+                    style="color: var(--accent)"
+                    (click)="removeDownload($index)"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            }
           }
         </div>
       }
-
       <!-- ══════════════ SETTINGS ══════════════ -->
       @if (activeSection === "settings") {
         <div class="content-row">
           <h2 style="margin-bottom: 24px">Settings</h2>
+
           <div class="settings-section">
             <h3>Playback</h3>
             <div class="setting-row">
@@ -1065,6 +1150,7 @@
               <div class="toggle" (click)="toggleSetting($event)"></div>
             </div>
           </div>
+
           <div class="settings-section">
             <h3>Notifications</h3>
             <div class="setting-row">
@@ -1082,6 +1168,7 @@
               <div class="toggle on" (click)="toggleSetting($event)"></div>
             </div>
           </div>
+
           <div class="settings-section">
             <h3>Account</h3>
             <div class="setting-row">
@@ -1095,12 +1182,93 @@
                 <option>Français</option>
               </select>
             </div>
-            <div class="setting-row">
+            <div
+              class="setting-row"
+              style="cursor: pointer"
+              (click)="onNavigate('parental-controls')"
+            >
               <div class="label">
                 <h4>Parental Controls</h4>
                 <p>Restrict mature content</p>
               </div>
-              <div class="toggle" (click)="toggleSetting($event)"></div>
+              <i
+                class="fa-solid fa-chevron-right"
+                style="color: var(--text-muted)"
+              ></i>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Storage</h3>
+            <div class="setting-row">
+              <div class="label">
+                <h4>Clear Cache</h4>
+                <p>{{ cacheSize }} used</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" (click)="clearCache()">
+                Clear
+              </button>
+            </div>
+            <div class="setting-row">
+              <div class="label">
+                <h4>Downloads Storage</h4>
+                <p>Manage downloaded content</p>
+              </div>
+              <button
+                class="btn btn-secondary btn-sm"
+                (click)="onNavigate('downloads')"
+              >
+                Manage
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>About</h3>
+            <div class="setting-row">
+              <div class="label"><h4>App Version</h4></div>
+              <span style="color: var(--text-dim)">1.0.0</span>
+            </div>
+            <div class="setting-row">
+              <div class="label"><h4>Build Number</h4></div>
+              <span style="color: var(--text-dim)">2026.09.21</span>
+            </div>
+            <div class="setting-row" style="cursor: pointer">
+              <div class="label"><h4>Terms of Service</h4></div>
+              <i
+                class="fa-solid fa-chevron-right"
+                style="color: var(--text-muted)"
+              ></i>
+            </div>
+            <div class="setting-row" style="cursor: pointer">
+              <div class="label"><h4>Privacy Policy</h4></div>
+              <i
+                class="fa-solid fa-chevron-right"
+                style="color: var(--text-muted)"
+              ></i>
+            </div>
+            <div class="setting-row" style="cursor: pointer">
+              <div class="label"><h4>Open Source Licenses</h4></div>
+              <i
+                class="fa-solid fa-chevron-right"
+                style="color: var(--text-muted)"
+              ></i>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Danger Zone</h3>
+            <div class="setting-row">
+              <div class="label">
+                <h4 style="color: var(--accent)">Delete Account</h4>
+                <p>Permanently delete your account and data</p>
+              </div>
+              <button
+                class="btn btn-sm"
+                style="color: var(--accent); border: 1px solid var(--accent)"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
@@ -1350,15 +1518,93 @@
           }
 
           @if (mySubscription) {
-            <div class="active-sub-banner">
-              <i class="fa-solid fa-crown"></i>
-              <div>
-                <strong>You have an active subscription</strong>
-                <p>
-                  Expires: {{ mySubscription.endDate | date: "mediumDate" }}
-                </p>
+            <div class="manage-subscription">
+              <div class="current-plan">
+                <div class="plan-icon">
+                  <i class="fa-solid fa-crown" style="color: var(--gold)"></i>
+                </div>
+                <div class="plan-details">
+                  <h3>{{ mySubscription.plan?.name || "Active Plan" }}</h3>
+                  <p>${{ mySubscription.plan?.price || "9.99" }}/month</p>
+                  <div class="plan-meta">
+                    <span
+                      ><i class="fa-solid fa-calendar"></i> Next billing:
+                      {{ mySubscription.endDate | date: "mediumDate" }}</span
+                    >
+                    <span class="status-badge active">Active</span>
+                  </div>
+                </div>
               </div>
-              <span class="status-badge active">Active</span>
+
+              @if (cancelSuccess) {
+                <div class="alert-success" style="margin-top: 16px">
+                  <i class="fa-solid fa-circle-check"></i> {{ cancelSuccess }}
+                </div>
+              }
+              @if (cancelError) {
+                <div class="alert-error" style="margin-top: 16px">
+                  <i class="fa-solid fa-circle-exclamation"></i>
+                  {{ cancelError }}
+                </div>
+              }
+
+              @if (!showCancelConfirm) {
+                <div class="plan-actions">
+                  <button
+                    class="btn btn-secondary btn-sm"
+                    (click)="showCancelConfirm = true"
+                  >
+                    <i class="fa-solid fa-xmark"></i> Cancel Subscription
+                  </button>
+                </div>
+              }
+
+              @if (showCancelConfirm) {
+                <div class="cancel-confirm">
+                  <h4>Are you sure you want to cancel?</h4>
+                  <p
+                    style="
+                      color: var(--text-dim);
+                      font-size: 14px;
+                      margin-bottom: 16px;
+                    "
+                  >
+                    You will lose access at the end of your billing period on
+                    {{ mySubscription.endDate | date: "mediumDate" }}.
+                  </p>
+                  <div class="form-group" style="margin-bottom: 16px">
+                    <label>Reason (optional)</label>
+                    <select [(ngModel)]="cancelReason">
+                      <option value="">Select a reason</option>
+                      <option value="too_expensive">Too expensive</option>
+                      <option value="not_enough_content">
+                        Not enough content
+                      </option>
+                      <option value="technical_issues">Technical issues</option>
+                      <option value="switching_service">
+                        Switching to another service
+                      </option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div style="display: flex; gap: 12px">
+                    <button
+                      class="btn btn-primary btn-sm"
+                      (click)="showCancelConfirm = false"
+                    >
+                      Keep Subscription
+                    </button>
+                    <button
+                      class="btn btn-secondary btn-sm"
+                      style="color: var(--accent)"
+                      [disabled]="cancelLoading"
+                      (click)="cancelSubscription()"
+                    >
+                      {{ cancelLoading ? "Cancelling..." : "Confirm Cancel" }}
+                    </button>
+                  </div>
+                </div>
+              }
             </div>
           }
 
