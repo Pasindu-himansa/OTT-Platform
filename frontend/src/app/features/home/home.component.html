@@ -1976,6 +1976,63 @@
             </div>
           }
 
+          <!-- Current Plan Features -->
+          @if (mySubscription) {
+            <div class="plan-features-list" style="margin-bottom: 32px">
+              <h3 style="margin-bottom: 16px">Your Plan Includes</h3>
+              <div class="features-grid">
+                <div class="feature-item">
+                  <i
+                    class="fa-solid fa-check-circle"
+                    style="color: var(--success)"
+                  ></i>
+                  <span
+                    >Watch on
+                    {{ mySubscription.plan?.maxDevices || 2 }} device(s)</span
+                  >
+                </div>
+                <div class="feature-item">
+                  <i
+                    class="fa-solid fa-check-circle"
+                    style="color: var(--success)"
+                  ></i>
+                  <span
+                    >{{ mySubscription.plan?.maxQuality || "FHD" }} video
+                    quality</span
+                  >
+                </div>
+                <div class="feature-item">
+                  <i
+                    class="fa-solid fa-check-circle"
+                    style="color: var(--success)"
+                  ></i>
+                  <span>Download and watch offline</span>
+                </div>
+                <div class="feature-item">
+                  <i
+                    class="fa-solid fa-check-circle"
+                    style="color: var(--success)"
+                  ></i>
+                  <span>No Ads</span>
+                </div>
+                <div class="feature-item">
+                  <i
+                    class="fa-solid fa-check-circle"
+                    style="color: var(--success)"
+                  ></i>
+                  <span>Live TV access</span>
+                </div>
+                <div class="feature-item">
+                  <i
+                    class="fa-solid fa-check-circle"
+                    style="color: var(--success)"
+                  ></i>
+                  <span>Cancel anytime</span>
+                </div>
+              </div>
+            </div>
+          }
+
           <div
             class="plans-grid"
             style="
