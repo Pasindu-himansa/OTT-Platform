@@ -82,6 +82,15 @@
       >
         <i class="fa-solid fa-clock-rotate-left"></i> Watch History
       </div>
+
+      <div
+        class="sidebar-link"
+        [class.active]="activeSection === 'continue-watching'"
+        (click)="go('continue-watching')"
+      >
+        <i class="fa-solid fa-circle-play"></i> Continue Watching
+      </div>
+
       <div
         class="sidebar-link"
         [class.active]="activeSection === 'downloads'"

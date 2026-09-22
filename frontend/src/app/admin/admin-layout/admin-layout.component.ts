@@ -25,6 +25,7 @@ export class AdminLayoutComponent {
     { label: 'Live TV', icon: 'fa-tower-broadcast', path: 'live-tv' },
     { label: 'Subscriptions', icon: 'fa-crown', path: 'subscriptions' },
     { label: 'Analytics', icon: 'fa-chart-pie', path: 'analytics' },
+    { label: 'Settings', icon: 'fa-gear', path: 'settings' },
   ];
   constructor(
     public authService: AuthService,

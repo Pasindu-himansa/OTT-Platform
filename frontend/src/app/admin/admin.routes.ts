@@ -49,6 +49,14 @@ export const ADMIN_ROUTES: Routes = [
             (m) => m.LiveTvComponent,
           ),
       },
+
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./pages/settings/settings.component').then(
+            (m) => m.AdminSettingsComponent,
+          ),
+      },
     ],
   },
 ];

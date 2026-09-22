@@ -129,13 +129,8 @@ const subscribe = async (req, res) => {
 const cancelSubscription = async (req, res) => {
   try {
     const { reason } = req.body;
-
     const subscription = await Subscription.findOne({
-      where: {
-        userId: req.user.id,
-        status: "active",
-        endDate: { [Op.gt]: new Date() },
-      },
+      where: { userId: req.user.id, status: "active" },
     });
 
     if (!subscription) {
@@ -146,15 +141,13 @@ const cancelSubscription = async (req, res) => {
 
     await subscription.update({
       status: "cancelled",
-      autoRenew: false,
       cancelledAt: new Date(),
-      cancelReason: reason || "User requested cancellation",
+      cancelReason: reason || "User cancelled",
     });
 
     return res.json({
       success: true,
-      message: "Subscription cancelled. Access remains until end date.",
-      data: { subscription },
+      message: "Subscription cancelled successfully",
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });

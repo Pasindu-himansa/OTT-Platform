@@ -1,0 +1,473 @@
+<div>
+  <h2 style="margin-bottom: 24px">Admin Settings</h2>
+
+  @if (saveSuccess) {
+    <div class="alert-success" style="margin-bottom: 16px">
+      <i class="fa-solid fa-circle-check"></i> {{ saveSuccess }}
+    </div>
+  }
+
+  <div class="admin-settings-layout">
+    <!-- Tabs -->
+    <div class="settings-tabs">
+      @for (tab of tabs; track tab.id) {
+        <div
+          class="settings-tab"
+          [class.active]="activeTab === tab.id"
+          (click)="activeTab = tab.id"
+        >
+          <i class="fa-solid" [class]="'fa-solid ' + tab.icon"></i>
+          {{ tab.label }}
+        </div>
+      }
+    </div>
+
+    <!-- Content -->
+    <div class="settings-content">
+      <!-- General Settings -->
+      @if (activeTab === "general") {
+        <div class="settings-section">
+          <h3>General Settings</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>App Name</label>
+              <input type="text" [(ngModel)]="general.appName" />
+            </div>
+            <div class="form-group">
+              <label>App URL</label>
+              <input type="text" [(ngModel)]="general.appUrl" />
+            </div>
+            <div class="form-group">
+              <label>Support Email</label>
+              <input type="text" [(ngModel)]="general.supportEmail" />
+            </div>
+            <div class="form-group">
+              <label>Timezone</label>
+              <select [(ngModel)]="general.timezone">
+                <option>UTC</option>
+                <option>US/Eastern</option>
+                <option>US/Pacific</option>
+                <option>Europe/London</option>
+                <option>Asia/Colombo</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Currency</label>
+              <select [(ngModel)]="general.currency">
+                <option>USD</option>
+                <option>EUR</option>
+                <option>GBP</option>
+                <option>LKR</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Free Trial Days</label>
+              <input type="number" [(ngModel)]="general.trialDays" />
+            </div>
+          </div>
+          <div class="setting-row" style="margin-top: 16px">
+            <div class="label">
+              <h4>Maintenance Mode</h4>
+              <p>Put the app in maintenance mode</p>
+            </div>
+            <div
+              class="toggle"
+              [class.on]="general.maintenanceMode"
+              (click)="general.maintenanceMode = !general.maintenanceMode"
+            ></div>
+          </div>
+          <button
+            class="btn btn-primary"
+            style="margin-top: 20px"
+            (click)="save('General Settings')"
+          >
+            <i class="fa-solid fa-save"></i> Save Changes
+          </button>
+        </div>
+      }
+
+      <!-- Payment Gateways -->
+      @if (activeTab === "payment") {
+        <div class="settings-section">
+          <h3>Payment Gateways</h3>
+
+          <div class="gateway-card">
+            <div class="gateway-header">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <i
+                  class="fa-brands fa-stripe"
+                  style="font-size: 28px; color: #635bff"
+                ></i>
+                <div>
+                  <h4>Stripe</h4>
+                  <p>Credit/debit cards worldwide</p>
+                </div>
+              </div>
+              <div
+                class="toggle"
+                [class.on]="payment.stripeEnabled"
+                (click)="payment.stripeEnabled = !payment.stripeEnabled"
+              ></div>
+            </div>
+            @if (payment.stripeEnabled) {
+              <div class="form-group" style="margin-top: 16px">
+                <label>Stripe Secret Key</label>
+                <input
+                  type="password"
+                  [(ngModel)]="payment.stripeKey"
+                  placeholder="sk_live_..."
+                />
+              </div>
+            }
+          </div>
+
+          <div class="gateway-card">
+            <div class="gateway-header">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <i
+                  class="fa-brands fa-paypal"
+                  style="font-size: 28px; color: #003087"
+                ></i>
+                <div>
+                  <h4>PayPal</h4>
+                  <p>PayPal payments</p>
+                </div>
+              </div>
+              <div
+                class="toggle"
+                [class.on]="payment.paypalEnabled"
+                (click)="payment.paypalEnabled = !payment.paypalEnabled"
+              ></div>
+            </div>
+            @if (payment.paypalEnabled) {
+              <div class="form-group" style="margin-top: 16px">
+                <label>PayPal Client ID</label>
+                <input
+                  type="text"
+                  [(ngModel)]="payment.paypalClientId"
+                  placeholder="Client ID..."
+                />
+              </div>
+            }
+          </div>
+
+          <div class="gateway-card">
+            <div class="gateway-header">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <i
+                  class="fa-solid fa-indian-rupee-sign"
+                  style="font-size: 24px; color: #3395ff"
+                ></i>
+                <div>
+                  <h4>Razorpay</h4>
+                  <p>Popular in South Asia</p>
+                </div>
+              </div>
+              <div
+                class="toggle"
+                [class.on]="payment.razorpayEnabled"
+                (click)="payment.razorpayEnabled = !payment.razorpayEnabled"
+              ></div>
+            </div>
+            @if (payment.razorpayEnabled) {
+              <div class="form-group" style="margin-top: 16px">
+                <label>Razorpay Key ID</label>
+                <input
+                  type="text"
+                  [(ngModel)]="payment.razorpayKey"
+                  placeholder="rzp_live_..."
+                />
+              </div>
+            }
+          </div>
+
+          <button
+            class="btn btn-primary"
+            style="margin-top: 20px"
+            (click)="save('Payment Gateways')"
+          >
+            <i class="fa-solid fa-save"></i> Save Changes
+          </button>
+        </div>
+      }
+
+      <!-- Email Templates -->
+      @if (activeTab === "email") {
+        <div class="settings-section">
+          <h3>Email Settings</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>From Name</label>
+              <input type="text" [(ngModel)]="email.fromName" />
+            </div>
+            <div class="form-group">
+              <label>From Email</label>
+              <input type="text" [(ngModel)]="email.fromEmail" />
+            </div>
+            <div class="form-group">
+              <label>SMTP Host</label>
+              <input type="text" [(ngModel)]="email.smtpHost" />
+            </div>
+            <div class="form-group">
+              <label>SMTP Port</label>
+              <input type="number" [(ngModel)]="email.smtpPort" />
+            </div>
+            <div class="form-group">
+              <label>SMTP Username</label>
+              <input type="text" [(ngModel)]="email.smtpUser" />
+            </div>
+            <div class="form-group">
+              <label>SMTP Password</label>
+              <input type="password" [(ngModel)]="email.smtpPass" />
+            </div>
+          </div>
+          <button
+            class="btn btn-primary"
+            style="margin-top: 20px"
+            (click)="save('Email Settings')"
+          >
+            <i class="fa-solid fa-save"></i> Save Changes
+          </button>
+        </div>
+      }
+
+      <!-- Notification Settings -->
+      @if (activeTab === "notifications") {
+        <div class="settings-section">
+          <h3>Notification Settings</h3>
+          <div class="setting-row">
+            <div class="label">
+              <h4>New User Registration</h4>
+              <p>Send email when new user registers</p>
+            </div>
+            <div
+              class="toggle"
+              [class.on]="notifications.newUserEmail"
+              (click)="notifications.newUserEmail = !notifications.newUserEmail"
+            ></div>
+          </div>
+          <div class="setting-row">
+            <div class="label">
+              <h4>Subscription Created</h4>
+              <p>Send email on new subscription</p>
+            </div>
+            <div
+              class="toggle"
+              [class.on]="notifications.subscriptionEmail"
+              (click)="
+                notifications.subscriptionEmail =
+                  !notifications.subscriptionEmail
+              "
+            ></div>
+          </div>
+          <div class="setting-row">
+            <div class="label">
+              <h4>Payment Received</h4>
+              <p>Send email on payment</p>
+            </div>
+            <div
+              class="toggle"
+              [class.on]="notifications.paymentEmail"
+              (click)="notifications.paymentEmail = !notifications.paymentEmail"
+            ></div>
+          </div>
+          <div class="setting-row">
+            <div class="label">
+              <h4>New Content Push</h4>
+              <p>Push notification for new content</p>
+            </div>
+            <div
+              class="toggle"
+              [class.on]="notifications.newContentPush"
+              (click)="
+                notifications.newContentPush = !notifications.newContentPush
+              "
+            ></div>
+          </div>
+          <div class="setting-row">
+            <div class="label">
+              <h4>Maintenance Alerts</h4>
+              <p>Push notification for maintenance</p>
+            </div>
+            <div
+              class="toggle"
+              [class.on]="notifications.maintenancePush"
+              (click)="
+                notifications.maintenancePush = !notifications.maintenancePush
+              "
+            ></div>
+          </div>
+          <button
+            class="btn btn-primary"
+            style="margin-top: 20px"
+            (click)="save('Notification Settings')"
+          >
+            <i class="fa-solid fa-save"></i> Save Changes
+          </button>
+        </div>
+      }
+
+      <!-- Security Settings -->
+      @if (activeTab === "security") {
+        <div class="settings-section">
+          <h3>Security Settings</h3>
+          <div class="setting-row">
+            <div class="label">
+              <h4>Two Factor Authentication</h4>
+              <p>Require 2FA for admin login</p>
+            </div>
+            <div
+              class="toggle"
+              [class.on]="security.twoFactorAuth"
+              (click)="security.twoFactorAuth = !security.twoFactorAuth"
+            ></div>
+          </div>
+          <div class="form-grid" style="margin-top: 16px">
+            <div class="form-group">
+              <label>Max Login Attempts</label>
+              <input type="number" [(ngModel)]="security.maxLoginAttempts" />
+            </div>
+            <div class="form-group">
+              <label>Session Timeout (minutes)</label>
+              <input type="number" [(ngModel)]="security.sessionTimeout" />
+            </div>
+            <div class="form-group">
+              <label>Min Password Length</label>
+              <input type="number" [(ngModel)]="security.passwordMinLength" />
+            </div>
+          </div>
+          <div class="setting-row" style="margin-top: 8px">
+            <div class="label">
+              <h4>Require Uppercase</h4>
+              <p>Password must contain uppercase letters</p>
+            </div>
+            <div
+              class="toggle"
+              [class.on]="security.requireUppercase"
+              (click)="security.requireUppercase = !security.requireUppercase"
+            ></div>
+          </div>
+          <div class="setting-row">
+            <div class="label">
+              <h4>Require Numbers</h4>
+              <p>Password must contain numbers</p>
+            </div>
+            <div
+              class="toggle"
+              [class.on]="security.requireNumbers"
+              (click)="security.requireNumbers = !security.requireNumbers"
+            ></div>
+          </div>
+          <button
+            class="btn btn-primary"
+            style="margin-top: 20px"
+            (click)="save('Security Settings')"
+          >
+            <i class="fa-solid fa-save"></i> Save Changes
+          </button>
+        </div>
+      }
+
+      <!-- System Logs -->
+      @if (activeTab === "logs") {
+        <div class="settings-section">
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 16px;
+            "
+          >
+            <h3 style="margin: 0">System Logs</h3>
+            <button class="btn btn-secondary btn-sm" (click)="clearLogs()">
+              <i class="fa-solid fa-trash"></i> Clear Logs
+            </button>
+          </div>
+          @if (logs.length === 0) {
+            <div
+              style="text-align: center; padding: 40px; color: var(--text-dim)"
+            >
+              No logs available
+            </div>
+          } @else {
+            <div class="log-list">
+              @for (log of logs; track $index) {
+                <div
+                  class="log-item"
+                  [class]="'log-' + log.level.toLowerCase()"
+                >
+                  <span class="log-level">{{ log.level }}</span>
+                  <span class="log-time">{{ log.time }}</span>
+                  <span class="log-message">{{ log.message }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Backup & Restore -->
+      @if (activeTab === "backup") {
+        <div class="settings-section">
+          <h3>Backup & Restore</h3>
+          <div class="backup-cards">
+            <div class="backup-card">
+              <i
+                class="fa-solid fa-database"
+                style="
+                  font-size: 32px;
+                  color: var(--accent2);
+                  margin-bottom: 12px;
+                  display: block;
+                "
+              ></i>
+              <h4>Database Backup</h4>
+              <p>
+                Create a full backup of your database including users,
+                subscriptions and payments.
+              </p>
+              <button class="btn btn-primary btn-sm" style="margin-top: 16px">
+                <i class="fa-solid fa-download"></i> Download Backup
+              </button>
+            </div>
+            <div class="backup-card">
+              <i
+                class="fa-solid fa-film"
+                style="
+                  font-size: 32px;
+                  color: var(--success);
+                  margin-bottom: 12px;
+                  display: block;
+                "
+              ></i>
+              <h4>Media Backup</h4>
+              <p>
+                Backup all uploaded videos and thumbnails stored on the server.
+              </p>
+              <button class="btn btn-primary btn-sm" style="margin-top: 16px">
+                <i class="fa-solid fa-download"></i> Download Media
+              </button>
+            </div>
+            <div class="backup-card">
+              <i
+                class="fa-solid fa-upload"
+                style="
+                  font-size: 32px;
+                  color: var(--gold);
+                  margin-bottom: 12px;
+                  display: block;
+                "
+              ></i>
+              <h4>Restore</h4>
+              <p>Restore your platform from a previous backup file.</p>
+              <button class="btn btn-secondary btn-sm" style="margin-top: 16px">
+                <i class="fa-solid fa-upload"></i> Upload Backup
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

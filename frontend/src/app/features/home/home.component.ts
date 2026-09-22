@@ -111,6 +111,101 @@ export class HomeComponent implements OnInit, OnDestroy {
   popularMovies: any[] = [];
   newReleases: any[] = [];
 
+  sportsFilter = 'All';
+
+  sportsContent = [
+    {
+      title: 'Cricket Gold',
+      meta: 'Cricket • Live Now',
+      rating: '8.9',
+      gradient: 'linear-gradient(135deg,#f1c40f,#f39c12)',
+      emoji: 'fa-cricket-bat-ball',
+      live: true,
+      sport: 'Cricket',
+      streamUrl: 'https://streams2.sofast.tv/scheduler/scheduleMaster/418.m3u8',
+    },
+    {
+      title: 'Champions League',
+      meta: 'Football • Live Now',
+      rating: '9.5',
+      gradient: 'linear-gradient(135deg,#1a6b3a,#2ecc71)',
+      emoji: 'fa-futbol',
+      live: true,
+      sport: 'Football',
+      streamUrl: '',
+    },
+    {
+      title: 'NBA Live',
+      meta: 'Basketball • Live Now',
+      rating: '9.2',
+      gradient: 'linear-gradient(135deg,#c0392b,#e74c3c)',
+      emoji: 'fa-basketball',
+      live: true,
+      sport: 'Basketball',
+      streamUrl: '',
+    },
+    {
+      title: 'Wimbledon',
+      meta: 'Tennis • Live Now',
+      rating: '8.8',
+      gradient: 'linear-gradient(135deg,#27ae60,#2ecc71)',
+      emoji: 'fa-baseball',
+      live: true,
+      sport: 'Tennis',
+      streamUrl: '',
+    },
+    {
+      title: 'IPL Cricket',
+      meta: 'Cricket • Live Now',
+      rating: '8.5',
+      gradient: 'linear-gradient(135deg,#f39c12,#e67e22)',
+      emoji: 'fa-cricket-bat-ball',
+      live: true,
+      sport: 'Cricket',
+      streamUrl: '',
+    },
+    {
+      title: 'Formula 1',
+      meta: 'F1 • Live Now',
+      rating: '9.0',
+      gradient: 'linear-gradient(135deg,#c0392b,#922b21)',
+      emoji: 'fa-flag-checkered',
+      live: true,
+      sport: 'Formula 1',
+      streamUrl: '',
+    },
+    {
+      title: 'Super Bowl',
+      meta: 'Football • Starting Soon',
+      rating: '9.3',
+      gradient: 'linear-gradient(135deg,#2980b9,#3498db)',
+      emoji: 'fa-football',
+      live: false,
+      sport: 'Football',
+      streamUrl: '',
+    },
+    {
+      title: 'French Open',
+      meta: 'Tennis • Starting Soon',
+      rating: '8.7',
+      gradient: 'linear-gradient(135deg,#e74c3c,#c0392b)',
+      emoji: 'fa-baseball',
+      live: false,
+      sport: 'Tennis',
+      streamUrl: '',
+    },
+    {
+      title: 'World Cup Qualifier',
+      meta: 'Football • Tomorrow',
+      rating: '9.1',
+      gradient: 'linear-gradient(135deg,#8e44ad,#9b59b6)',
+      emoji: 'fa-futbol',
+      live: false,
+      sport: 'Football',
+      streamUrl: '',
+    },
+  ];
+
   allMovies: any[] = [];
   filteredMovies: any[] = [];
   movieFilter = 'All';
@@ -137,6 +232,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   searchQuery = '';
   searchResults: any[] = [];
   hasSearched = false;
+
+  recentSearches: string[] = [];
+  trendingSearches = [
+    'Action Movies',
+    'Live News',
+    'Comedy Shows',
+    'Sports',
+    'Documentaries',
+    'Sci-Fi',
+    'Horror',
+    'Romance',
+  ];
 
   categories = [
     {
@@ -603,6 +710,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Favorites
   favorites: any[] = [];
   favoritesMap: any = {};
+  myListTab = 'movies';
 
   // Notifications
   realNotifications: any[] = [];
@@ -780,8 +888,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loadContinueWatching();
     this.loadWatchHistory();
     this.loadNotifications();
-    this.loadParentalControls();
     this.loadMySubscription();
+    this.loadDownloads();
+    this.loadParentalControls();
+    // Add this line:
+    const saved = localStorage.getItem('ott_recent_searches');
+    this.recentSearches = saved ? JSON.parse(saved) : [];
   }
 
   buildMockData(): void {
@@ -896,9 +1008,19 @@ export class HomeComponent implements OnInit, OnDestroy {
         : this.allChannels.filter((c) => c.cat === cat);
   }
 
-  onSearch(): void {
+  onSearch(saveToRecent = false): void {
     this.hasSearched = true;
     const q = this.searchQuery.toLowerCase().trim();
+
+    // Only save to recent searches when explicitly searching
+    if (saveToRecent && q && !this.recentSearches.includes(q)) {
+      this.recentSearches.unshift(q);
+      if (this.recentSearches.length > 5) this.recentSearches.pop();
+      localStorage.setItem(
+        'ott_recent_searches',
+        JSON.stringify(this.recentSearches),
+      );
+    }
 
     if (!q) {
       this.searchResults = [...this.allMovies, ...this.allShows];
@@ -950,6 +1072,17 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.hasSearched = false;
+    this.searchResults = [...this.allMovies, ...this.allShows];
+  }
+
+  clearRecentSearches(): void {
+    this.recentSearches = [];
+    localStorage.removeItem('ott_recent_searches');
+  }
+
   startHeroTimer(): void {
     this.heroTimer = setInterval(() => {
       this.heroIndex = (this.heroIndex + 1) % this.heroItems.length;
@@ -984,6 +1117,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
     if (section === 'payment-methods') this.loadPaymentMethods();
     if (section === 'parental-controls') this.loadParentalControls();
+    if (section === 'continue-watching') this.loadContinueWatching();
   }
 
   toggleSetting(event: Event): void {
@@ -1193,6 +1327,16 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
       })
       .catch(() => {});
+  }
+
+  get filteredFavorites(): any[] {
+    if (this.myListTab === 'movies') {
+      return this.favorites.filter((f: any) => f.type === 'movie' || !f.type);
+    } else if (this.myListTab === 'tvshows') {
+      return this.favorites.filter((f: any) => f.type === 'series');
+    } else {
+      return this.favorites.filter((f: any) => f.type === 'channel');
+    }
   }
 
   isFavorite(item: any): boolean {
@@ -1718,6 +1862,25 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.downloadedItems = [];
     localStorage.setItem('ott_downloads', '[]');
     this.cdr.detectChanges();
+  }
+
+  playSports(item: any): void {
+    if (!item.live) {
+      alert(`${item.title} is not live yet. ${item.meta}`);
+      return;
+    }
+    if (item.streamUrl) {
+      this.router.navigate(['/player'], {
+        queryParams: {
+          title: item.title,
+          subtitle: item.meta,
+          stream: item.streamUrl,
+          live: 'true',
+        },
+      });
+    } else {
+      alert('Stream not available. Check back when the event starts!');
+    }
   }
 
   ngOnDestroy(): void {

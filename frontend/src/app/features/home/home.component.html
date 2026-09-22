@@ -455,6 +455,88 @@
         </div>
       }
 
+      <!-- ══════════════ SPORTS ══════════════ -->
+      @if (activeSection === "sports") {
+        <div class="content-row">
+          <div class="content-row-header">
+            <h2 style="font-size: 28px">Live Sports</h2>
+          </div>
+
+          <div class="filter-row">
+            @for (
+              f of [
+                "All",
+                "Football",
+                "Basketball",
+                "Tennis",
+                "Cricket",
+                "Formula 1",
+              ];
+              track f
+            ) {
+              <button
+                class="btn btn-sm"
+                [class.btn-primary]="sportsFilter === f"
+                [class.btn-secondary]="sportsFilter !== f"
+                (click)="sportsFilter = f"
+              >
+                {{ f }}
+              </button>
+            }
+          </div>
+
+          <div class="channels-grid">
+            @for (item of sportsContent; track $index) {
+              @if (sportsFilter === "All" || item.sport === sportsFilter) {
+                <div
+                  class="live-card"
+                  style="width: auto"
+                  (click)="playSports(item)"
+                >
+                  <div class="channel-icon" [style.background]="item.gradient">
+                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
+                  </div>
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.meta }}</p>
+                  @if (item.live) {
+                    <div class="live-indicator">
+                      <span class="dot"></span> LIVE
+                    </div>
+                  } @else {
+                    <div
+                      style="
+                        color: var(--text-muted);
+                        font-size: 11px;
+                        margin-top: 8px;
+                      "
+                    >
+                      <i class="fa-solid fa-clock"></i>
+                      {{ item.meta.split("•")[1]?.trim() }}
+                    </div>
+                  }
+                  <button
+                    class="btn btn-sm"
+                    style="margin-top: 12px; width: 100%; pointer-events: none"
+                    [class.btn-primary]="item.live"
+                    [class.btn-secondary]="!item.live"
+                  >
+                    <i
+                      class="fa-solid"
+                      [class]="
+                        item.live
+                          ? 'fa-solid fa-circle-dot'
+                          : 'fa-solid fa-clock'
+                      "
+                    ></i>
+                    {{ item.live ? "Watch Live" : "Set Reminder" }}
+                  </button>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+
       <!-- ══════════════ LIVE TV ══════════════ -->
       @if (activeSection === "live-tv") {
         <div class="content-row">
@@ -638,74 +720,175 @@
               type="text"
               placeholder="Search movies, shows, channels..."
               [(ngModel)]="searchQuery"
-              (input)="onSearch()"
-              (keyup.enter)="onSearch()"
+              (input)="onSearch(false)"
+              (keyup.enter)="onSearch(true)"
             />
-          </div>
-        </div>
-        <div class="content-row">
-          @if (!hasSearched) {
-            <h3 style="margin-bottom: 16px; color: var(--text-dim)">
-              Popular Searches
-            </h3>
-            <div class="filter-row" style="margin-bottom: 32px">
-              @for (
-                tag of [
-                  "Action Movies",
-                  "Live News",
-                  "Comedy Shows",
-                  "Sports",
-                  "Documentaries",
-                ];
-                track tag
-              ) {
-                <button
-                  class="btn btn-secondary btn-sm"
-                  (click)="searchQuery = tag; onSearch()"
-                >
-                  {{ tag }}
-                </button>
-              }
-            </div>
-          }
-          <h3 style="margin-bottom: 16px">
-            {{
-              hasSearched ? 'Results for "' + searchQuery + '"' : "Browse All"
-            }}
-          </h3>
-          <div class="search-grid">
-            @for (item of searchResults; track $index) {
-              <div class="card grid-card" (click)="openWithPinCheck(item)">
-                <div class="card-img grid-img">
-                  <div class="poster" [style.background]="item.gradient">
-                    <i class="fa-solid" [class]="'fa-solid ' + item.emoji"></i>
-                  </div>
-                  @if (item.rating_class) {
-                    <span
-                      class="rating-class-badge"
-                      [attr.data-rating]="item.rating_class"
-                      >{{ item.rating_class }}</span
-                    >
-                  }
-                  <div class="card-overlay">
-                    <div class="play-btn">
-                      <i class="fa-solid fa-play" style="margin-left: 3px"></i>
-                    </div>
-                  </div>
-                </div>
-                <div class="card-info">
-                  <h4>{{ item.title }}</h4>
-                  <p>{{ item.meta }}</p>
-                  <div class="card-rating">
-                    <i class="fa-solid fa-star"></i> {{ item.rating }}
-                  </div>
-                </div>
-              </div>
+            @if (searchQuery) {
+              <button
+                style="
+                  position: absolute;
+                  right: 16px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  color: var(--text-muted);
+                "
+                (click)="clearSearch()"
+              >
+                <i class="fa-solid fa-xmark"></i>
+              </button>
             }
           </div>
         </div>
-      }
 
+        <div class="content-row">
+          @if (!hasSearched) {
+            <!-- Recent Searches -->
+            @if (recentSearches.length > 0) {
+              <div style="margin-bottom: 32px">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 12px;
+                  "
+                >
+                  <h3>Recent Searches</h3>
+                  <button
+                    class="btn btn-ghost btn-sm"
+                    style="color: var(--text-muted); font-size: 13px"
+                    (click)="clearRecentSearches()"
+                  >
+                    Clear
+                  </button>
+                </div>
+                <div class="filter-row">
+                  @for (term of recentSearches; track term) {
+                    <button
+                      class="btn btn-secondary btn-sm"
+                      (click)="searchQuery = term; onSearch(true)"
+                    >
+                      <i
+                        class="fa-solid fa-clock-rotate-left"
+                        style="font-size: 11px"
+                      ></i>
+                      {{ term }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Trending -->
+            <div style="margin-bottom: 32px">
+              <h3 style="margin-bottom: 12px">Trending Searches</h3>
+              <div class="filter-row">
+                @for (tag of trendingSearches; track tag) {
+                  <button
+                    class="btn btn-secondary btn-sm"
+                    (click)="searchQuery = tag; onSearch(true)"
+                  >
+                    <i
+                      class="fa-solid fa-fire"
+                      style="color: var(--accent); font-size: 11px"
+                    ></i>
+                    {{ tag }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Browse All -->
+            <h3 style="margin-bottom: 16px">Browse All</h3>
+            <div class="search-grid">
+              @for (item of searchResults.slice(0, 12); track $index) {
+                <div class="card grid-card" (click)="openWithPinCheck(item)">
+                  <div class="card-img grid-img">
+                    <div class="poster" [style.background]="item.gradient">
+                      @if (item.rating_class) {
+                        <span
+                          class="rating-class-badge"
+                          [attr.data-rating]="item.rating_class"
+                          >{{ item.rating_class }}</span
+                        >
+                      }
+                      <i
+                        class="fa-solid"
+                        [class]="'fa-solid ' + item.emoji"
+                      ></i>
+                    </div>
+                    <div class="card-overlay">
+                      <div class="play-btn">
+                        <i
+                          class="fa-solid fa-play"
+                          style="margin-left: 3px"
+                        ></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-info">
+                    <h4>{{ item.title }}</h4>
+                    <p>{{ item.meta }}</p>
+                    <div class="card-rating">
+                      <i class="fa-solid fa-star"></i> {{ item.rating }}
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @if (hasSearched) {
+            <h3 style="margin-bottom: 16px">
+              Results for "{{ searchQuery }}" — {{ searchResults.length }} found
+            </h3>
+            @if (searchResults.length === 0) {
+              <div class="empty-state">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <h3>No results found</h3>
+                <p>Try searching for something else</p>
+              </div>
+            } @else {
+              <div class="search-grid">
+                @for (item of searchResults; track $index) {
+                  <div class="card grid-card" (click)="openWithPinCheck(item)">
+                    <div class="card-img grid-img">
+                      <div class="poster" [style.background]="item.gradient">
+                        @if (item.rating_class) {
+                          <span
+                            class="rating-class-badge"
+                            [attr.data-rating]="item.rating_class"
+                            >{{ item.rating_class }}</span
+                          >
+                        }
+                        <i
+                          class="fa-solid"
+                          [class]="'fa-solid ' + item.emoji"
+                        ></i>
+                      </div>
+                      <div class="card-overlay">
+                        <div class="play-btn">
+                          <i
+                            class="fa-solid fa-play"
+                            style="margin-left: 3px"
+                          ></i>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-info">
+                      <h4>{{ item.title }}</h4>
+                      <p>{{ item.meta }}</p>
+                      <div class="card-rating">
+                        <i class="fa-solid fa-star"></i> {{ item.rating }}
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      }
       <!-- ══════════════ CATEGORIES ══════════════ -->
       @if (activeSection === "categories") {
         <div class="content-row">
@@ -931,41 +1114,93 @@
       }
 
       <!-- ══════════════ MY LIST ══════════════ -->
+      <!-- ══════════════ MY LIST ══════════════ -->
       @if (activeSection === "mylist") {
         <div class="content-row">
           <div class="content-row-header">
             <h2 style="font-size: 28px">My List</h2>
           </div>
-          @if (favorites.length === 0) {
+
+          <!-- Tabs -->
+          <div class="filter-row" style="margin-bottom: 24px">
+            <button
+              class="btn btn-sm"
+              [class.btn-primary]="myListTab === 'movies'"
+              [class.btn-secondary]="myListTab !== 'movies'"
+              (click)="myListTab = 'movies'"
+            >
+              <i class="fa-solid fa-film"></i> Movies
+            </button>
+            <button
+              class="btn btn-sm"
+              [class.btn-primary]="myListTab === 'tvshows'"
+              [class.btn-secondary]="myListTab !== 'tvshows'"
+              (click)="myListTab = 'tvshows'"
+            >
+              <i class="fa-solid fa-tv"></i> TV Shows
+            </button>
+            <button
+              class="btn btn-sm"
+              [class.btn-primary]="myListTab === 'channels'"
+              [class.btn-secondary]="myListTab !== 'channels'"
+              (click)="myListTab = 'channels'"
+            >
+              <i class="fa-solid fa-tower-broadcast"></i> Channels
+            </button>
+          </div>
+
+          @if (filteredFavorites.length === 0) {
             <div class="empty-state">
               <i class="fa-solid fa-heart"></i>
-              <h3>Your list is empty</h3>
-              <p>Add movies and shows to your list</p>
-              <button class="btn btn-primary" (click)="onNavigate('home')">
-                Browse Content
+              <h3>Nothing here yet</h3>
+              <p>
+                Add
+                {{
+                  myListTab === "movies"
+                    ? "movies"
+                    : myListTab === "tvshows"
+                      ? "TV shows"
+                      : "channels"
+                }}
+                to your list
+              </p>
+              <button
+                class="btn btn-primary"
+                (click)="
+                  onNavigate(myListTab === 'channels' ? 'live-tv' : myListTab)
+                "
+              >
+                Browse
+                {{
+                  myListTab === "movies"
+                    ? "Movies"
+                    : myListTab === "tvshows"
+                      ? "TV Shows"
+                      : "Channels"
+                }}
               </button>
             </div>
           } @else {
             <div class="search-grid">
-              @for (item of favorites; track $index) {
+              @for (item of filteredFavorites; track $index) {
                 <div class="card grid-card" (click)="openWithPinCheck(item)">
                   <div class="card-img grid-img">
                     <div
                       class="poster"
                       [style.background]="item.gradient || '#1a1a25'"
                     >
+                      @if (item.rating_class) {
+                        <span
+                          class="rating-class-badge"
+                          [attr.data-rating]="item.rating_class"
+                          >{{ item.rating_class }}</span
+                        >
+                      }
                       <i
                         class="fa-solid"
                         [class]="'fa-solid ' + (item.emoji || 'fa-film')"
                       ></i>
                     </div>
-                    @if (item.rating_class) {
-                      <span
-                        class="rating-class-badge"
-                        [attr.data-rating]="item.rating_class"
-                        >{{ item.rating_class }}</span
-                      >
-                    }
                     <div class="card-overlay">
                       <div class="play-btn">
                         <i
@@ -978,6 +1213,65 @@
                   <div class="card-info">
                     <h4>{{ item.title }}</h4>
                     <p>{{ item.meta }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ══════════════ CONTINUE WATCHING ══════════════ -->
+      @if (activeSection === "continue-watching") {
+        <div class="content-row">
+          <div class="content-row-header">
+            <h2 style="font-size: 28px">Continue Watching</h2>
+          </div>
+
+          @if (continueCards.length === 0) {
+            <div class="empty-state">
+              <i class="fa-solid fa-circle-play"></i>
+              <h3>Nothing to continue</h3>
+              <p>Start watching something and it will appear here</p>
+              <button class="btn btn-primary" (click)="onNavigate('home')">
+                Browse Content
+              </button>
+            </div>
+          } @else {
+            <div class="search-grid">
+              @for (item of continueCards; track $index) {
+                <div class="card grid-card" (click)="openWithPinCheck(item)">
+                  <div class="card-img grid-img">
+                    <div
+                      class="poster"
+                      [style.background]="item.gradient || '#1a1a25'"
+                    >
+                      <i
+                        class="fa-solid"
+                        [class]="'fa-solid ' + (item.emoji || 'fa-film')"
+                      ></i>
+                    </div>
+                    <div class="card-overlay">
+                      <div class="play-btn">
+                        <i
+                          class="fa-solid fa-play"
+                          style="margin-left: 3px"
+                        ></i>
+                      </div>
+                    </div>
+                    <div class="progress-bar-bottom">
+                      <div
+                        class="progress-fill"
+                        [style.width.%]="item.progress"
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="card-info">
+                    <h4>{{ item.title }}</h4>
+                    <p>{{ item.meta }}</p>
+                    <p style="font-size: 12px; color: var(--accent)">
+                      {{ item.progress }}% watched
+                    </p>
                   </div>
                 </div>
               }
