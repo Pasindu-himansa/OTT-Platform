@@ -1443,3 +1443,17 @@ app-topbar .topbar {
     transform: scale(1.1);
   }
 }
+
+.download-item.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.download-checkbox {
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+}

@@ -669,6 +669,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Downloads
   downloadedItems: any[] = [];
 
+  downloadsEditMode = false;
+  selectedDownloads: string[] = [];
+
   faqs = [
     {
       q: 'How do I cancel my subscription?',
@@ -1881,6 +1884,25 @@ export class HomeComponent implements OnInit, OnDestroy {
     } else {
       alert('Stream not available. Check back when the event starts!');
     }
+  }
+
+  toggleDownloadSelect(title: string): void {
+    const idx = this.selectedDownloads.indexOf(title);
+    if (idx > -1) {
+      this.selectedDownloads.splice(idx, 1);
+    } else {
+      this.selectedDownloads.push(title);
+    }
+  }
+
+  deleteSelectedDownloads(): void {
+    this.downloadedItems = this.downloadedItems.filter(
+      (d: any) => !this.selectedDownloads.includes(d.title),
+    );
+    localStorage.setItem('ott_downloads', JSON.stringify(this.downloadedItems));
+    this.selectedDownloads = [];
+    this.downloadsEditMode = false;
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
