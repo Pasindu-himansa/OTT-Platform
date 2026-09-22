@@ -127,6 +127,32 @@ export class DashboardComponent implements OnInit {
     },
   ];
 
+  userChartPoints = [
+    { x: 0, y: 120 },
+    { x: 55, y: 100 },
+    { x: 110, y: 80 },
+    { x: 165, y: 90 },
+    { x: 220, y: 60 },
+    { x: 275, y: 40 },
+    { x: 330, y: 50 },
+    { x: 400, y: 20 },
+  ];
+
+  chartLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  userChartStats = [
+    { label: 'New Users', value: '2,350', color: '#ff2d55' },
+    { label: 'Active', value: '18.2K', color: '#30d158' },
+    { label: 'Churned', value: '142', color: '#ff9f0a' },
+  ];
+
+  contentPieData = [
+    { label: 'Movies', percent: 33, color: '#ff2d55' },
+    { label: 'TV Shows', percent: 27, color: '#5856d6' },
+    { label: 'Live TV', percent: 20, color: '#30d158' },
+    { label: 'Sports', percent: 20, color: '#ffd60a' },
+  ];
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {

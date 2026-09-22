@@ -82,3 +82,28 @@
     font-weight: 700;
   }
 }
+
+.chart-wrap {
+  margin-bottom: 16px;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.chart-stat {
+  text-align: center;
+  .stat-val {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+}
