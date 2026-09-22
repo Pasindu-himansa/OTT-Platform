@@ -631,6 +631,31 @@ export class HomeComponent implements OnInit, OnDestroy {
     isDefault: false,
   };
 
+  // Mobile Wallets
+  mobileWallets = [
+    {
+      id: 'paypal',
+      name: 'PayPal',
+      icon: 'fa-paypal',
+      color: '#003087',
+      connected: false,
+    },
+    {
+      id: 'googlepay',
+      name: 'Google Pay',
+      icon: 'fa-google-pay',
+      color: '#4285f4',
+      connected: false,
+    },
+    {
+      id: 'applepay',
+      name: 'Apple Pay',
+      icon: 'fa-apple-pay',
+      color: '#000000',
+      connected: false,
+    },
+  ];
+
   // Parental Controls
   parentalEnabled = false;
   parentalPin = '';
@@ -1902,6 +1927,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     localStorage.setItem('ott_downloads', JSON.stringify(this.downloadedItems));
     this.selectedDownloads = [];
     this.downloadsEditMode = false;
+    this.cdr.detectChanges();
+  }
+
+  toggleWallet(wallet: any): void {
+    wallet.connected = !wallet.connected;
     this.cdr.detectChanges();
   }
 
