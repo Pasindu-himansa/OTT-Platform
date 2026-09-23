@@ -40,7 +40,20 @@
       }
     </button>
     <button class="topbar-btn" (click)="sectionChanged.emit('profile')">
-      <i class="fa-solid fa-user-circle"></i>
+      @if (profilePicUrl) {
+        <img
+          [src]="profilePicUrl"
+          style="
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+          "
+        />
+      } @else {
+        <i class="fa-solid fa-user-circle"></i>
+      }
     </button>
   </div>
 </div>

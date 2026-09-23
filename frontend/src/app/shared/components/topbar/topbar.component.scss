@@ -5,7 +5,13 @@
   left: var(--sidebar-w);
   right: 0;
   z-index: 999;
-  background: rgba(6, 6, 16, 0.95);
+  background: linear-gradient(
+    180deg,
+    rgba(6, 6, 16, 1) 0%,
+    rgba(6, 6, 16, 0.95) 80%,
+    rgba(6, 6, 16, 0.8) 100%
+  );
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
   @media (max-width: 1024px) {
     left: 0;

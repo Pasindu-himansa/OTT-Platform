@@ -190,6 +190,7 @@
   <app-sidebar
     [isOpen]="sidebarOpen"
     [activeSection]="activeSection"
+    [profilePicUrl]="profilePicUrl"
     (closed)="closeSidebar()"
     (navigate)="onNavigate($event)"
   />
@@ -199,6 +200,7 @@
       [activeSection]="activeSection"
       [unreadCount]="unreadCount"
       [canGoBack]="canGoBack()"
+      [profilePicUrl]="profilePicUrl"
       (menuToggled)="toggleSidebar()"
       (sectionChanged)="onNavigate($event)"
       (backClicked)="goBack()"
@@ -1647,13 +1649,44 @@
       <!-- ══════════════ PROFILE ══════════════ -->
       @if (activeSection === "profile") {
         <div class="content-row">
+          <!-- Profile Header -->
           <div class="profile-header">
-            <div class="profile-avatar">
-              {{ profile?.name?.charAt(0) || "U" }}
+            <div class="profile-avatar-wrap">
+              @if (profilePicUrl) {
+                <img
+                  [src]="profilePicUrl"
+                  class="profile-avatar-img"
+                  alt="Profile"
+                />
+              } @else {
+                <div class="profile-avatar">
+                  {{ profile?.name?.charAt(0) || "U" }}
+                </div>
+              }
+              <label
+                class="profile-pic-upload"
+                [class.loading]="profilePicLoading"
+              >
+                @if (profilePicLoading) {
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                } @else {
+                  <i class="fa-solid fa-camera"></i>
+                }
+                <input
+                  type="file"
+                  accept="image/*"
+                  (change)="uploadProfilePic($event)"
+                  style="display: none"
+                />
+              </label>
             </div>
             <div class="profile-info">
               <h2>{{ profile?.name || "User" }}</h2>
               <p>{{ profile?.email }}</p>
+              <div class="profile-badge">
+                <i class="fa-solid fa-crown" style="color: var(--gold)"></i>
+                Premium Member
+              </div>
               <div class="profile-stats">
                 <div class="stat">
                   <div class="stat-val">{{ watchHistory.length }}</div>
@@ -1664,44 +1697,52 @@
                   <div class="stat-label">My List</div>
                 </div>
                 <div class="stat">
-                  <div class="stat-val">5</div>
+                  <div class="stat-val">{{ downloadedItems.length }}</div>
                   <div class="stat-label">Downloads</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="settings-section" style="margin-top: 24px">
-            <h3>Edit Profile</h3>
-            @if (profileSuccess) {
-              <div class="alert-success">
-                <i class="fa-solid fa-circle-check"></i> {{ profileSuccess }}
-              </div>
-            }
-            @if (profileError) {
-              <div class="alert-error">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                {{ profileError }}
-              </div>
-            }
-            <div class="setting-row">
-              <div class="label"><h4>Full Name</h4></div>
-              <input
-                type="text"
-                [(ngModel)]="profileName"
-                style="width: 240px"
-              />
+          <!-- Success/Error messages -->
+          @if (profileSuccess) {
+            <div class="alert-success" style="margin-bottom: 16px">
+              <i class="fa-solid fa-circle-check"></i> {{ profileSuccess }}
             </div>
-            <div class="setting-row">
-              <div class="label">
-                <h4>Email</h4>
-                <p>Cannot be changed</p>
-              </div>
-              <span style="color: var(--text-dim); font-size: 14px">{{
-                profile?.email
-              }}</span>
+          }
+          @if (profileError) {
+            <div class="alert-error" style="margin-bottom: 16px">
+              <i class="fa-solid fa-circle-exclamation"></i> {{ profileError }}
             </div>
-            <div style="margin-top: 16px">
+          }
+
+          <!-- Edit Profile -->
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <i class="fa-solid fa-user-pen"></i>
+              <h3>Edit Profile</h3>
+            </div>
+            <div class="profile-form">
+              <div class="profile-field">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  [(ngModel)]="profileName"
+                  placeholder="Your name"
+                />
+              </div>
+              <div class="profile-field">
+                <label>Email Address</label>
+                <input
+                  type="text"
+                  [value]="profile?.email"
+                  disabled
+                  style="opacity: 0.5; cursor: not-allowed"
+                />
+                <span class="field-note"
+                  ><i class="fa-solid fa-lock"></i> Cannot be changed</span
+                >
+              </div>
               <button
                 class="btn btn-primary"
                 [disabled]="profileLoading"
@@ -1713,156 +1754,265 @@
             </div>
           </div>
 
-          <div class="settings-section">
-            <h3>Change Password</h3>
-            @if (passwordSuccess) {
-              <div class="alert-success">
-                <i class="fa-solid fa-circle-check"></i> {{ passwordSuccess }}
+          <!-- Password Reset via OTP -->
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <i class="fa-solid fa-shield-halved"></i>
+              <h3>Change Password</h3>
+            </div>
+
+            @if (otpResetSuccess) {
+              <div class="alert-success" style="margin: 16px 0">
+                <i class="fa-solid fa-circle-check"></i> {{ otpResetSuccess }}
               </div>
             }
-            @if (passwordError) {
-              <div class="alert-error">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                {{ passwordError }}
+
+            @if (otpResetStep === 0) {
+              <div class="profile-form">
+                <p
+                  style="
+                    color: var(--text-dim);
+                    font-size: 14px;
+                    margin-bottom: 20px;
+                  "
+                >
+                  We'll send a one-time code to
+                  <strong>{{ profile?.email }}</strong> to verify it's you
+                  before changing your password.
+                </p>
+                <button
+                  class="btn btn-secondary"
+                  [disabled]="otpResetLoading"
+                  (click)="otpResetStep = 1; otpResetError = ''"
+                >
+                  <i class="fa-solid fa-envelope"></i> Send OTP to Email
+                </button>
               </div>
             }
-            <div class="setting-row">
-              <div class="label"><h4>Current Password</h4></div>
-              <input
-                type="password"
-                [(ngModel)]="currentPassword"
-                placeholder="Enter current password"
-                style="width: 240px"
-              />
-            </div>
-            <div class="setting-row">
-              <div class="label"><h4>New Password</h4></div>
-              <input
-                type="password"
-                [(ngModel)]="newPassword"
-                placeholder="Enter new password"
-                style="width: 240px"
-              />
-            </div>
-            <div class="setting-row">
-              <div class="label"><h4>Confirm Password</h4></div>
-              <input
-                type="password"
-                [(ngModel)]="confirmNewPassword"
-                placeholder="Confirm new password"
-                style="width: 240px"
-              />
-            </div>
-            <div style="margin-top: 16px">
-              <button
-                class="btn btn-primary"
-                [disabled]="passwordLoading"
-                (click)="changePassword()"
-              >
-                <i class="fa-solid fa-lock"></i>
-                {{ passwordLoading ? "Changing..." : "Change Password" }}
-              </button>
-            </div>
+
+            @if (otpResetStep === 1) {
+              <div class="profile-form">
+                <div class="otp-info">
+                  <i
+                    class="fa-solid fa-envelope-open-text"
+                    style="
+                      font-size: 32px;
+                      color: var(--accent2);
+                      margin-bottom: 12px;
+                      display: block;
+                    "
+                  ></i>
+                  <p>We'll send a 6-digit code to</p>
+                  <strong>{{ profile?.email }}</strong>
+                </div>
+                @if (otpResetError) {
+                  <div class="alert-error" style="margin-bottom: 16px">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {{ otpResetError }}
+                  </div>
+                }
+                <div style="display: flex; gap: 12px; margin-top: 20px">
+                  <button
+                    class="btn btn-primary"
+                    [disabled]="otpResetLoading"
+                    (click)="sendPasswordOtp()"
+                  >
+                    {{ otpResetLoading ? "Sending..." : "Send OTP" }}
+                  </button>
+                  <button class="btn btn-secondary" (click)="otpResetStep = 0">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            }
+
+            @if (otpResetStep === 2) {
+              <div class="profile-form">
+                <p
+                  style="
+                    color: var(--text-dim);
+                    font-size: 14px;
+                    margin-bottom: 20px;
+                  "
+                >
+                  Enter the 6-digit code sent to
+                  <strong>{{ profile?.email }}</strong>
+                </p>
+                @if (otpResetError) {
+                  <div class="alert-error" style="margin-bottom: 16px">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {{ otpResetError }}
+                  </div>
+                }
+                <div style="display: flex; gap: 10px; margin-bottom: 24px">
+                  @for (i of [0, 1, 2, 3, 4, 5]; track i) {
+                    <input
+                      type="text"
+                      maxlength="1"
+                      class="otp-input"
+                      [(ngModel)]="otpResetCode[i]"
+                      [name]="'otp-reset-' + i"
+                      [id]="'otp-reset-' + i"
+                      (input)="onOtpResetInput($event, i)"
+                      (keydown)="onOtpResetKeydown($event, i)"
+                    />
+                  }
+                </div>
+                <div class="profile-field">
+                  <label>New Password</label>
+                  <input
+                    type="password"
+                    [(ngModel)]="otpNewPassword"
+                    placeholder="Enter new password"
+                  />
+                </div>
+                <div class="profile-field">
+                  <label>Confirm Password</label>
+                  <input
+                    type="password"
+                    [(ngModel)]="otpConfirmPassword"
+                    placeholder="Confirm new password"
+                  />
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 8px">
+                  <button
+                    class="btn btn-primary"
+                    [disabled]="otpResetLoading"
+                    (click)="verifyPasswordOtp()"
+                  >
+                    {{ otpResetLoading ? "Verifying..." : "Reset Password" }}
+                  </button>
+                  <button class="btn btn-secondary" (click)="otpResetStep = 0">
+                    Cancel
+                  </button>
+                </div>
+                <button
+                  class="btn btn-ghost btn-sm"
+                  style="margin-top: 12px; color: var(--text-dim)"
+                  (click)="sendPasswordOtp()"
+                >
+                  Didn't receive code? Resend
+                </button>
+              </div>
+            }
           </div>
 
-          <div class="settings-section">
-            <h3>Quick Links</h3>
-            <div
-              class="setting-row"
-              style="cursor: pointer"
-              (click)="onNavigate('subscription')"
-            >
-              <div class="label">
-                <h4>
-                  <i
-                    class="fa-solid fa-crown"
-                    style="color: var(--gold); margin-right: 8px"
-                  ></i>
-                  Subscription
-                </h4>
-                <p>
-                  {{
-                    mySubscription ? "Active plan" : "No active subscription"
-                  }}
-                </p>
-              </div>
-              <i
-                class="fa-solid fa-chevron-right"
-                style="color: var(--text-muted)"
-              ></i>
+          <!-- Quick Links -->
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <i class="fa-solid fa-bolt"></i>
+              <h3>Quick Links</h3>
             </div>
-            <div
-              class="setting-row"
-              style="cursor: pointer"
-              (click)="onNavigate('watch-history')"
-            >
-              <div class="label">
-                <h4>
+            <div class="quick-links">
+              <div class="quick-link" (click)="onNavigate('subscription')">
+                <div
+                  class="quick-link-icon"
+                  style="background: var(--gold-soft)"
+                >
+                  <i class="fa-solid fa-crown" style="color: var(--gold)"></i>
+                </div>
+                <div class="quick-link-info">
+                  <h4>Subscription</h4>
+                  <p>
+                    {{
+                      mySubscription ? "Active plan" : "No active subscription"
+                    }}
+                  </p>
+                </div>
+                <i
+                  class="fa-solid fa-chevron-right"
+                  style="color: var(--text-muted)"
+                ></i>
+              </div>
+              <div class="quick-link" (click)="onNavigate('watch-history')">
+                <div
+                  class="quick-link-icon"
+                  style="background: var(--accent2-soft)"
+                >
                   <i
                     class="fa-solid fa-clock-rotate-left"
-                    style="color: var(--accent2); margin-right: 8px"
+                    style="color: var(--accent2)"
                   ></i>
-                  Watch History
-                </h4>
-                <p>{{ watchHistory.length }} items</p>
+                </div>
+                <div class="quick-link-info">
+                  <h4>Watch History</h4>
+                  <p>{{ watchHistory.length }} items</p>
+                </div>
+                <i
+                  class="fa-solid fa-chevron-right"
+                  style="color: var(--text-muted)"
+                ></i>
               </div>
-              <i
-                class="fa-solid fa-chevron-right"
-                style="color: var(--text-muted)"
-              ></i>
-            </div>
-            <div
-              class="setting-row"
-              style="cursor: pointer"
-              (click)="onNavigate('downloads')"
-            >
-              <div class="label">
-                <h4>
+              <div class="quick-link" (click)="onNavigate('payment-methods')">
+                <div
+                  class="quick-link-icon"
+                  style="background: var(--success-soft)"
+                >
                   <i
-                    class="fa-solid fa-download"
-                    style="color: var(--success); margin-right: 8px"
+                    class="fa-solid fa-credit-card"
+                    style="color: var(--success)"
                   ></i>
-                  Downloads
-                </h4>
-                <p>5 items</p>
+                </div>
+                <div class="quick-link-info">
+                  <h4>Payment Methods</h4>
+                  <p>Manage your cards</p>
+                </div>
+                <i
+                  class="fa-solid fa-chevron-right"
+                  style="color: var(--text-muted)"
+                ></i>
               </div>
-              <i
-                class="fa-solid fa-chevron-right"
-                style="color: var(--text-muted)"
-              ></i>
-            </div>
-            <div
-              class="setting-row"
-              style="cursor: pointer"
-              (click)="onNavigate('settings')"
-            >
-              <div class="label">
-                <h4>
+              <div class="quick-link" (click)="onNavigate('parental-controls')">
+                <div
+                  class="quick-link-icon"
+                  style="background: var(--accent-soft)"
+                >
                   <i
-                    class="fa-solid fa-gear"
-                    style="color: var(--accent2); margin-right: 8px"
+                    class="fa-solid fa-shield-halved"
+                    style="color: var(--accent)"
                   ></i>
-                  Settings
-                </h4>
-                <p>App preferences</p>
+                </div>
+                <div class="quick-link-info">
+                  <h4>Parental Controls</h4>
+                  <p>{{ parentalEnabled ? "Enabled" : "Disabled" }}</p>
+                </div>
+                <i
+                  class="fa-solid fa-chevron-right"
+                  style="color: var(--text-muted)"
+                ></i>
               </div>
-              <i
-                class="fa-solid fa-chevron-right"
-                style="color: var(--text-muted)"
-              ></i>
+              <div class="quick-link" (click)="onNavigate('help')">
+                <div
+                  class="quick-link-icon"
+                  style="background: rgba(255, 159, 10, 0.1)"
+                >
+                  <i
+                    class="fa-solid fa-circle-question"
+                    style="color: #ff9f0a"
+                  ></i>
+                </div>
+                <div class="quick-link-info">
+                  <h4>Help & Support</h4>
+                  <p>Get help anytime</p>
+                </div>
+                <i
+                  class="fa-solid fa-chevron-right"
+                  style="color: var(--text-muted)"
+                ></i>
+              </div>
             </div>
           </div>
 
+          <!-- Sign Out -->
           <button
             class="btn btn-secondary"
-            style="margin-top: 8px"
+            style="width: 100%; margin-top: 8px; color: var(--accent)"
             (click)="authService.logout()"
           >
             <i class="fa-solid fa-right-from-bracket"></i> Sign Out
           </button>
         </div>
       }
-
       <!-- ══════════════ SUBSCRIPTION ══════════════ -->
       @if (activeSection === "subscription") {
         <div class="plans-container">

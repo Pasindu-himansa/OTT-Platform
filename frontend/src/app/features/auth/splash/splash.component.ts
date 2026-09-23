@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { TokenService } from '../../../core/services/token.service';
 
 @Component({
   selector: 'app-splash',
@@ -19,7 +20,6 @@ import { Router } from '@angular/router';
       :host {
         display: block;
       }
-
       .splash {
         min-height: 100vh;
         width: 100%;
@@ -35,7 +35,6 @@ import { Router } from '@angular/router';
         position: relative;
         overflow: hidden;
       }
-
       .splash::before {
         content: '';
         position: absolute;
@@ -49,7 +48,6 @@ import { Router } from '@angular/router';
         );
         animation: splashPulse 3s ease-in-out infinite;
       }
-
       @keyframes splashPulse {
         0%,
         100% {
@@ -61,14 +59,12 @@ import { Router } from '@angular/router';
           opacity: 0.7;
         }
       }
-
       .splash-logo {
         position: relative;
         z-index: 2;
         text-align: center;
         animation: splashFadeIn 1.5s ease;
       }
-
       .logo-icon {
         font-size: 80px;
         background: linear-gradient(135deg, #ff2d55, #5856d6);
@@ -76,7 +72,6 @@ import { Router } from '@angular/router';
         -webkit-text-fill-color: transparent;
         margin-bottom: 16px;
       }
-
       .splash-logo h1 {
         font-family: 'Outfit', sans-serif;
         font-size: 48px;
@@ -86,7 +81,6 @@ import { Router } from '@angular/router';
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
-
       .splash-logo p {
         color: #8888a8;
         font-size: 13px;
@@ -94,7 +88,6 @@ import { Router } from '@angular/router';
         letter-spacing: 4px;
         text-transform: uppercase;
       }
-
       .splash-loader {
         margin-top: 40px;
         width: 200px;
@@ -105,7 +98,6 @@ import { Router } from '@angular/router';
         position: relative;
         z-index: 2;
       }
-
       .splash-loader::after {
         content: '';
         position: absolute;
@@ -117,13 +109,11 @@ import { Router } from '@angular/router';
         border-radius: 2px;
         animation: loader 2.5s ease forwards;
       }
-
       @keyframes loader {
         to {
           width: 100%;
         }
       }
-
       @keyframes splashFadeIn {
         from {
           opacity: 0;
@@ -138,11 +128,16 @@ import { Router } from '@angular/router';
   ],
 })
 export class SplashComponent implements OnInit {
-  constructor(private router: Router) {}
+  private router = inject(Router);
+  private tokenService = inject(TokenService);
 
   ngOnInit(): void {
     setTimeout(() => {
-      this.router.navigate(['/auth/onboarding']);
-    }, 3000);
+      if (this.tokenService.isLoggedIn()) {
+        this.router.navigate(['/home']);
+      } else {
+        this.router.navigate(['/auth/onboarding']);
+      }
+    }, 2500);
   }
 }

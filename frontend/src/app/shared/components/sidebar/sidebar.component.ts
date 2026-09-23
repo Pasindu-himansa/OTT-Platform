@@ -14,6 +14,7 @@ export class SidebarComponent {
   @Input() activeSection = 'home';
   @Output() closed = new EventEmitter<void>();
   @Output() navigate = new EventEmitter<string>();
+  @Input() profilePicUrl = '';
 
   constructor(
     public authService: AuthService,

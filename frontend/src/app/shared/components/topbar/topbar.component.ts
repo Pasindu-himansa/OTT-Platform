@@ -23,6 +23,7 @@ export class TopbarComponent {
   @Output() menuToggled = new EventEmitter<void>();
   @Output() sectionChanged = new EventEmitter<string>();
   @Output() backClicked = new EventEmitter<void>();
+  @Input() profilePicUrl = '';
   searchQuery = '';
 
   onSearch(): void {

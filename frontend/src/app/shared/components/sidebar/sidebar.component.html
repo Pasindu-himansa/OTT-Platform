@@ -167,9 +167,23 @@
   </div>
 
   <div class="sidebar-user">
-    <div class="avatar">
-      {{ authService.currentUser?.name?.charAt(0) | uppercase }}
-    </div>
+    @if (profilePicUrl) {
+      <img
+        [src]="profilePicUrl"
+        style="
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid var(--accent);
+          flex-shrink: 0;
+        "
+      />
+    } @else {
+      <div class="avatar">
+        {{ authService.currentUser?.name?.charAt(0) || "U" }}
+      </div>
+    }
     <div class="info">
       <div class="name">{{ authService.currentUser?.name }}</div>
       <div class="plan"><i class="fa-solid fa-crown"></i> Premium</div>

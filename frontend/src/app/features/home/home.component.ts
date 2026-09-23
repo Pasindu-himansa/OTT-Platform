@@ -600,6 +600,19 @@ export class HomeComponent implements OnInit, OnDestroy {
   passwordSuccess = '';
   passwordError = '';
 
+  // OTP Password Reset
+  otpResetStep = 0; // 0=hidden, 1=send otp, 2=verify otp
+  otpResetLoading = false;
+  otpResetError = '';
+  otpResetSuccess = '';
+  otpResetCode = ['', '', '', '', '', ''];
+  otpNewPassword = '';
+  otpConfirmPassword = '';
+
+  // Profile Picture
+  profilePicUrl = '';
+  profilePicLoading = false;
+
   // Subscription
   plans: any[] = [];
   mySubscription: any = null;
@@ -920,9 +933,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loadMySubscription();
     this.loadDownloads();
     this.loadParentalControls();
-    // Add this line:
+    this.loadProfile(); // add this
     const saved = localStorage.getItem('ott_recent_searches');
     this.recentSearches = saved ? JSON.parse(saved) : [];
+    this.profilePicUrl = localStorage.getItem('ott_profile_pic') || '';
   }
 
   buildMockData(): void {
@@ -1152,6 +1166,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (section === 'continue-watching') this.loadContinueWatching();
     if (section === 'epg') this.epgCurrentHour = new Date().getHours();
     this.cdr.detectChanges();
+    this.profilePicUrl = localStorage.getItem('ott_profile_pic') || '';
   }
 
   goBack(): void {
@@ -1951,6 +1966,115 @@ export class HomeComponent implements OnInit, OnDestroy {
       },
       error: () => {},
     });
+    // Load profile pic from localStorage
+    this.profilePicUrl = localStorage.getItem('ott_profile_pic') || '';
+    this.cdr.detectChanges();
+  }
+  // ─── OTP Password Reset ──────────────────────────────────────
+  sendPasswordOtp(): void {
+    this.otpResetLoading = true;
+    this.otpResetError = '';
+    fetch(`${environment.apiUrl}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: this.profile?.email }),
+    })
+      .then((r) => r.json())
+      .then(() => {
+        this.otpResetStep = 2;
+        this.otpResetLoading = false;
+        this.cdr.detectChanges();
+      })
+      .catch(() => {
+        this.otpResetLoading = false;
+      });
+  }
+
+  verifyPasswordOtp(): void {
+    const otp = this.otpResetCode.join('');
+    if (otp.length !== 6) {
+      this.otpResetError = 'Enter complete OTP';
+      return;
+    }
+    if (this.otpNewPassword !== this.otpConfirmPassword) {
+      this.otpResetError = 'Passwords do not match';
+      return;
+    }
+    if (this.otpNewPassword.length < 8) {
+      this.otpResetError = 'Password must be at least 8 characters';
+      return;
+    }
+
+    this.otpResetLoading = true;
+    this.otpResetError = '';
+
+    fetch(`${environment.apiUrl}/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: this.profile?.email,
+        otp: otp,
+        newPassword: this.otpNewPassword,
+      }),
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success) {
+          this.otpResetSuccess = 'Password changed successfully!';
+          this.otpResetStep = 0;
+          this.otpResetLoading = false;
+          this.otpResetCode = ['', '', '', '', '', ''];
+          this.otpNewPassword = '';
+          this.otpConfirmPassword = '';
+          this.cdr.detectChanges();
+        } else {
+          this.otpResetError = res.message || 'Invalid OTP';
+          this.otpResetLoading = false;
+        }
+      })
+      .catch(() => {
+        this.otpResetLoading = false;
+      });
+  }
+
+  onOtpResetInput(event: Event, index: number): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value && index < 5) {
+      document.getElementById('otp-reset-' + (index + 1))?.focus();
+    }
+  }
+
+  onOtpResetKeydown(event: KeyboardEvent, index: number): void {
+    if (event.key === 'Backspace' && !this.otpResetCode[index] && index > 0) {
+      document.getElementById('otp-reset-' + (index - 1))?.focus();
+    }
+  }
+
+  // ─── Profile Picture ─────────────────────────────────────────
+  uploadProfilePic(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    this.profilePicLoading = true;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'streamvault_profiles');
+    formData.append('cloud_name', 'hef69sid');
+
+    fetch('https://api.cloudinary.com/v1_1/hef69sid/image/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        this.profilePicUrl = res.secure_url;
+        this.profilePicLoading = false;
+        localStorage.setItem('ott_profile_pic', res.secure_url);
+        this.cdr.detectChanges();
+      })
+      .catch(() => {
+        this.profilePicLoading = false;
+      });
   }
 
   ngOnDestroy(): void {
