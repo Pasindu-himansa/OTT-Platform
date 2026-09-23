@@ -1480,3 +1480,15 @@ app-topbar .topbar {
     flex-shrink: 0;
   }
 }
+
+app-sidebar nav.sidebar {
+  z-index: 1000 !important;
+}
+
+app-bottom-nav .bottom-nav {
+  z-index: 998 !important;
+}
+
+.overlay.show {
+  z-index: 999 !important;
+}

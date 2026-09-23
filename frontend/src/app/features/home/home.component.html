@@ -198,8 +198,10 @@
     <app-topbar
       [activeSection]="activeSection"
       [unreadCount]="unreadCount"
+      [canGoBack]="canGoBack()"
       (menuToggled)="toggleSidebar()"
       (sectionChanged)="onNavigate($event)"
+      (backClicked)="goBack()"
     />
 
     <div class="content-body">
@@ -1865,7 +1867,7 @@
       @if (activeSection === "subscription") {
         <div class="plans-container">
           <h2>Choose Your Plan</h2>
-          <p class="plans-subtitle">Unlock the full OTT TV experience</p>
+          <p class="plans-subtitle">Unlock the full StreamVault experience</p>
 
           @if (subscriptionSuccess) {
             <div

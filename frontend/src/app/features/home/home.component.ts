@@ -28,6 +28,7 @@ import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-na
 export class HomeComponent implements OnInit, OnDestroy {
   sidebarOpen = false;
   activeSection = 'home';
+  sectionHistory: string[] = [];
   showEpg = false;
 
   heroIndex = 0;
@@ -1129,6 +1130,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   onNavigate(section: string): void {
+    // Save current section to history before navigating
+    if (this.activeSection !== section) {
+      this.sectionHistory.push(this.activeSection);
+      if (this.sectionHistory.length > 10) this.sectionHistory.shift();
+    }
+
     this.activeSection = section;
     this.showEpg = section === 'epg';
     this.sidebarOpen = false;
@@ -1141,27 +1148,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (section === 'watch-history') this.loadWatchHistory();
     if (section === 'mylist') this.loadFavorites();
     if (section === 'notifications') this.loadNotifications();
+    if (section === 'payment-methods') this.loadPaymentMethods();
+    if (section === 'continue-watching') this.loadContinueWatching();
     if (section === 'epg') this.epgCurrentHour = new Date().getHours();
     this.cdr.detectChanges();
-    if (section === 'payment-methods') this.loadPaymentMethods();
-    if (section === 'parental-controls') this.loadParentalControls();
-    if (section === 'continue-watching') this.loadContinueWatching();
   }
 
-  toggleSetting(event: Event): void {
-    const el = event.target as HTMLElement;
-    el.classList.toggle('on');
+  goBack(): void {
+    if (this.sectionHistory.length > 0) {
+      const prev = this.sectionHistory.pop()!;
+      this.activeSection = prev;
+      this.showEpg = prev === 'epg';
+      this.cdr.detectChanges();
+    }
   }
 
-  // ─── Profile ─────────────────────────────────────────────
-  loadProfile(): void {
-    this.subscriptionService.getProfile().subscribe({
-      next: (res) => {
-        this.profile = res.data.user;
-        this.profileName = res.data.user.name;
-      },
-      error: () => {},
-    });
+  canGoBack(): boolean {
+    return this.sectionHistory.length > 0;
   }
 
   saveProfile(): void {
@@ -1933,6 +1936,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   toggleWallet(wallet: any): void {
     wallet.connected = !wallet.connected;
     this.cdr.detectChanges();
+  }
+
+  toggleSetting(event: Event): void {
+    const el = event.target as HTMLElement;
+    el.classList.toggle('on');
+  }
+
+  loadProfile(): void {
+    this.subscriptionService.getProfile().subscribe({
+      next: (res) => {
+        this.profile = res.data.user;
+        this.profileName = res.data.user.name;
+      },
+      error: () => {},
+    });
   }
 
   ngOnDestroy(): void {

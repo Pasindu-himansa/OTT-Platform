@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { TokenService } from '../../../core/services/token.service';
 
 @Component({
   selector: 'app-splash',
@@ -9,20 +8,25 @@ import { TokenService } from '../../../core/services/token.service';
     <div class="splash">
       <div class="splash-logo">
         <div class="logo-icon"><i class="fa-solid fa-play"></i></div>
-        <h1>OTT TV</h1>
-        <p>Entertainment Unlimited</p>
+        <h1>StreamVault</h1>
+        <p>Premium IPTV Experience</p>
       </div>
       <div class="splash-loader"></div>
     </div>
   `,
   styles: [
     `
+      :host {
+        display: block;
+      }
+
       .splash {
         min-height: 100vh;
+        width: 100%;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
         background: radial-gradient(
           ellipse at 50% 40%,
           #1a0a2e 0%,
@@ -30,8 +34,8 @@ import { TokenService } from '../../../core/services/token.service';
         );
         position: relative;
         overflow: hidden;
-        gap: 40px;
       }
+
       .splash::before {
         content: '';
         position: absolute;
@@ -45,55 +49,7 @@ import { TokenService } from '../../../core/services/token.service';
         );
         animation: splashPulse 3s ease-in-out infinite;
       }
-      .splash-logo {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-        animation: splashFadeIn 1.5s ease;
-      }
-      .logo-icon {
-        font-size: 80px;
-        background: linear-gradient(135deg, #ff2d55, #5856d6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 16px;
-      }
-      h1 {
-        font-family: 'Outfit', sans-serif;
-        font-size: 48px;
-        font-weight: 800;
-        letter-spacing: -2px;
-        background: linear-gradient(135deg, #fff, #8888a8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-      p {
-        color: #8888a8;
-        font-size: 16px;
-        margin-top: 8px;
-        letter-spacing: 4px;
-        text-transform: uppercase;
-      }
-      .splash-loader {
-        width: 200px;
-        height: 3px;
-        background: #111125;
-        border-radius: 2px;
-        overflow: hidden;
-        position: relative;
-        z-index: 2;
-      }
-      .splash-loader::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 0;
-        background: linear-gradient(90deg, #ff2d55, #5856d6);
-        border-radius: 2px;
-        animation: loader 2.8s ease forwards;
-      }
+
       @keyframes splashPulse {
         0%,
         100% {
@@ -105,11 +61,69 @@ import { TokenService } from '../../../core/services/token.service';
           opacity: 0.7;
         }
       }
+
+      .splash-logo {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        animation: splashFadeIn 1.5s ease;
+      }
+
+      .logo-icon {
+        font-size: 80px;
+        background: linear-gradient(135deg, #ff2d55, #5856d6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 16px;
+      }
+
+      .splash-logo h1 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 48px;
+        font-weight: 800;
+        letter-spacing: -2px;
+        background: linear-gradient(135deg, #fff, #8888a8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .splash-logo p {
+        color: #8888a8;
+        font-size: 13px;
+        margin-top: 8px;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+      }
+
+      .splash-loader {
+        margin-top: 40px;
+        width: 200px;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+        z-index: 2;
+      }
+
+      .splash-loader::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #ff2d55, #5856d6);
+        border-radius: 2px;
+        animation: loader 2.5s ease forwards;
+      }
+
       @keyframes loader {
         to {
           width: 100%;
         }
       }
+
       @keyframes splashFadeIn {
         from {
           opacity: 0;
@@ -124,18 +138,11 @@ import { TokenService } from '../../../core/services/token.service';
   ],
 })
 export class SplashComponent implements OnInit {
-  constructor(
-    private router: Router,
-    private token: TokenService,
-  ) {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     setTimeout(() => {
-      if (this.token.isLoggedIn()) {
-        this.router.navigate(['/home']);
-      } else {
-        this.router.navigate(['/auth/onboarding']);
-      }
+      this.router.navigate(['/auth/onboarding']);
     }, 3000);
   }
 }

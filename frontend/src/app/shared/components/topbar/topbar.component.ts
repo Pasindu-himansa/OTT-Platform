@@ -19,8 +19,10 @@ import { FormsModule } from '@angular/forms';
 export class TopbarComponent {
   @Input() activeSection = 'home';
   @Input() unreadCount = 0;
+  @Input() canGoBack = false;
   @Output() menuToggled = new EventEmitter<void>();
   @Output() sectionChanged = new EventEmitter<string>();
+  @Output() backClicked = new EventEmitter<void>();
   searchQuery = '';
 
   onSearch(): void {

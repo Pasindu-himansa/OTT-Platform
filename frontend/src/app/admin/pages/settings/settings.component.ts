@@ -24,7 +24,7 @@ export class AdminSettingsComponent {
 
   // General Settings
   general = {
-    appName: 'OTT TV',
+    appName: 'StreamVault',
     appUrl: 'http://localhost',
     supportEmail: 'support@otttv.com',
     timezone: 'UTC',
@@ -34,7 +34,7 @@ export class AdminSettingsComponent {
   };
 
   email = {
-    fromName: 'OTT TV',
+    fromName: 'StreamVault',
     fromEmail: 'noreply@otttv.com',
     smtpHost: 'smtp.gmail.com',
     smtpPort: 587,

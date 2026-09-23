@@ -33,7 +33,7 @@ export class PlayerComponent implements OnInit, AfterViewInit, OnDestroy {
   duration = 0;
   buffered = 0;
   volume = 0.8;
-  title = 'OTT TV';
+  title = 'StreamVault';
   subtitle = '';
   videoId = '';
   streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';

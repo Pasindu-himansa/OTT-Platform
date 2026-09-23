@@ -1,8 +1,18 @@
 <div class="topbar">
   <div class="topbar-left">
-    <button class="menu-toggle" (click)="menuToggled.emit()">
-      <i class="fa-solid fa-bars"></i>
-    </button>
+    @if (canGoBack) {
+      <button class="topbar-btn" (click)="backClicked.emit()">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    } @else {
+      <button class="menu-toggle" (click)="menuToggled.emit()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    }
+    <div class="topbar-logo">
+      <i class="fa-solid fa-play" style="color: var(--accent)"></i>
+      <span>StreamVault</span>
+    </div>
   </div>
 
   <div class="topbar-search">
@@ -19,7 +29,11 @@
     <button class="topbar-btn" (click)="sectionChanged.emit('search')">
       <i class="fa-solid fa-magnifying-glass"></i>
     </button>
-    <button class="topbar-btn" (click)="sectionChanged.emit('notifications')">
+    <button
+      class="topbar-btn"
+      style="position: relative"
+      (click)="sectionChanged.emit('notifications')"
+    >
       <i class="fa-solid fa-bell"></i>
       @if (unreadCount > 0) {
         <span class="notif-badge">{{ unreadCount }}</span>
