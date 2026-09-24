@@ -1963,12 +1963,17 @@ export class HomeComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.profile = res.data.user;
         this.profileName = res.data.user.name;
+        // Load avatar from API or localStorage
+        if (res.data.user.avatar) {
+          this.profilePicUrl = res.data.user.avatar;
+          localStorage.setItem('ott_profile_pic', res.data.user.avatar);
+        } else {
+          this.profilePicUrl = localStorage.getItem('ott_profile_pic') || '';
+        }
+        this.cdr.detectChanges();
       },
       error: () => {},
     });
-    // Load profile pic from localStorage
-    this.profilePicUrl = localStorage.getItem('ott_profile_pic') || '';
-    this.cdr.detectChanges();
   }
   // ─── OTP Password Reset ──────────────────────────────────────
   sendPasswordOtp(): void {
@@ -2059,7 +2064,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', 'streamvault_profiles');
-    formData.append('cloud_name', 'hef69sid');
 
     fetch('https://api.cloudinary.com/v1_1/hef69sid/image/upload', {
       method: 'POST',
@@ -2067,16 +2071,38 @@ export class HomeComponent implements OnInit, OnDestroy {
     })
       .then((r) => r.json())
       .then((res) => {
+        console.log('Cloudinary response:', res);
+        if (!res.secure_url) {
+          console.error('Cloudinary upload failed:', res);
+          this.profilePicLoading = false;
+          return;
+        }
+
         this.profilePicUrl = res.secure_url;
         this.profilePicLoading = false;
         localStorage.setItem('ott_profile_pic', res.secure_url);
+
+        // Save to backend
+        const token = this.tokenService.getAccessToken();
+        fetch(`${environment.apiUrl}/users/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ avatar: res.secure_url }),
+        })
+          .then((r) => r.json())
+          .then((d) => console.log('Avatar saved:', d))
+          .catch((e) => console.error('Avatar save error:', e));
+
         this.cdr.detectChanges();
       })
-      .catch(() => {
+      .catch((e) => {
+        console.error('Upload error:', e);
         this.profilePicLoading = false;
       });
   }
-
   ngOnDestroy(): void {
     clearInterval(this.heroTimer);
   }

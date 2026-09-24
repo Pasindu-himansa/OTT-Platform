@@ -1,14 +1,14 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.streamvault.app',
+  appId: 'com.otttv.app',
   appName: 'StreamVault',
   webDir: 'dist/frontend/browser/browser',
   server: {
     androidScheme: 'http',
-    url: 'http://192.168.62.34',
+    url: 'http://192.168.41.34',
     cleartext: true,
-    hostname: '192.168.62.34',
+    hostname: '192.168.41.34',
   },
   plugins: {
     SplashScreen: {
