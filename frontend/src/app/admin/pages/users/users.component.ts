@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-users',
@@ -11,7 +12,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./users.component.scss'],
 })
 export class UsersComponent implements OnInit {
-  private API = 'http://localhost/api/v1';
+  private API = environment.apiUrl;
   users: any[] = [];
   loading = true;
   searchQuery = '';

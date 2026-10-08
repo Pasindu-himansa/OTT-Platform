@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpEventType } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-content',
@@ -11,7 +12,7 @@ import { HttpClient, HttpEventType } from '@angular/common/http';
   styleUrls: ['./content.component.scss'],
 })
 export class ContentComponent implements OnInit {
-  private API = 'http://localhost/api/v1';
+  private API = environment.apiUrl;
   videos: any[] = [];
   channels: any[] = [];
   activeTab = 'videos';

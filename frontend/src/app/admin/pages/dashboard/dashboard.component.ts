@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,7 +12,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
-  private API = 'http://localhost/api/v1';
+  private API = environment.apiUrl;
 
   stats = [
     {

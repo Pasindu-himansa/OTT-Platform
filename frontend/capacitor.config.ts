@@ -6,9 +6,9 @@ const config: CapacitorConfig = {
   webDir: 'dist/frontend/browser/browser',
   server: {
     androidScheme: 'http',
-    url: 'http://192.168.41.34',
+    url: 'http://192.168.136.34',
     cleartext: true,
-    hostname: '192.168.41.34',
+    hostname: '192.168.136.34',
   },
   plugins: {
     SplashScreen: {

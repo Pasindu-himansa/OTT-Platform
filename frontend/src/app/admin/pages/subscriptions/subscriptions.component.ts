@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-subscriptions',
@@ -10,7 +11,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./subscriptions.component.scss'],
 })
 export class SubscriptionsComponent implements OnInit {
-  private API = 'http://localhost/api/v1';
+  private API = environment.apiUrl;
   subscriptions: any[] = [];
   payments: any[] = [];
   activeTab = 'subscriptions';
